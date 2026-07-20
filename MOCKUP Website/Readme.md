@@ -164,22 +164,22 @@ Instead of relying on complex third-party session management for the MVP, we eng
 *These screenshots showcase the finalized dynamic collections, detailed product pages, the optimized responsive mobile application view, and the high-fidelity database imagery.*
 
 **1. Desktop Hero & Navigation (Performance Optimized)**
-![Desktop Home](MOCKUP%20Website/images/home.png)
+![Desktop Home](images/home.png)
 
 **2. Dynamic Collections Grid (Real-Time Stock Rendering)**
-![Collections Grid](MOCKUP%20Website/images/collections.png)
+![Collections Grid](images/collections.png)
 
 **3. Product Deep-Dive (Zod-Validated Checkout Pipeline)**
-![Product Details](MOCKUP%20Website/images/product.png)
+![Product Details](images/product.png)
 
 **4. Flawless Mobile Responsiveness (Native-Like Bottom Nav)**
-![Mobile View](MOCKUP%20Website/images/home_mobile.png)
+![Mobile View](images/home_mobile.png)
 
 **5. Product Image Gallery Data Integration**
 <p align="center">
-  <img src="MOCKUP%20Website/images/1.jpeg" width="30%" />
+  <img src="images/1.jpeg" width="30%" />
   &nbsp;
-  <img src="MOCKUP%20Website/images/2.jpeg" width="30%" />
+  <img src="images/2.jpeg" width="30%" />
   &nbsp;
-  <img src="MOCKUP%20Website/images/3.jpeg" width="30%" />
+  <img src="images/3.jpeg" width="30%" />
 </p>
