@@ -156,21 +156,21 @@ graph LR
 *(Note: The following images reflect the live production build and the actual integrated dashboard.)*
 
 ### Storefront & Product Grid Operations
-![Homepage UI](../docs/screenshots/homepage.png)
+![Homepage UI](docs/screenshots/homepage.png)
 *The highly optimized, responsive storefront dynamically rendering products directly from the Supabase PostgreSQL database.*
 
-![Products View](../docs/screenshots/products.png)
+![Products View](docs/screenshots/products.png)
 *Category filtering and dynamic product routing in action. Prices and stock labels are injected in real-time.*
 
 ### Cart & Secure Checkout
-![Checkout Flow](../docs/screenshots/checkout.png)
+![Checkout Flow](docs/screenshots/checkout.png)
 *The seamless checkout interface that securely transmits customer data to the backend via Server Actions.*
 
 ### Administrative Control Portal
-![Admin Products Management](../docs/screenshots/admin_products.png)
+![Admin Products Management](docs/screenshots/admin_products.png)
 *The secure administrative portal for managing inventory. Notice the "Update Stock" inline editing functionality.*
 
-![Admin Orders Tracking](../docs/screenshots/admin_orders.png)
+![Admin Orders Tracking](docs/screenshots/admin_orders.png)
 *Centralized order tracking dashboard showing total, pending, and completed orders synced instantly from the live checkout flow.*
 
 ---
