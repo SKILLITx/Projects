@@ -1,0 +1,9 @@
+﻿student_number,marks,absent,missing,remarks
+DMU-0001,42,false,false,Good
+DMU-0002,46.5,false,false,Very good
+DMU-0003,38,false,false,Satisfactory
+DMU-0004,49,false,false,Excellent
+DMU-0005,41.5,false,false,Good
+DMU-0006,35,false,false,Needs improvement
+DMU-0007,50,false,false,Excellent
+DMU-0008,44,false,false,Very good

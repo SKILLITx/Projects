@@ -1,0 +1,12 @@
+{
+  "suite": "phase4-wave1-trigger-range-repair",
+  "success": true,
+  "affected_workflows": [
+    "01-student-intake.json",
+    "02-enrollment-lifecycle.json"
+  ],
+  "old_range": "A:P",
+  "new_range": "A1:P",
+  "prevents": "A0:P0",
+  "reimport_required": false
+}

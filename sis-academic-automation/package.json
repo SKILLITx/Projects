@@ -1,0 +1,25 @@
+{
+    "name":  "sis-academic-automation",
+    "version":  "0.1.0",
+    "private":  true,
+    "description":  "Controlled-pilot academic operations automation runtime pinned to n8n 2.4.0.",
+    "license":  "UNLICENSED",
+    "engines":  {
+                    "node":  "\u003e=20.19.0 \u003c=24.x"
+                },
+    "dependencies":  {
+                         "n8n":  "2.4.0"
+                     },
+    "scripts":  {
+                    "environment:init":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/Initialize-Environment.ps1",
+                    "environment:test":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/Test-Environment.ps1",
+                    "sis:start":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/Start-SIS-All.ps1",
+                    "sis:test":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/Test-SIS.ps1",
+                    "sis:stop":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/Stop-SIS.ps1",
+                    "test:static":  "node ./tests/static/validate-phase1.js",
+                    "sis:start:core":  "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/Start-SIS.ps1"
+                },
+    "devDependencies":  {
+                            "supabase":  "^2.109.1"
+                        }
+}

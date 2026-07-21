@@ -1,0 +1,34 @@
+{
+  "suite": "phase4-wave1-prepackage-verification",
+  "success": true,
+  "validation_runtime": "PostgreSQL-compatible in-memory runtime",
+  "migration_chain": {
+    "first": "20260717000100",
+    "last": "20260717000900",
+    "count": 9,
+    "executed_in_order": true
+  },
+  "database_checks": {
+    "hosted_verification_sql_executed": true,
+    "hosted_verification_test_count": 9,
+    "hosted_verification_failed_tests": [],
+    "student_replay_with_new_correlation": true,
+    "enrollment_replay_with_new_correlation": true,
+    "school_guardian_validation": true,
+    "duplicate_course_rejected": true,
+    "forbidden_fallback_rolled_back": true,
+    "notification_attempt_idempotency": true,
+    "duplicate_document_rejected": true
+  },
+  "workflow_checks": {
+    "workflow_exports": 3,
+    "json_valid": true,
+    "code_nodes_compile": true,
+    "expressions_compile": true,
+    "normalizer_regression_passed": true,
+    "credential_ids_embedded": false,
+    "hardcoded_supabase_urls": false,
+    "direct_private_schema_access": false,
+    "execute_command_nodes": false
+  }
+}

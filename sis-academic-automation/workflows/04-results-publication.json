@@ -1,0 +1,886 @@
+{
+  "name": "SIS 04 — Results Approval and Publication — Complete",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "staff/rpc_decide_marks_batch",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1160,
+        -360
+      ],
+      "id": "3b8b45be-5f72-4825-af8b-3f9379fa1ad3",
+      "name": "Marks Decision Webhook",
+      "webhookId": "ba205e4d-f452-4cba-b60a-6cb2249dee95",
+      "notesInFlow": true,
+      "notes": "Authenticated staff portal endpoint for approving, rejecting or returning a finalized marks batch."
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "staff/rpc_decide_mark_correction",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1160,
+        -180
+      ],
+      "id": "3a5e9bc4-47ee-41cb-b313-ccee43e3cf7e",
+      "name": "Correction Decision Webhook",
+      "webhookId": "d96c1c74-5d18-4bb8-b31a-e987f4cf6d50",
+      "notesInFlow": true,
+      "notes": "Authenticated staff portal endpoint for approving/applying or rejecting a mark-correction request."
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "staff/rpc_publish_results",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1160,
+        0
+      ],
+      "id": "ee63ca0d-8be0-42ae-8a95-fd5303941565",
+      "name": "Publish Results Webhook",
+      "webhookId": "c539e155-17a5-4029-a74d-a0857d70c7e9",
+      "notesInFlow": true,
+      "notes": "Authenticated staff portal endpoint for idempotent course-result publication."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const uuid = () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => {\n  const random = Math.floor(Math.random() * 16);\n  const value = character === 'x' ? random : ((random & 3) | 8);\n  return value.toString(16);\n});\nconst input = $json || {};\nconst body = input.body && typeof input.body === 'object'\n  ? input.body\n  : {};\nconst headers = input.headers || {};\nconst authHeader = String(\n  headers.authorization ||\n  headers.Authorization ||\n  ''\n).trim();\nconst operation = String(body.operation || '').trim();\n\nconst operationMap = {\n  'marks.batch.decision': 'rpc_decide_marks_batch',\n  'marks.batch.decide': 'rpc_decide_marks_batch',\n  'marks.correction.decision': 'rpc_decide_mark_correction',\n  'marks.correction.decide': 'rpc_decide_mark_correction',\n  'results.publish': 'rpc_publish_results',\n};\n\nlet rpcName = operationMap[operation] || '';\nconst webhookUrl = String(input.webhookUrl || '');\nif (!rpcName && webhookUrl.includes('rpc_decide_marks_batch')) {\n  rpcName = 'rpc_decide_marks_batch';\n}\nif (!rpcName && webhookUrl.includes('rpc_decide_mark_correction')) {\n  rpcName = 'rpc_decide_mark_correction';\n}\nif (!rpcName && webhookUrl.includes('rpc_publish_results')) {\n  rpcName = 'rpc_publish_results';\n}\n\nconst correlationId =\n  String(body.correlation_id || '').trim() ||\n  uuid();\n\nconst request = {\n  ...body,\n  correlation_id: correlationId,\n  source: {\n    ...(body.source && typeof body.source === 'object'\n      ? body.source\n      : {}),\n    channel: 'staff_portal_n8n_webhook',\n  },\n};\n\nreturn {\n  json: {\n    authHeader,\n    rpcName,\n    request,\n    correlationId,\n    requestReady:\n      authHeader.toLowerCase().startsWith('bearer ') &&\n      Boolean(rpcName) &&\n      body &&\n      typeof body === 'object',\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -900,
+        -180
+      ],
+      "id": "1fea044e-dcc9-4875-86ae-1fb574d7fd22",
+      "name": "Normalize Staff Results Request",
+      "notesInFlow": true,
+      "notes": "Normalizes all three staff webhook operations and accepts only an Authorization bearer token plus an allowlisted RPC name."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.requestReady}}",
+              "operation": "equal",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -660,
+        -180
+      ],
+      "id": "3801bb30-ccb8-4fde-a6de-6eabf8a29bd5",
+      "name": "Is Staff Request Structurally Valid?",
+      "notesInFlow": true,
+      "notes": "Rejects malformed requests before any Supabase user lookup or business RPC call."
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.SUPABASE_URL + '/auth/v1/user'}}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{$env.SUPABASE_ANON_KEY}}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{$('Normalize Staff Results Request').item.json.authHeader}}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -420,
+        -280
+      ],
+      "id": "52f59434-ae2f-4c92-891f-c93749e8f3e6",
+      "name": "Verify Supabase Staff Session",
+      "notesInFlow": true,
+      "notes": "Validates the incoming Supabase access token with the Auth user endpoint. The service-role credential is not used for this identity check.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source = $('Normalize Staff Results Request').item.json;\nconst raw = $json || {};\nlet body = Object.prototype.hasOwnProperty.call(raw, 'body')\n  ? raw.body\n  : raw;\n\nif (typeof body === 'string') {\n  try {\n    body = JSON.parse(body);\n  } catch {\n    body = {};\n  }\n}\n\nconst statusCode = Number(raw.statusCode ?? raw.status ?? 0);\nconst userId = String(body?.id || '').trim();\nconst email = String(body?.email || '').trim().toLowerCase();\nconst authenticated =\n  statusCode >= 200 &&\n  statusCode < 300 &&\n  Boolean(userId) &&\n  email.includes('@');\n\nif (!authenticated) {\n  return {\n    json: {\n      authVerified: false,\n      finalResponse: {\n        success: false,\n        operation: source.request?.operation || 'results.staff.request',\n        correlation_id: source.correlationId,\n        error: {\n          code: 'AUTH_SESSION_INVALID',\n          message: 'Your staff session is invalid or expired. Sign in again.',\n          retryable: false,\n        },\n      },\n    },\n  };\n}\n\nconst request = {\n  ...source.request,\n  requester: {\n    identity_verified: true,\n    verified_auth_user_id: userId,\n    verified_email: email,\n    verification_source: 'supabase_auth_user_endpoint',\n  },\n};\n\nreturn {\n  json: {\n    authVerified: true,\n    rpcName: source.rpcName,\n    request,\n    correlationId: source.correlationId,\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -180,
+        -280
+      ],
+      "id": "73735db2-92ca-4e73-b0ed-ca51c0c9eeba",
+      "name": "Build Verified Staff RPC Request",
+      "notesInFlow": true,
+      "notes": "Overwrites all browser-supplied requester fields with the user ID and email returned by Supabase Auth."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.authVerified}}",
+              "operation": "equal",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        60,
+        -280
+      ],
+      "id": "7a9149a1-62d6-40ba-999a-93577a4947e3",
+      "name": "Is Staff Identity Verified?",
+      "notesInFlow": true,
+      "notes": "Only verified Supabase sessions can reach a service-role business RPC."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/' + $json.rpcName}}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': $json.request } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 20000
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        300,
+        -360
+      ],
+      "id": "f2aa9898-0352-4f1b-90af-6b5cc90c0db2",
+      "name": "Call Results Business RPC",
+      "notesInFlow": true,
+      "notes": "Calls only the allowlisted results RPC selected by the normalized operation. Database authorization and idempotency remain authoritative.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "supabaseApi": {
+          "name": "SIS Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const raw = $json || {};\n\nif (raw.finalResponse && typeof raw.finalResponse === 'object') {\n  return { json: raw.finalResponse };\n}\n\nlet body = Object.prototype.hasOwnProperty.call(raw, 'body')\n  ? raw.body\n  : raw;\n\nif (typeof body === 'string') {\n  try {\n    body = JSON.parse(body);\n  } catch {\n    body = null;\n  }\n}\n\nif (Array.isArray(body) && body.length === 1) {\n  body = body[0];\n}\n\nif (body && typeof body === 'object' && typeof body.success === 'boolean') {\n  return { json: body };\n}\n\nconst statusCode = Number(raw.statusCode ?? raw.status ?? 0);\nreturn {\n  json: {\n    success: false,\n    operation: 'results.staff.request',\n    correlation_id:\n      $('Normalize Staff Results Request').item.json.correlationId,\n    error: {\n      code:\n        statusCode >= 500\n          ? 'SYSTEM_TEMPORARY_FAILURE'\n          : 'RESULT_WORKFLOW_RESPONSE_INVALID',\n      message: 'The results operation could not be completed.',\n      retryable: statusCode >= 500 || statusCode === 0,\n    },\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        -280
+      ],
+      "id": "506bcf55-c9d6-4c1d-b776-fab8ce43940e",
+      "name": "Build Staff Webhook Response",
+      "notesInFlow": true,
+      "notes": "Returns only the stable RPC success/failure contract and never exposes provider errors, SQL or tokens."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source = $('Normalize Staff Results Request').item.json;\nreturn {\n  json: {\n    success: false,\n    operation: source.request?.operation || 'results.staff.request',\n    correlation_id: source.correlationId,\n    error: {\n      code: 'VALIDATION_REQUEST_INVALID',\n      message: 'The staff results request is incomplete or unsupported.',\n      retryable: false,\n    },\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -420,
+        -80
+      ],
+      "id": "f303d731-6039-4fd8-99b3-41c5131ca7da",
+      "name": "Reject Invalid Staff Request",
+      "notesInFlow": true,
+      "notes": "Sanitized terminal response for malformed or unsupported staff requests."
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "={{$env.SIS_MARK_CORRECTION_RESPONSE_SHEET_ID}}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{$env.SIS_MARK_CORRECTION_QUEUE_TAB_ID}}",
+          "mode": "id"
+        },
+        "event": "rowAdded",
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "A1:P"
+            }
+          },
+          "valueRender": "UNFORMATTED_VALUE",
+          "dateTimeRenderOption": "FORMATTED_STRING"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1160,
+        360
+      ],
+      "id": "3179a7a1-b7b3-425a-a239-df62ffbd53b2",
+      "name": "Mark Correction Queue Trigger",
+      "notesInFlow": true,
+      "notes": "Polls only newly appended Automation Queue rows from the Mark Correction Request response spreadsheet.",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "name": "SIS Google Sheets Trigger OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const row = $json || {};\nconst text = (value) =>\n  value == null ? '' : String(value).trim();\nconst uuid = () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => {\n  const random = Math.floor(Math.random() * 16);\n  const value = character === 'x' ? random : ((random & 3) | 8);\n  return value.toString(16);\n});\nconst uuidPattern =\n  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;\nconst queue = {\n  formResponseId: text(row['Form Response ID']),\n  retryCount: Number(row['Retry Count'] || 0),\n};\nconst status = text(row['Processing Status']).toLowerCase();\nconst operation = text(row['Operation']);\nconst processable =\n  (status === '' || status === 'pending') &&\n  operation === 'marks.correction.request';\n\nif (!processable) {\n  return {\n    json: {\n      processable: false,\n      queue,\n      skipReason:\n        status && status !== 'pending'\n          ? 'QUEUE_ROW_NOT_PENDING'\n          : 'QUEUE_OPERATION_MISMATCH',\n    },\n  };\n}\n\nlet raw = row['Raw Response JSON'];\nif (typeof raw === 'string') {\n  try {\n    raw = JSON.parse(raw);\n  } catch {\n    raw = null;\n  }\n}\n\nconst get = (...titles) => {\n  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {\n    return '';\n  }\n  for (const title of titles) {\n    if (Object.prototype.hasOwnProperty.call(raw, title)) {\n      const value = raw[title];\n      if (Array.isArray(value)) return value.join(', ');\n      return text(value);\n    }\n  }\n  return '';\n};\n\nconst now = new Date().toISOString();\nconst correlationId = uuid();\nconst idempotencyKey =\n  text(row['Idempotency Key']) ||\n  `google-form:${text(row['Source Form ID'])}:${queue.formResponseId}`;\n\nconst fail = (code, message) => ({\n  json: {\n    processable: true,\n    requestReady: false,\n    'Form Response ID': queue.formResponseId,\n    'Processing Status': 'failed',\n    'Processed At UTC': now,\n    'Correlation ID': correlationId,\n    'Error Code': code,\n    'Error Message': message,\n    'Retry Count': queue.retryCount,\n    'Last Attempt At UTC': now,\n    'n8n Execution ID': $execution.id,\n    success: false,\n  },\n});\n\nif (!queue.formResponseId) {\n  return fail(\n    'VALIDATION_FORM_RESPONSE_ID_REQUIRED',\n    'The correction queue row has no response identifier.'\n  );\n}\nif (!raw || typeof raw !== 'object' || Array.isArray(raw)) {\n  return fail(\n    'VALIDATION_RAW_RESPONSE_JSON',\n    'The correction form response could not be read.'\n  );\n}\n\nconst institutionCode = get('Institution code').toUpperCase();\nconst campusCode = get('Campus code').toUpperCase();\nconst marksBatchId = get('Marks batch ID');\nconst studentMarkId = get('Student mark ID');\nconst studentNumber = get('Student number').toUpperCase();\nconst assessmentCode = get('Assessment code').toUpperCase();\nconst currentMarksText = get('Current marks');\nconst proposedMarksText = get('Proposed corrected marks');\nconst reason = get('Detailed reason for correction');\nconst evidenceUrl = get('Supporting evidence Drive URL (optional)');\nconst declaration = get(\n  'I confirm that this request is accurate and auditable.'\n).toLowerCase();\nconst requesterEmail = text(row['Respondent Email']).toLowerCase();\n\nif (!institutionCode || !campusCode) {\n  return fail(\n    'VALIDATION_CORRECTION_SCOPE_REQUIRED',\n    'Institution and campus codes are required.'\n  );\n}\nif (!uuidPattern.test(marksBatchId) || !uuidPattern.test(studentMarkId)) {\n  return fail(\n    'VALIDATION_CORRECTION_UUID_INVALID',\n    'Marks batch ID and student mark ID must be valid UUID values.'\n  );\n}\nif (!studentNumber || !assessmentCode) {\n  return fail(\n    'VALIDATION_CORRECTION_REFERENCE_REQUIRED',\n    'Student number and assessment code are required.'\n  );\n}\nconst currentMarks = Number(currentMarksText);\nconst proposedMarks = Number(proposedMarksText);\nif (\n  currentMarksText === '' ||\n  proposedMarksText === '' ||\n  !Number.isFinite(currentMarks) ||\n  !Number.isFinite(proposedMarks) ||\n  currentMarks < 0 ||\n  proposedMarks < 0\n) {\n  return fail(\n    'VALIDATION_CORRECTION_MARKS_INVALID',\n    'Current and proposed marks must be valid non-negative numbers.'\n  );\n}\nif (reason.length < 10) {\n  return fail(\n    'VALIDATION_CORRECTION_REASON_REQUIRED',\n    'A detailed correction reason is required.'\n  );\n}\nif (evidenceUrl && !/^https:\\/\\//i.test(evidenceUrl)) {\n  return fail(\n    'VALIDATION_EVIDENCE_URL_INVALID',\n    'The supporting evidence URL must use HTTPS.'\n  );\n}\nif (!declaration.includes('confirm')) {\n  return fail(\n    'VALIDATION_DECLARATION_REQUIRED',\n    'The correction declaration must be confirmed.'\n  );\n}\nif (!requesterEmail.includes('@')) {\n  return fail(\n    'AUTH_VERIFIED_EMAIL_REQUIRED',\n    'The form did not provide a collected respondent email.'\n  );\n}\n\nconst request = {\n  operation: 'marks.correction.request',\n  correlation_id: correlationId,\n  idempotency_key: idempotencyKey,\n  requester: {\n    email: requesterEmail,\n    type: 'google_form_collected_email',\n  },\n  submitted_at:\n    text(row['Submitted At UTC']) || now,\n  source: {\n    channel: 'google_forms',\n    source_form_id: text(row['Source Form ID']),\n    source_spreadsheet_id: text(row['Source Spreadsheet ID']),\n    source_submission_id: queue.formResponseId,\n  },\n  payload: {\n    institution_code: institutionCode,\n    campus_code: campusCode,\n    marks_batch_id: marksBatchId,\n    student_mark_id: studentMarkId,\n    student_number: studentNumber,\n    assessment_code: assessmentCode,\n    current_marks: currentMarks,\n    proposed_marks: proposedMarks,\n    reason,\n    evidence_drive_url: evidenceUrl || null,\n  },\n};\n\nreturn {\n  json: {\n    processable: true,\n    requestReady: true,\n    queue,\n    request,\n    correlationId,\n    idempotencyKey,\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -900,
+        360
+      ],
+      "id": "41045509-f715-487e-9e0f-7321784c15f6",
+      "name": "Normalize Correction Queue Row",
+      "notesInFlow": true,
+      "notes": "Normalizes the Mark Correction Request form and converts deterministic validation failures into durable queue outcomes."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.processable}}",
+              "operation": "equal",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -660,
+        360
+      ],
+      "id": "e71bde7f-e99a-4730-b03e-9cadc008a60b",
+      "name": "Is Correction Queue Row Processable?",
+      "notesInFlow": true,
+      "notes": "Processes only pending marks.correction.request rows and ignores already handled or unrelated queue rows."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.requestReady}}",
+              "operation": "equal",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        300
+      ],
+      "id": "f5e75d9c-4802-4eb4-b5d4-a622a7dfb16f",
+      "name": "Is Correction Request Ready?",
+      "notesInFlow": true,
+      "notes": "Routes valid form requests to Supabase and validation failures directly to the queue update."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': { 'operation':'workflow.run.log', 'correlation_id': $('Normalize Correction Queue Row').item.json.request.correlation_id, 'idempotency_key': $('Normalize Correction Queue Row').item.json.request.idempotency_key + ':workflow-start', 'source':{'channel':'n8n'}, 'payload':{ 'workflow_code':'04-results-publication', 'n8n_execution_id':$execution.id, 'operation':'marks.correction.request', 'run_status':'started', 'input_summary':{'form_response_id':$('Normalize Correction Queue Row').item.json.queue.formResponseId,'marks_batch_id':$('Normalize Correction Queue Row').item.json.request.payload.marks_batch_id,'student_mark_id':$('Normalize Correction Queue Row').item.json.request.payload.student_mark_id} } } } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 20000
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -180,
+        220
+      ],
+      "id": "fa34f90f-f263-44b6-9b5d-3f3f33f04b77",
+      "name": "Log Correction Workflow Start",
+      "notesInFlow": true,
+      "notes": "Best-effort start evidence. A logging outage cannot block the correction request.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "supabaseApi": {
+          "name": "SIS Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_request_mark_correction_from_form'}}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': $('Normalize Correction Queue Row').item.json.request } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 20000
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        60,
+        220
+      ],
+      "id": "7d79bf12-5341-4619-9a87-0dbca35d6b80",
+      "name": "Submit Correction Request RPC",
+      "notesInFlow": true,
+      "notes": "Calls the service-role-only form wrapper, which resolves codes, verifies teacher/admin scope and validates the referenced mark.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "supabaseApi": {
+          "name": "SIS Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source = $('Normalize Correction Queue Row').item.json;\nconst raw = $json || {};\nlet body = Object.prototype.hasOwnProperty.call(raw, 'body')\n  ? raw.body\n  : raw;\n\nif (typeof body === 'string') {\n  try {\n    body = JSON.parse(body);\n  } catch {\n    body = { message: body };\n  }\n}\nif (Array.isArray(body) && body.length === 1) {\n  body = body[0];\n}\n\nconst statusValue = raw.statusCode ?? raw.status ?? null;\nconst statusCode =\n  statusValue == null\n    ? (raw.error ? 0 : 200)\n    : Number(statusValue);\nconst bodyError =\n  body && typeof body === 'object'\n    ? (\n        body.error && typeof body.error === 'object'\n          ? body.error\n          : body\n      )\n    : {};\nconst success =\n  statusCode >= 200 &&\n  statusCode < 300 &&\n  body &&\n  typeof body === 'object' &&\n  body.success === true;\nconst retryable = bodyError.retryable === true;\nconst now = new Date().toISOString();\n\nreturn {\n  json: {\n    'Form Response ID': source.queue.formResponseId,\n    'Processing Status': success ? 'completed' : 'failed',\n    'Processed At UTC': now,\n    'Correlation ID':\n      body?.correlation_id || source.request.correlation_id,\n    'Error Code': success\n      ? ''\n      : String(\n          bodyError.code ||\n          bodyError.error_code ||\n          (statusCode > 0\n            ? `HTTP_${statusCode}`\n            : 'NETWORK_FAILURE')\n        ).slice(0, 100),\n    'Error Message': success\n      ? ''\n      : String(\n          bodyError.message ||\n          bodyError.error_message ||\n          'The mark correction request could not be completed.'\n        ).slice(0, 300),\n    'Retry Count':\n      source.queue.retryCount +\n      (!success && retryable ? 1 : 0),\n    'Last Attempt At UTC': now,\n    'n8n Execution ID': $execution.id,\n    correctionRequestId:\n      body?.data?.correction_request_id || '',\n    rpcResult: body,\n    success,\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        220
+      ],
+      "id": "f36f3ba4-ae30-4cb0-8723-ee6d122bed10",
+      "name": "Build Correction Queue Outcome",
+      "notesInFlow": true,
+      "notes": "Converts the RPC result into sanitized queue fields and increments retries only for explicitly retryable failures."
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "sheet",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{$env.SIS_MARK_CORRECTION_RESPONSE_SHEET_ID}}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{$env.SIS_MARK_CORRECTION_QUEUE_TAB_ID}}",
+          "mode": "id"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "Form Response ID",
+        "valueToMatchOn": "={{$json[\"Form Response ID\"]}}",
+        "fieldsUi": {
+          "values": [
+            {
+              "column": "Processing Status",
+              "fieldValue": "={{$json[\"Processing Status\"]}}"
+            },
+            {
+              "column": "Processed At UTC",
+              "fieldValue": "={{$json[\"Processed At UTC\"]}}"
+            },
+            {
+              "column": "Correlation ID",
+              "fieldValue": "={{$json[\"Correlation ID\"]}}"
+            },
+            {
+              "column": "Error Code",
+              "fieldValue": "={{$json[\"Error Code\"]}}"
+            },
+            {
+              "column": "Error Message",
+              "fieldValue": "={{$json[\"Error Message\"]}}"
+            },
+            {
+              "column": "Retry Count",
+              "fieldValue": "={{$json[\"Retry Count\"]}}"
+            },
+            {
+              "column": "Last Attempt At UTC",
+              "fieldValue": "={{$json[\"Last Attempt At UTC\"]}}"
+            },
+            {
+              "column": "n8n Execution ID",
+              "fieldValue": "={{$json[\"n8n Execution ID\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        540,
+        300
+      ],
+      "id": "fafdd723-2dc4-40af-907b-f750f2764721",
+      "name": "Update Correction Automation Queue",
+      "notesInFlow": true,
+      "notes": "Updates exactly one Automation Queue row by immutable Form Response ID.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "name": "SIS Google Sheets OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': { 'operation':'workflow.run.log', 'correlation_id': $json['Correlation ID'], 'idempotency_key': $('Normalize Correction Queue Row').item.json.request.idempotency_key + ':workflow-complete', 'source':{'channel':'n8n'}, 'payload':{ 'workflow_code':'04-results-publication', 'n8n_execution_id':$execution.id, 'operation':'marks.correction.request', 'run_status':$json.success ? 'completed' : 'failed', 'output_summary':{'processing_status':$json['Processing Status'],'correction_request_id':$json.correctionRequestId || null}, 'error_code':$json['Error Code'] || null, 'error_message':$json['Error Message'] || null } } } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 20000
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        780,
+        300
+      ],
+      "id": "09866ce0-5abd-4d83-baee-1694203677d4",
+      "name": "Log Correction Workflow Completion",
+      "notesInFlow": true,
+      "notes": "Best-effort completion evidence. Queue durability remains authoritative if operational logging is unavailable.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "supabaseApi": {
+          "name": "SIS Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        480
+      ],
+      "id": "2c0ee742-430e-4d92-8b60-8c909a457799",
+      "name": "Skip Non-Pending Correction Queue Row",
+      "notesInFlow": true,
+      "notes": "Terminal node for already processed or unrelated queue rows."
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Marks Decision Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Staff Results Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Correction Decision Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Staff Results Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Results Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Staff Results Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Staff Results Request": {
+      "main": [
+        [
+          {
+            "node": "Is Staff Request Structurally Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Staff Request Structurally Valid?": {
+      "main": [
+        [
+          {
+            "node": "Verify Supabase Staff Session",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Invalid Staff Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Supabase Staff Session": {
+      "main": [
+        [
+          {
+            "node": "Build Verified Staff RPC Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Verified Staff RPC Request": {
+      "main": [
+        [
+          {
+            "node": "Is Staff Identity Verified?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Staff Identity Verified?": {
+      "main": [
+        [
+          {
+            "node": "Call Results Business RPC",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Staff Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Results Business RPC": {
+      "main": [
+        [
+          {
+            "node": "Build Staff Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Correction Queue Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalize Correction Queue Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Correction Queue Row": {
+      "main": [
+        [
+          {
+            "node": "Is Correction Queue Row Processable?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Correction Queue Row Processable?": {
+      "main": [
+        [
+          {
+            "node": "Is Correction Request Ready?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip Non-Pending Correction Queue Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Correction Request Ready?": {
+      "main": [
+        [
+          {
+            "node": "Log Correction Workflow Start",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Correction Automation Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Correction Workflow Start": {
+      "main": [
+        [
+          {
+            "node": "Submit Correction Request RPC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit Correction Request RPC": {
+      "main": [
+        [
+          {
+            "node": "Build Correction Queue Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Correction Queue Outcome": {
+      "main": [
+        [
+          {
+            "node": "Update Correction Automation Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Correction Automation Queue": {
+      "main": [
+        [
+          {
+            "node": "Log Correction Workflow Completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  },
+  "tags": []
+}

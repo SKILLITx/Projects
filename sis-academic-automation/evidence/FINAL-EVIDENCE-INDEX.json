@@ -1,0 +1,214 @@
+﻿{
+    "generated_at_utc":  "2026-07-21T22:08:41.5701485Z",
+    "classification":  "controlled_institutional_pilot",
+    "completed_workflows":  [
+                                "01",
+                                "02",
+                                "03",
+                                "04",
+                                "05",
+                                "07",
+                                "08",
+                                "09"
+                            ],
+    "deferred_workflows":  [
+                               "06",
+                               "10"
+                           ],
+    "evidence_count":  32,
+    "evidence":  [
+                     {
+                         "file":  ".gitkeep",
+                         "size_bytes":  0,
+                         "modified_utc":  "2026-07-16T12:07:16.0000000Z",
+                         "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                     },
+                     {
+                         "file":  "phase-0-manifest.json",
+                         "size_bytes":  3561,
+                         "modified_utc":  "2026-07-16T11:50:10.0000000Z",
+                         "sha256":  "7B4F34CC304D818EFB01E2DCEEB7D8BB1D79243995B2930571C78FC4E6E507A9"
+                     },
+                     {
+                         "file":  "phase-1-manifest.json",
+                         "size_bytes":  10168,
+                         "modified_utc":  "2026-07-16T12:51:04.0000000Z",
+                         "sha256":  "0CD049D74449DBAD16827BEF83DCD71FDFB25E5B2EE89E5D8773C3CA408B375A"
+                     },
+                     {
+                         "file":  "phase-1-runtime-verification.md",
+                         "size_bytes":  1041,
+                         "modified_utc":  "2026-07-16T13:00:02.0000000Z",
+                         "sha256":  "6DB8097056E2E3251272ED8A905A9C5DE7D564FA27C18D5E54A6ABB44B21D454"
+                     },
+                     {
+                         "file":  "phase-1-static-regression.txt",
+                         "size_bytes":  559,
+                         "modified_utc":  "2026-07-16T12:51:04.0000000Z",
+                         "sha256":  "1BF33001EEE9201BB0CD0F4E4C62F13B86076149B569FDAE500D3F99042C8925"
+                     },
+                     {
+                         "file":  "phase-1-static-test.txt",
+                         "size_bytes":  34,
+                         "modified_utc":  "2026-07-16T12:09:12.0000000Z",
+                         "sha256":  "C055165C055CF357EE2C72E5B360333531284ACC652ECEBF8BB99FE58D9E7FC0"
+                     },
+                     {
+                         "file":  "phase-2-accelerated-package-validation.md",
+                         "size_bytes":  2109,
+                         "modified_utc":  "2026-07-16T16:44:04.0000000Z",
+                         "sha256":  "D2E6DD31C5E9174B97F1A93686CB3391470AB654DDB8040D2E5B44F4515EC753"
+                     },
+                     {
+                         "file":  "phase-2-hosted-verification.json",
+                         "size_bytes":  349,
+                         "modified_utc":  "2026-07-16T17:17:36.0000000Z",
+                         "sha256":  "6876FBF2B1C148E6E4E9C5F8C645104469C761984DD78B8C386AD55AF1669177"
+                     },
+                     {
+                         "file":  "phase-2-hosted-verification.md",
+                         "size_bytes":  719,
+                         "modified_utc":  "2026-07-16T17:17:36.0000000Z",
+                         "sha256":  "CFA30861D5B6DCF8F8852810931CA6BCD3A3B0CB08E8F3234ED823ACB1A60D46"
+                     },
+                     {
+                         "file":  "phase-2-pgcrypto-repair-validation.md",
+                         "size_bytes":  732,
+                         "modified_utc":  "2026-07-16T17:00:36.0000000Z",
+                         "sha256":  "A09447CAE9DE39693F934BD32909E9FC70C5EA9FB9AAF656135174C4B33431FE"
+                     },
+                     {
+                         "file":  "phase-2-tranche-1-state.md",
+                         "size_bytes":  625,
+                         "modified_utc":  "2026-07-16T15:27:26.0000000Z",
+                         "sha256":  "AAAF234A87078FBF554900DE59EAA54CE18F67716620803FCB647FED7AC56660"
+                     },
+                     {
+                         "file":  "phase-3-authorization-verification.json",
+                         "size_bytes":  286,
+                         "modified_utc":  "2026-07-16T17:51:14.0000000Z",
+                         "sha256":  "1A888766A76F602A36AB518781ACF7E118ACBB5E5A2F74C676BDB69C423C7ADD"
+                     },
+                     {
+                         "file":  "phase-3-completion.md",
+                         "size_bytes":  1303,
+                         "modified_utc":  "2026-07-16T17:51:14.0000000Z",
+                         "sha256":  "D55F6B9C0DB6B9D13EBDBFA12AC2E5011F5AAFAC76EFACB704D59055078096D2"
+                     },
+                     {
+                         "file":  "phase-3-google-workspace-verification.json",
+                         "size_bytes":  259,
+                         "modified_utc":  "2026-07-16T17:51:14.0000000Z",
+                         "sha256":  "B54C1237F1CEC973A95F57826F2EFCF289053E55D857B58AE5847A3B2E7693A6"
+                     },
+                     {
+                         "file":  "phase-3-package-static-validation.md",
+                         "size_bytes":  739,
+                         "modified_utc":  "2026-07-16T17:18:46.0000000Z",
+                         "sha256":  "5F8B6A1DC732B7A1A1FB3827F276AF79573190E2ACD5B253BC828C9AD6589FB5"
+                     },
+                     {
+                         "file":  "phase-3-placeholder-secret-scan-repair.md",
+                         "size_bytes":  469,
+                         "modified_utc":  "2026-07-16T17:25:22.0000000Z",
+                         "sha256":  "F6C377D9E3917C7B9E0ECBCA308E4C111A688B8F4A431256BA740EF3B0299FAD"
+                     },
+                     {
+                         "file":  "phase-3-regression-fixture-repair.md",
+                         "size_bytes":  365,
+                         "modified_utc":  "2026-07-16T17:27:26.0000000Z",
+                         "sha256":  "53689356C9BC9E3FE3060B2BBA29992F83CE9A90061282E92B555060E0BCD901"
+                     },
+                     {
+                         "file":  "phase-3-repair-state.md",
+                         "size_bytes":  515,
+                         "modified_utc":  "2026-07-16T17:22:02.0000000Z",
+                         "sha256":  "D9E2D6FEDCD69B7FC5791323083860885D8F5F8754560D6C126ECEB9295D34FA"
+                     },
+                     {
+                         "file":  "phase-3-secret-scan-repair.md",
+                         "size_bytes":  346,
+                         "modified_utc":  "2026-07-16T17:22:02.0000000Z",
+                         "sha256":  "E6F2C94FFDEFCF1819072151C2B715A0C19A2EA90BD34224B5759C184F01726E"
+                     },
+                     {
+                         "file":  "phase-4-wave1-code-contract-repair.json",
+                         "size_bytes":  314,
+                         "modified_utc":  "2026-07-17T10:56:36.0000000Z",
+                         "sha256":  "7E5C7CDEF34750FE3BC2643AE09CFE696B6DF1D669BE67D5FA2FDD43C8288EEB"
+                     },
+                     {
+                         "file":  "phase-4-wave1-construction-validation.md",
+                         "size_bytes":  1729,
+                         "modified_utc":  "2026-07-16T18:37:40.0000000Z",
+                         "sha256":  "6B35B260F122878F331C93FF330F8A9E11A9839D0BC1A3ED98D7D0C412794C77"
+                     },
+                     {
+                         "file":  "phase-4-wave1-prepackage-verification.json",
+                         "size_bytes":  1084,
+                         "modified_utc":  "2026-07-16T18:37:54.0000000Z",
+                         "sha256":  "B0EE3232C583C289E82CD565BFB5FAE3A37138D8AB7439909AB2AB588D1F3DFE"
+                     },
+                     {
+                         "file":  "phase-4-wave1-trigger-range-repair.json",
+                         "size_bytes":  264,
+                         "modified_utc":  "2026-07-17T10:38:24.0000000Z",
+                         "sha256":  "3B33E8D9AFFB4398A4872602F17749FDB4DD12A68A4AD5B7722BDB490D3FC1AB"
+                     },
+                     {
+                         "file":  "restore-verification-20260721T214514695Z.json",
+                         "size_bytes":  429,
+                         "modified_utc":  "2026-07-21T21:45:46.4586890Z",
+                         "sha256":  "056524BBFA1E2134C90D4A19AC85BC8C2E0D80C705467EC95C24C24F1B7F72A9"
+                     },
+                     {
+                         "file":  "workflow07-negative-2026-07-21T00-14-40-318Z.json",
+                         "size_bytes":  3981,
+                         "modified_utc":  "2026-07-21T00:14:40.3153109Z",
+                         "sha256":  "146433DB273569AF466F6F15CCE16E443E67F78F75AB643E1BF28C1583FAA40B"
+                     },
+                     {
+                         "file":  "workflow07-positive-2026-07-21T00-13-51-290Z.json",
+                         "size_bytes":  2247,
+                         "modified_utc":  "2026-07-21T00:13:51.2964873Z",
+                         "sha256":  "986A35A93414E217A1F0B9806896431FE36632AF3BCC5D3BF9EE92C5B578C8E1"
+                     },
+                     {
+                         "file":  "workflow09-acceptance-2026-07-21T01-24-11-426Z.json",
+                         "size_bytes":  2113,
+                         "modified_utc":  "2026-07-21T01:24:11.4280479Z",
+                         "sha256":  "3587B4716B39A7CB0865DB795F6697938A88925E9BD43E19B8B9C96A40662DAC"
+                     },
+                     {
+                         "file":  "workflow09-acceptance-2026-07-21T01-24-53-009Z.json",
+                         "size_bytes":  2113,
+                         "modified_utc":  "2026-07-21T01:24:53.0038701Z",
+                         "sha256":  "01014B625973CB540F6CE1BE656263AFE118A9AD77CAE4A817D56245E7D1BF66"
+                     },
+                     {
+                         "file":  "workflow09-freeze-2026-07-21.md",
+                         "size_bytes":  1102,
+                         "modified_utc":  "2026-07-21T01:46:01.8669484Z",
+                         "sha256":  "B80A9D39F322376E1A81D07C140A766EDCC03085A4AAC59C859E654D663669E4"
+                     },
+                     {
+                         "file":  "workflow10-local-preflight-2026-07-21T01-57-09-670Z.json",
+                         "size_bytes":  63248,
+                         "modified_utc":  "2026-07-21T01:57:09.6801432Z",
+                         "sha256":  "31BDC19359275F775503B8AFA55D9D6256065577DF1174D460D7FDD7BEA66083"
+                     },
+                     {
+                         "file":  "workflow10-local-preflight-2026-07-21T02-00-09-961Z.json",
+                         "size_bytes":  63248,
+                         "modified_utc":  "2026-07-21T02:00:09.9775225Z",
+                         "sha256":  "0003E062FCAC84370A899D8D6DF9096F0790776A5695F3FB63DFAB0940415723"
+                     },
+                     {
+                         "file":  "workflow10-local-preflight-2026-07-21T02-15-40-901Z.json",
+                         "size_bytes":  62733,
+                         "modified_utc":  "2026-07-21T02:15:40.9090712Z",
+                         "sha256":  "FC985E1164BD0F180656DCAD391664949B86D80BBD76171D99A2275356968471"
+                     }
+                 ],
+    "secrets_included":  false
+}

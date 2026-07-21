@@ -1,0 +1,8 @@
+﻿{
+    "status":  "PASS",
+    "installed_at_utc":  "2026-07-21T22:08:41.6969978Z",
+    "documentation_directory":  "docs/final",
+    "evidence_index":  "evidence/FINAL-EVIDENCE-INDEX.json",
+    "evidence_files_indexed":  32,
+    "secrets_printed":  false
+}

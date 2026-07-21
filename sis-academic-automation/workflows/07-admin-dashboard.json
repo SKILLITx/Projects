@@ -1,0 +1,1275 @@
+{
+  "name": "SIS 07 — Administrative Search and Basic Dashboard — Complete",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "staff/rpc_search_students",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1600,
+        -520
+      ],
+      "id": "c04e1fee-1bc8-5475-97a8-800f144723fa",
+      "name": "Webhook — Staff Student Search",
+      "webhookId": "5aa31b7a-9570-5324-907c-fc762ab818dd",
+      "notesInFlow": true,
+      "notes": "Purpose: Receives an authenticated student-search request.\nInput: POST JSON body and Supabase bearer token.\nOutput: Raw webhook item.\nError behaviour: Unsupported methods are rejected; all other validation is downstream."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const makeUuid = () =>\n  'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => {\n    const random = Math.floor(Math.random() * 16);\n    const value = character === 'x' ? random : ((random & 3) | 8);\n    return value.toString(16);\n  });\nconst canonicalUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\nconst input = $json || {};\nconst body = input.body && typeof input.body === 'object' ? input.body : {};\nconst headers = input.headers && typeof input.headers === 'object' ? input.headers : {};\nconst authHeader = String(headers.authorization || headers.Authorization || '').trim();\nconst token = authHeader.replace(/^Bearer\\s+/i, '');\nconst correlationId = String(body.correlation_id || '').trim() || makeUuid();\nconst idempotencyKey = String(body.idempotency_key || '').trim() || `portal:student.search:${correlationId}`;\nconst context = body.context && typeof body.context === 'object' ? body.context : {};\nconst payload = body.payload && typeof body.payload === 'object' ? body.payload : {};\nconst institutionId = String(context.institution_id || '').trim();\nconst campusId = String(context.campus_id || '').trim();\nconst query = String(payload.query || '').trim();\nconst searchType = String(payload.search_type || 'auto').trim().toLowerCase();\nconst limitInput = payload.limit == null || payload.limit === '' ? 25 : Number(payload.limit);\nconst offsetInput = payload.offset == null || payload.offset === '' ? 0 : Number(payload.offset);\nlet validationError = null;\nlet responseCode = 400;\nif (!authHeader) {\n  validationError = { code:'AUTH_HEADER_REQUIRED', message:'A valid staff sign-in is required.', retryable:false };\n  responseCode = 401;\n} else if (!/^Bearer\\s+\\S+$/i.test(authHeader) || token.split('.').length !== 3) {\n  validationError = { code:'AUTH_HEADER_INVALID', message:'The staff session token is invalid.', retryable:false };\n  responseCode = 401;\n} else if (!canonicalUuid.test(correlationId)) {\n  validationError = { code:'VALIDATION_CORRELATION_UUID_INVALID', message:'The request correlation identifier is invalid.', retryable:false };\n} else if (!canonicalUuid.test(institutionId)) {\n  validationError = { code:'VALIDATION_INSTITUTION_UUID_INVALID', message:'Select a valid institution.', retryable:false };\n} else if (campusId && !canonicalUuid.test(campusId)) {\n  validationError = { code:'VALIDATION_CAMPUS_UUID_INVALID', message:'Select a valid campus.', retryable:false };\n} else if (!query) {\n  validationError = { code:'VALIDATION_SEARCH_QUERY_REQUIRED', message:'Enter a student number, name, email, or identity reference.', retryable:false };\n} else if (!['auto','student_number','name','email','identity_reference'].includes(searchType)) {\n  validationError = { code:'VALIDATION_SEARCH_TYPE_UNSUPPORTED', message:'Select a supported search type.', retryable:false };\n} else if ((searchType === 'name' || searchType === 'auto') && query.length < 2) {\n  validationError = { code:'VALIDATION_NAME_QUERY_TOO_SHORT', message:'Enter at least two characters.', retryable:false };\n} else if (!Number.isInteger(limitInput) || limitInput < 1) {\n  validationError = { code:'VALIDATION_SEARCH_LIMIT_INVALID', message:'The result limit is invalid.', retryable:false };\n} else if (!Number.isInteger(offsetInput) || offsetInput < 0) {\n  validationError = { code:'VALIDATION_SEARCH_OFFSET_INVALID', message:'The result offset is invalid.', retryable:false };\n}\nconst request = {\n  operation:'student.search',\n  correlation_id:correlationId,\n  idempotency_key:idempotencyKey,\n  submitted_at:new Date().toISOString(),\n  source:{ channel:'staff_portal', workflow:'07-admin-dashboard' },\n  context:{ institution_id:institutionId || null, campus_id:campusId || null },\n  payload:{ query, search_type:searchType, limit:Math.min(Math.max(limitInput || 25,1),25), offset:offsetInput || 0 }\n};\nconst finalResponse = validationError ? {\n  success:false,\n  operation:'student.search',\n  correlation_id:correlationId,\n  idempotency_key:idempotencyKey,\n  error:validationError,\n  meta:{ workflow_code:'07-admin-dashboard', n8n_execution_id:$execution.id }\n} : null;\nconst logRequest = validationError ? {\n  operation:'workflow.run.log',\n  correlation_id:correlationId,\n  idempotency_key:`${idempotencyKey}:workflow:${$execution.id}`,\n  source:{channel:'n8n'},\n  context:{institution_id:institutionId || null,campus_id:campusId || null},\n  institution_id:canonicalUuid.test(institutionId) ? institutionId : null,\n  campus_id:canonicalUuid.test(campusId) ? campusId : null,\n  payload:{workflow_code:'07-admin-dashboard',n8n_execution_id:$execution.id,operation:'student.search',run_status:'failed',input_summary:{search_type:searchType,query_length:query.length},error_code:validationError.code,error_message:validationError.message}\n} : null;\nreturn { json:{ requestReady:!validationError, authHeader, request, correlationId, idempotencyKey, finalResponse, responseCode, logRequest } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1360,
+        -520
+      ],
+      "id": "8a72ce2e-3f30-53cb-9696-4061b12ce987",
+      "name": "Normalize Student Search Request",
+      "notesInFlow": true,
+      "notes": "Purpose: Normalizes and validates the search request without trusting browser role data.\nInput: Webhook item.\nOutput: Canonical request or sanitized validation response plus operational log request.\nError behaviour: Malformed input is routed to HTTP 400/401 without calling Auth or the business RPC."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cedb886d-a073-54f8-849d-d8be99a6db6c",
+              "leftValue": "={{$json.requestReady}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1120,
+        -520
+      ],
+      "id": "ee6d6604-940d-5d38-a361-a8078a37716b",
+      "name": "Search Request Valid?",
+      "notesInFlow": true,
+      "notes": "Purpose: Routes only structurally valid search requests to Supabase Auth.\nInput: Normalized validation result.\nOutput: True branch for Auth; false branch for logged validation failure.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{($env.SIS_SUPABASE_URL || $env.SUPABASE_URL) + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': $json.logRequest } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 20000
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -880,
+        -340
+      ],
+      "id": "e62ff78b-6e16-5933-940b-62e360212687",
+      "name": "Log Search Validation Failure",
+      "notesInFlow": true,
+      "notes": "Purpose: Best-effort durable log for a rejected search request.\nInput: Sanitized workflow-run log request.\nOutput: Supabase logging response.\nError behaviour: A logging outage never blocks the public response.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "supabaseApi": {
+          "name": "SIS Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$('Normalize Student Search Request').item.json.finalResponse}}",
+        "options": {
+          "responseCode": "={{$('Normalize Student Search Request').item.json.responseCode}}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -640,
+        -340
+      ],
+      "id": "8b63e648-1188-511e-adfc-c88e0cdd90ac",
+      "name": "Respond Search Validation Failure",
+      "notesInFlow": true,
+      "notes": "Purpose: Returns a sanitized validation or missing-token response.\nInput: Normalized failure response.\nOutput: HTTP 400 or 401 JSON.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{($env.SIS_SUPABASE_URL || $env.SUPABASE_URL) + '/auth/v1/user'}}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{$env.SIS_SUPABASE_ANON_KEY || $env.SUPABASE_ANON_KEY}}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{$('Normalize Student Search Request').item.json.authHeader}}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -880,
+        -620
+      ],
+      "id": "e1c4197e-1cd9-5ae3-ac81-623887f9c171",
+      "name": "Supabase Auth — Validate Search User",
+      "notesInFlow": true,
+      "notes": "Purpose: Validates the staff bearer token against Supabase Auth.\nInput: Bearer token and anon API key from environment.\nOutput: Full, never-error Auth response.\nError behaviour: Two bounded attempts for transport failures; provider details stay private.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source = $('Normalize Student Search Request').item.json;\nconst raw = $json || {};\nconst parse = (value) => {\n  if (typeof value !== 'string') return value;\n  try { return JSON.parse(value); } catch { return {}; }\n};\nlet body = Object.prototype.hasOwnProperty.call(raw,'body') ? parse(raw.body) : parse(raw);\nif (body && typeof body === 'object' && body.data && typeof body.data === 'object' && !body.id) body = body.data;\nconst statusCode = Number(raw.statusCode ?? raw.status ?? (raw.error ? 0 : 200));\nconst userId = String(body?.id || '').trim();\nconst email = String(body?.email || '').trim().toLowerCase();\nconst authenticated = statusCode >= 200 && statusCode < 300 && Boolean(userId) && email.includes('@');\nif (authenticated) return { json:{ authVerified:true, authHeader:source.authHeader, request:source.request, verifiedUser:{id:userId,email} } };\nconst finalResponse = {\n  success:false, operation:'student.search', correlation_id:source.correlationId, idempotency_key:source.idempotencyKey,\n  error:{code:'AUTH_SESSION_INVALID',message:'Your staff session is invalid or expired. Sign in again.',retryable:false},\n  meta:{workflow_code:'07-admin-dashboard',n8n_execution_id:$execution.id}\n};\nconst logRequest = {\n  operation:'workflow.run.log',correlation_id:source.correlationId,idempotency_key:`${source.idempotencyKey}:workflow:${$execution.id}`,\n  institution_id:source.request.context.institution_id,campus_id:source.request.context.campus_id,\n  source:{channel:'n8n'},payload:{workflow_code:'07-admin-dashboard',n8n_execution_id:$execution.id,operation:'student.search',run_status:'failed',input_summary:{search_type:source.request.payload.search_type,query_length:source.request.payload.query.length},error_code:'AUTH_SESSION_INVALID',error_message:'Your staff session is invalid or expired. Sign in again.'}\n};\nreturn { json:{authVerified:false,finalResponse,responseCode:401,logRequest} };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        -620
+      ],
+      "id": "2f90e19f-89c7-535f-869c-e17b48e9f06e",
+      "name": "Classify Search Authentication",
+      "notesInFlow": true,
+      "notes": "Purpose: Classifies the Auth response and discards provider internals.\nInput: Supabase Auth response and normalized request.\nOutput: Verified user context or sanitized HTTP 401 response plus log request.\nError behaviour: Invalid/expired tokens are permanent and not retried."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3993f520-b119-5f9e-bfa6-b351ec04bd1a",
+              "leftValue": "={{$json.authVerified}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -400,
+        -620
+      ],
+      "id": "7372af4b-b4ac-57d8-b8a2-4bd2b90973f5",
+      "name": "Search User Authenticated?",
+      "notesInFlow": true,
+      "notes": "Purpose: Allows only a verified Supabase user to reach the search RPC.\nInput: Classified Auth result.\nOutput: True branch to build RPC; false branch to logged HTTP 401.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{($env.SIS_SUPABASE_URL || $env.SUPABASE_URL) + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': $json.logRequest } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 20000
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -160,
+        -400
+      ],
+      "id": "4d607119-b85f-500d-b953-6d65faf2227a",
+      "name": "Log Search Authentication Failure",
+      "notesInFlow": true,
+      "notes": "Purpose: Best-effort durable log for invalid or expired search sessions.\nInput: Sanitized workflow-run log request.\nOutput: Supabase logging response.\nError behaviour: A logging outage never blocks HTTP 401.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "supabaseApi": {
+          "name": "SIS Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$('Classify Search Authentication').item.json.finalResponse}}",
+        "options": {
+          "responseCode": "={{$('Classify Search Authentication').item.json.responseCode}}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        -400
+      ],
+      "id": "8e80c0d5-f2ff-59ef-867e-50de6bd6eabe",
+      "name": "Respond Search Authentication Failure",
+      "notesInFlow": true,
+      "notes": "Purpose: Returns a sanitized authentication failure.\nInput: Classified Auth failure.\nOutput: HTTP 401 JSON.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const auth = $json;\nreturn { json:{\n  authHeader:auth.authHeader,\n  request:{...auth.request,requester:{identity_verified:true,verified_auth_user_id:auth.verifiedUser.id,verified_email:auth.verifiedUser.email,verification_source:'supabase_auth_user_endpoint'}}\n} };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        -720
+      ],
+      "id": "5e91c2d5-07dd-532c-a144-0d819336c214",
+      "name": "Build Search RPC Envelope",
+      "notesInFlow": true,
+      "notes": "Purpose: Adds only the verified Supabase identity to the canonical search envelope.\nInput: Verified Auth user and normalized request.\nOutput: User-JWT RPC request.\nError behaviour: Browser-supplied role and identity values are ignored."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{($env.SIS_SUPABASE_URL || $env.SUPABASE_URL) + '/rest/v1/rpc/rpc_search_students'}}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{$env.SIS_SUPABASE_ANON_KEY || $env.SUPABASE_ANON_KEY}}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{$json.authHeader}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': $json.request } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        80,
+        -720
+      ],
+      "id": "fc09e58b-d00d-53e2-9115-03f9fc20470d",
+      "name": "Supabase RPC — Search Students using user JWT",
+      "notesInFlow": true,
+      "notes": "Purpose: Calls the public search RPC with the same verified user JWT.\nInput: Canonical p_request, bearer token, anon API key.\nOutput: Full, never-error PostgREST response.\nError behaviour: Two bounded transport attempts; permanent RPC errors are not retried.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source = $('Build Search RPC Envelope').item.json;\nconst raw = $json || {};\nconst parse = (value) => { if (typeof value !== 'string') return value; try { return JSON.parse(value); } catch { return null; } };\nlet body = Object.prototype.hasOwnProperty.call(raw,'body') ? parse(raw.body) : parse(raw);\nif (Array.isArray(body) && body.length === 1) body = body[0];\nif (body && typeof body === 'object' && body.data && typeof body.data === 'object' && typeof body.success !== 'boolean') body = body.data;\nconst statusCode = Number(raw.statusCode ?? raw.status ?? (raw.error ? 0 : 200));\nlet finalResponse;\nlet responseCode;\nif (body && typeof body === 'object' && typeof body.success === 'boolean') {\n  finalResponse = {...body,meta:{workflow_code:'07-admin-dashboard',n8n_execution_id:$execution.id}};\n  const code = String(body?.error?.code || '');\n  responseCode = body.success ? 200 : code.startsWith('AUTH_') ? 403 : code.startsWith('VALIDATION_') ? 400 : body?.error?.retryable ? 503 : 500;\n} else {\n  const temporary = statusCode === 0 || statusCode === 429 || statusCode >= 500;\n  const code = statusCode === 401 ? 'AUTH_SESSION_INVALID' : statusCode === 403 ? 'AUTH_SCOPE_DENIED' : temporary ? 'SYSTEM_TEMPORARY_FAILURE' : 'ADMIN_READ_RESPONSE_INVALID';\n  const message = statusCode === 401 ? 'Your staff session is invalid or expired. Sign in again.' : statusCode === 403 ? 'You do not have permission for this institution or campus.' : temporary ? 'The student search service is temporarily unavailable.' : 'The student search could not be completed.';\n  finalResponse = {success:false,operation:'student.search',correlation_id:source.request.correlation_id,idempotency_key:source.request.idempotency_key,error:{code,message,retryable:temporary},meta:{workflow_code:'07-admin-dashboard',n8n_execution_id:$execution.id}};\n  responseCode = statusCode === 401 ? 401 : statusCode === 403 ? 403 : temporary ? 503 : 502;\n}\nconst count = finalResponse.success ? Number(finalResponse?.data?.count || 0) : 0;\nconst logRequest = {operation:'workflow.run.log',correlation_id:source.request.correlation_id,idempotency_key:`${source.request.idempotency_key}:workflow:${$execution.id}`,institution_id:source.request.context.institution_id,campus_id:source.request.context.campus_id,source:{channel:'n8n'},payload:{workflow_code:'07-admin-dashboard',n8n_execution_id:$execution.id,operation:'student.search',run_status:finalResponse.success?'completed':'failed',input_summary:{search_type:source.request.payload.search_type,query_length:source.request.payload.query.length,limit:source.request.payload.limit,offset:source.request.payload.offset},output_summary:{result_count:count},error_code:finalResponse.success?null:finalResponse.error.code,error_message:finalResponse.success?null:finalResponse.error.message}};\nreturn {json:{finalResponse,responseCode,logRequest}};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        -720
+      ],
+      "id": "985bba27-ef42-5626-9747-62c720391d1f",
+      "name": "Normalize Search RPC Response",
+      "notesInFlow": true,
+      "notes": "Purpose: Normalizes success, empty results, authorization failures and transport failures.\nInput: PostgREST response and canonical request.\nOutput: Predictable public response, HTTP status, and sanitized workflow log request.\nError behaviour: Never returns SQL, private schemas, tokens, or raw provider errors."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{($env.SIS_SUPABASE_URL || $env.SUPABASE_URL) + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': $json.logRequest } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 20000
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        560,
+        -720
+      ],
+      "id": "47f56c9d-c6f1-5012-b78e-0123bac1dea9",
+      "name": "Log Search Workflow Run",
+      "notesInFlow": true,
+      "notes": "Purpose: Records the durable final outcome of the search execution.\nInput: Sanitized workflow-run request.\nOutput: Supabase logging response.\nError behaviour: Best effort; failure cannot change the business response.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "supabaseApi": {
+          "name": "SIS Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$('Normalize Search RPC Response').item.json.finalResponse}}",
+        "options": {
+          "responseCode": "={{$('Normalize Search RPC Response').item.json.responseCode}}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        -720
+      ],
+      "id": "631690de-d503-5afd-ae1b-509f67837d5c",
+      "name": "Respond Student Search",
+      "notesInFlow": true,
+      "notes": "Purpose: Returns the final student-search contract.\nInput: Normalized public response.\nOutput: HTTP 200/400/403/502/503 JSON.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "staff/rpc_get_dashboard_snapshot",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1600,
+        260
+      ],
+      "id": "86a7b359-f42f-570c-9b26-383d6ad5bf7f",
+      "name": "Webhook — Staff Dashboard Snapshot",
+      "webhookId": "a15fff92-7f13-569f-aff7-5f8249f6dd63",
+      "notesInFlow": true,
+      "notes": "Purpose: Receives an authenticated dashboard snapshot request.\nInput: POST JSON body and Supabase bearer token.\nOutput: Raw webhook item.\nError behaviour: Unsupported methods are rejected; validation is downstream."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const makeUuid = () =>\n  'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => {\n    const random = Math.floor(Math.random() * 16);\n    const value = character === 'x' ? random : ((random & 3) | 8);\n    return value.toString(16);\n  });\nconst canonicalUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\nconst input = $json || {};\nconst body = input.body && typeof input.body === 'object' ? input.body : {};\nconst headers = input.headers && typeof input.headers === 'object' ? input.headers : {};\nconst authHeader = String(headers.authorization || headers.Authorization || '').trim();\nconst token = authHeader.replace(/^Bearer\\s+/i, '');\nconst correlationId = String(body.correlation_id || '').trim() || makeUuid();\nconst idempotencyKey = String(body.idempotency_key || '').trim() || `portal:dashboard.snapshot:${correlationId}`;\nconst context = body.context && typeof body.context === 'object' ? body.context : {};\nconst payload = body.payload && typeof body.payload === 'object' ? body.payload : {};\nconst institutionId = String(context.institution_id || '').trim();\nconst campusId = String(context.campus_id || '').trim();\nconst termId = String(payload.term_id || '').trim();\nlet validationError = null;\nlet responseCode = 400;\nif (!authHeader) { validationError={code:'AUTH_HEADER_REQUIRED',message:'A valid staff sign-in is required.',retryable:false}; responseCode=401; }\nelse if (!/^Bearer\\s+\\S+$/i.test(authHeader) || token.split('.').length !== 3) { validationError={code:'AUTH_HEADER_INVALID',message:'The staff session token is invalid.',retryable:false}; responseCode=401; }\nelse if (!canonicalUuid.test(correlationId)) validationError={code:'VALIDATION_CORRELATION_UUID_INVALID',message:'The request correlation identifier is invalid.',retryable:false};\nelse if (!canonicalUuid.test(institutionId)) validationError={code:'VALIDATION_INSTITUTION_UUID_INVALID',message:'Select a valid institution.',retryable:false};\nelse if (campusId && !canonicalUuid.test(campusId)) validationError={code:'VALIDATION_CAMPUS_UUID_INVALID',message:'Select a valid campus.',retryable:false};\nelse if (termId && !canonicalUuid.test(termId)) validationError={code:'VALIDATION_TERM_UUID_INVALID',message:'Select a valid academic term.',retryable:false};\nconst request={operation:'dashboard.snapshot',correlation_id:correlationId,idempotency_key:idempotencyKey,submitted_at:new Date().toISOString(),source:{channel:'staff_portal',workflow:'07-admin-dashboard'},context:{institution_id:institutionId||null,campus_id:campusId||null},payload:{term_id:termId||null}};\nconst finalResponse=validationError?{success:false,operation:'dashboard.snapshot',correlation_id:correlationId,idempotency_key:idempotencyKey,error:validationError,meta:{workflow_code:'07-admin-dashboard',n8n_execution_id:$execution.id}}:null;\nconst logRequest=validationError?{operation:'workflow.run.log',correlation_id:correlationId,idempotency_key:`${idempotencyKey}:workflow:${$execution.id}`,institution_id:canonicalUuid.test(institutionId)?institutionId:null,campus_id:canonicalUuid.test(campusId)?campusId:null,source:{channel:'n8n'},payload:{workflow_code:'07-admin-dashboard',n8n_execution_id:$execution.id,operation:'dashboard.snapshot',run_status:'failed',input_summary:{term_selected:Boolean(termId)},error_code:validationError.code,error_message:validationError.message}}:null;\nreturn {json:{requestReady:!validationError,authHeader,request,correlationId,idempotencyKey,finalResponse,responseCode,logRequest}};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1360,
+        260
+      ],
+      "id": "63816864-62d8-5b3a-ae4a-d98316383c85",
+      "name": "Normalize Dashboard Request",
+      "notesInFlow": true,
+      "notes": "Purpose: Normalizes dashboard scope and optional visible-term selection.\nInput: Webhook item.\nOutput: Canonical request or sanitized validation response plus operational log request.\nError behaviour: Malformed input is routed to HTTP 400/401."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cacf51ed-5539-5f6a-a348-6b313f363032",
+              "leftValue": "={{$json.requestReady}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1120,
+        260
+      ],
+      "id": "9be200e5-12ad-5e8b-bdc5-a926d54a6e87",
+      "name": "Dashboard Request Valid?",
+      "notesInFlow": true,
+      "notes": "Purpose: Routes only structurally valid dashboard requests to Supabase Auth.\nInput: Normalized validation result.\nOutput: True branch for Auth; false branch for logged validation failure.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{($env.SIS_SUPABASE_URL || $env.SUPABASE_URL) + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': $json.logRequest } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 20000
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -880,
+        440
+      ],
+      "id": "c1c87b00-f97f-5a55-96ff-320c718a3c23",
+      "name": "Log Dashboard Validation Failure",
+      "notesInFlow": true,
+      "notes": "Purpose: Best-effort durable log for a rejected dashboard request.\nInput: Sanitized workflow-run log request.\nOutput: Supabase logging response.\nError behaviour: A logging outage never blocks the public response.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "supabaseApi": {
+          "name": "SIS Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$('Normalize Dashboard Request').item.json.finalResponse}}",
+        "options": {
+          "responseCode": "={{$('Normalize Dashboard Request').item.json.responseCode}}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -640,
+        440
+      ],
+      "id": "1168571a-7f07-5a1b-b5a5-3667257a5e6f",
+      "name": "Respond Dashboard Validation Failure",
+      "notesInFlow": true,
+      "notes": "Purpose: Returns a sanitized validation or missing-token response.\nInput: Normalized failure response.\nOutput: HTTP 400 or 401 JSON.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{($env.SIS_SUPABASE_URL || $env.SUPABASE_URL) + '/auth/v1/user'}}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{$env.SIS_SUPABASE_ANON_KEY || $env.SUPABASE_ANON_KEY}}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{$('Normalize Dashboard Request').item.json.authHeader}}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -880,
+        160
+      ],
+      "id": "47c2ff3d-22b4-54d5-bbed-84debd567d4c",
+      "name": "Supabase Auth — Validate Dashboard User",
+      "notesInFlow": true,
+      "notes": "Purpose: Validates the dashboard bearer token against Supabase Auth.\nInput: Bearer token and anon API key from environment.\nOutput: Full, never-error Auth response.\nError behaviour: Two bounded attempts for transport failures.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source = $('Normalize Dashboard Request').item.json;\nconst raw=$json||{};\nconst parse=(value)=>{if(typeof value!=='string')return value;try{return JSON.parse(value);}catch{return {};}};\nlet body=Object.prototype.hasOwnProperty.call(raw,'body')?parse(raw.body):parse(raw);\nif(body&&typeof body==='object'&&body.data&&typeof body.data==='object'&&!body.id)body=body.data;\nconst statusCode=Number(raw.statusCode??raw.status??(raw.error?0:200));\nconst userId=String(body?.id||'').trim();const email=String(body?.email||'').trim().toLowerCase();\nconst authenticated=statusCode>=200&&statusCode<300&&Boolean(userId)&&email.includes('@');\nif(authenticated)return{json:{authVerified:true,authHeader:source.authHeader,request:source.request,verifiedUser:{id:userId,email}}};\nconst finalResponse={success:false,operation:'dashboard.snapshot',correlation_id:source.correlationId,idempotency_key:source.idempotencyKey,error:{code:'AUTH_SESSION_INVALID',message:'Your staff session is invalid or expired. Sign in again.',retryable:false},meta:{workflow_code:'07-admin-dashboard',n8n_execution_id:$execution.id}};\nconst logRequest={operation:'workflow.run.log',correlation_id:source.correlationId,idempotency_key:`${source.idempotencyKey}:workflow:${$execution.id}`,institution_id:source.request.context.institution_id,campus_id:source.request.context.campus_id,source:{channel:'n8n'},payload:{workflow_code:'07-admin-dashboard',n8n_execution_id:$execution.id,operation:'dashboard.snapshot',run_status:'failed',input_summary:{term_selected:Boolean(source.request.payload.term_id)},error_code:'AUTH_SESSION_INVALID',error_message:'Your staff session is invalid or expired. Sign in again.'}};\nreturn{json:{authVerified:false,finalResponse,responseCode:401,logRequest}};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        160
+      ],
+      "id": "69922559-05c0-56eb-9c8c-f8c08d11d340",
+      "name": "Classify Dashboard Authentication",
+      "notesInFlow": true,
+      "notes": "Purpose: Classifies the Auth response and discards provider internals.\nInput: Supabase Auth response and normalized request.\nOutput: Verified user context or sanitized HTTP 401 response plus log request.\nError behaviour: Invalid/expired tokens are permanent and not retried."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f114f9b9-c8b1-50ee-a3a1-90c41455537f",
+              "leftValue": "={{$json.authVerified}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -400,
+        160
+      ],
+      "id": "b3456b74-0666-5c70-ae84-ab7744595b2c",
+      "name": "Dashboard User Authenticated?",
+      "notesInFlow": true,
+      "notes": "Purpose: Allows only a verified Supabase user to reach the dashboard RPC.\nInput: Classified Auth result.\nOutput: True branch to build RPC; false branch to logged HTTP 401.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{($env.SIS_SUPABASE_URL || $env.SUPABASE_URL) + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': $json.logRequest } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 20000
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -160,
+        380
+      ],
+      "id": "bb728357-3945-5b76-890a-f69182c276bc",
+      "name": "Log Dashboard Authentication Failure",
+      "notesInFlow": true,
+      "notes": "Purpose: Best-effort durable log for invalid or expired dashboard sessions.\nInput: Sanitized workflow-run log request.\nOutput: Supabase logging response.\nError behaviour: A logging outage never blocks HTTP 401.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "supabaseApi": {
+          "name": "SIS Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$('Classify Dashboard Authentication').item.json.finalResponse}}",
+        "options": {
+          "responseCode": "={{$('Classify Dashboard Authentication').item.json.responseCode}}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        380
+      ],
+      "id": "dc351f98-2d08-57e3-a372-8b7440d03717",
+      "name": "Respond Dashboard Authentication Failure",
+      "notesInFlow": true,
+      "notes": "Purpose: Returns a sanitized dashboard authentication failure.\nInput: Classified Auth failure.\nOutput: HTTP 401 JSON.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const auth=$json;\nreturn{json:{authHeader:auth.authHeader,request:{...auth.request,requester:{identity_verified:true,verified_auth_user_id:auth.verifiedUser.id,verified_email:auth.verifiedUser.email,verification_source:'supabase_auth_user_endpoint'}}}};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        60
+      ],
+      "id": "75303875-97e4-50da-81f2-0d2896117f43",
+      "name": "Build Dashboard RPC Envelope",
+      "notesInFlow": true,
+      "notes": "Purpose: Adds only the verified Supabase identity to the dashboard envelope.\nInput: Verified Auth user and normalized request.\nOutput: User-JWT RPC request.\nError behaviour: Browser-supplied role and identity values are ignored."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{($env.SIS_SUPABASE_URL || $env.SUPABASE_URL) + '/rest/v1/rpc/rpc_get_dashboard_snapshot'}}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{$env.SIS_SUPABASE_ANON_KEY || $env.SUPABASE_ANON_KEY}}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{$json.authHeader}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': $json.request } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        80,
+        60
+      ],
+      "id": "205c92b8-77d4-5002-a8d3-eaf06975d6e7",
+      "name": "Supabase RPC — Dashboard Snapshot using user JWT",
+      "notesInFlow": true,
+      "notes": "Purpose: Calls the public dashboard RPC with the verified user JWT.\nInput: Canonical p_request, bearer token, anon API key.\nOutput: Full, never-error PostgREST response.\nError behaviour: Two bounded transport attempts; permanent RPC errors are not retried.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source=$('Build Dashboard RPC Envelope').item.json;\nconst raw=$json||{};\nconst parse=(value)=>{if(typeof value!=='string')return value;try{return JSON.parse(value);}catch{return null;}};\nlet body=Object.prototype.hasOwnProperty.call(raw,'body')?parse(raw.body):parse(raw);\nif(Array.isArray(body)&&body.length===1)body=body[0];\nif(body&&typeof body==='object'&&body.data&&typeof body.data==='object'&&typeof body.success!=='boolean')body=body.data;\nconst statusCode=Number(raw.statusCode??raw.status??(raw.error?0:200));\nlet finalResponse;let responseCode;\nif(body&&typeof body==='object'&&typeof body.success==='boolean'){\n finalResponse={...body,meta:{workflow_code:'07-admin-dashboard',n8n_execution_id:$execution.id}};\n const code=String(body?.error?.code||'');responseCode=body.success?200:code.startsWith('AUTH_')?403:code.startsWith('VALIDATION_')?400:body?.error?.retryable?503:500;\n}else{\n const temporary=statusCode===0||statusCode===429||statusCode>=500;\n const code=statusCode===401?'AUTH_SESSION_INVALID':statusCode===403?'AUTH_SCOPE_DENIED':temporary?'SYSTEM_TEMPORARY_FAILURE':'ADMIN_READ_RESPONSE_INVALID';\n const message=statusCode===401?'Your staff session is invalid or expired. Sign in again.':statusCode===403?'You do not have permission for this institution or campus.':temporary?'The dashboard service is temporarily unavailable.':'The dashboard snapshot could not be completed.';\n finalResponse={success:false,operation:'dashboard.snapshot',correlation_id:source.request.correlation_id,idempotency_key:source.request.idempotency_key,error:{code,message,retryable:temporary},meta:{workflow_code:'07-admin-dashboard',n8n_execution_id:$execution.id}};\n responseCode=statusCode===401?401:statusCode===403?403:temporary?503:502;\n}\nconst metrics=finalResponse.success&&finalResponse.data?.metrics?finalResponse.data.metrics:{};\nconst logRequest={operation:'workflow.run.log',correlation_id:source.request.correlation_id,idempotency_key:`${source.request.idempotency_key}:workflow:${$execution.id}`,institution_id:source.request.context.institution_id,campus_id:source.request.context.campus_id,source:{channel:'n8n'},payload:{workflow_code:'07-admin-dashboard',n8n_execution_id:$execution.id,operation:'dashboard.snapshot',run_status:finalResponse.success?'completed':'failed',input_summary:{term_selected:Boolean(source.request.payload.term_id)},output_summary:{students_total:Number(metrics.students_total||0),active_enrollments:Number(metrics.active_enrollments||0)},error_code:finalResponse.success?null:finalResponse.error.code,error_message:finalResponse.success?null:finalResponse.error.message}};\nreturn{json:{finalResponse,responseCode,logRequest}};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        60
+      ],
+      "id": "1bbf94f6-d3ae-5372-8b45-b2028b79694b",
+      "name": "Normalize Dashboard RPC Response",
+      "notesInFlow": true,
+      "notes": "Purpose: Normalizes metrics, empty arrays, authorization failures and transport failures.\nInput: PostgREST response and canonical request.\nOutput: Predictable public response, HTTP status, and sanitized workflow log request.\nError behaviour: Never returns SQL, private schemas, tokens, or raw provider errors."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{($env.SIS_SUPABASE_URL || $env.SUPABASE_URL) + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': $json.logRequest } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 20000
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        560,
+        60
+      ],
+      "id": "0495c69d-e698-5843-8c44-149227bd7d74",
+      "name": "Log Dashboard Workflow Run",
+      "notesInFlow": true,
+      "notes": "Purpose: Records the durable final outcome of the dashboard execution.\nInput: Sanitized workflow-run request.\nOutput: Supabase logging response.\nError behaviour: Best effort; failure cannot change the business response.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "supabaseApi": {
+          "name": "SIS Supabase Service Role"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$('Normalize Dashboard RPC Response').item.json.finalResponse}}",
+        "options": {
+          "responseCode": "={{$('Normalize Dashboard RPC Response').item.json.responseCode}}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        60
+      ],
+      "id": "bfc7931f-72b3-5b6d-9c45-2b1e12ad2203",
+      "name": "Respond Dashboard Snapshot",
+      "notesInFlow": true,
+      "notes": "Purpose: Returns the final dashboard contract.\nInput: Normalized public response.\nOutput: HTTP 200/400/403/502/503 JSON.\nError behaviour: No retry."
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook — Staff Student Search": {
+      "main": [
+        [
+          {
+            "node": "Normalize Student Search Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Student Search Request": {
+      "main": [
+        [
+          {
+            "node": "Search Request Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Request Valid?": {
+      "main": [
+        [
+          {
+            "node": "Supabase Auth — Validate Search User",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Search Validation Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Search Validation Failure": {
+      "main": [
+        [
+          {
+            "node": "Respond Search Validation Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Auth — Validate Search User": {
+      "main": [
+        [
+          {
+            "node": "Classify Search Authentication",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Search Authentication": {
+      "main": [
+        [
+          {
+            "node": "Search User Authenticated?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search User Authenticated?": {
+      "main": [
+        [
+          {
+            "node": "Build Search RPC Envelope",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Search Authentication Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Search Authentication Failure": {
+      "main": [
+        [
+          {
+            "node": "Respond Search Authentication Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Search RPC Envelope": {
+      "main": [
+        [
+          {
+            "node": "Supabase RPC — Search Students using user JWT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase RPC — Search Students using user JWT": {
+      "main": [
+        [
+          {
+            "node": "Normalize Search RPC Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Search RPC Response": {
+      "main": [
+        [
+          {
+            "node": "Log Search Workflow Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Search Workflow Run": {
+      "main": [
+        [
+          {
+            "node": "Respond Student Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook — Staff Dashboard Snapshot": {
+      "main": [
+        [
+          {
+            "node": "Normalize Dashboard Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Dashboard Request": {
+      "main": [
+        [
+          {
+            "node": "Dashboard Request Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dashboard Request Valid?": {
+      "main": [
+        [
+          {
+            "node": "Supabase Auth — Validate Dashboard User",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Dashboard Validation Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Dashboard Validation Failure": {
+      "main": [
+        [
+          {
+            "node": "Respond Dashboard Validation Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Auth — Validate Dashboard User": {
+      "main": [
+        [
+          {
+            "node": "Classify Dashboard Authentication",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Dashboard Authentication": {
+      "main": [
+        [
+          {
+            "node": "Dashboard User Authenticated?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dashboard User Authenticated?": {
+      "main": [
+        [
+          {
+            "node": "Build Dashboard RPC Envelope",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Dashboard Authentication Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Dashboard Authentication Failure": {
+      "main": [
+        [
+          {
+            "node": "Respond Dashboard Authentication Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Dashboard RPC Envelope": {
+      "main": [
+        [
+          {
+            "node": "Supabase RPC — Dashboard Snapshot using user JWT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase RPC — Dashboard Snapshot using user JWT": {
+      "main": [
+        [
+          {
+            "node": "Normalize Dashboard RPC Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Dashboard RPC Response": {
+      "main": [
+        [
+          {
+            "node": "Log Dashboard Workflow Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Dashboard Workflow Run": {
+      "main": [
+        [
+          {
+            "node": "Respond Dashboard Snapshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  },
+  "tags": []
+}

@@ -1,0 +1,566 @@
+erDiagram
+  audit_audit_logs {
+    uuid id PK
+    uuid institution_id FK
+    uuid campus_id
+  }
+  audit_authorization_events {
+    uuid id PK
+    uuid institution_id FK
+    uuid campus_id FK
+  }
+  audit_data_change_events {
+    uuid id PK
+    uuid institution_id FK
+  }
+  ops_dashboard_refresh_runs {
+    uuid id PK
+    uuid institution_id FK
+    uuid campus_id
+  }
+  ops_generated_report_files {
+    uuid id PK
+    uuid institution_id FK
+  }
+  ops_hec_report_runs {
+    uuid id PK
+    uuid institution_id FK
+    uuid campus_id
+  }
+  ops_idempotency_records {
+    uuid id PK
+    uuid institution_id FK
+  }
+  ops_incident_events {
+    uuid id PK
+  }
+  ops_incidents {
+    uuid id PK
+    uuid institution_id FK
+    uuid campus_id
+  }
+  ops_maintenance_runs {
+    uuid id PK
+  }
+  ops_notification_deliveries {
+    uuid id PK
+    uuid institution_id FK
+  }
+  ops_notification_outbox {
+    uuid id PK
+    uuid institution_id FK
+    uuid campus_id
+  }
+  ops_workflow_runs {
+    uuid id PK
+    uuid institution_id FK
+    uuid campus_id
+  }
+  public_academic_standing_history {
+    uuid id PK
+    uuid institution_id
+    uuid student_id
+  }
+  public_academic_standing_rules {
+    uuid id PK
+    uuid institution_id
+  }
+  public_academic_years {
+    uuid id PK
+    uuid institution_id FK
+    public_record_status status
+  }
+  public_assessment_components {
+    uuid id PK
+    uuid institution_id
+    public_record_status status
+  }
+  public_assessments {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+    public_record_status status
+  }
+  public_campus_assignments {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+    public_assignment_status status
+  }
+  public_campuses {
+    uuid id PK
+    uuid institution_id FK
+    public_record_status status
+  }
+  public_course_equivalencies {
+    uuid id PK
+    uuid institution_id
+    public_record_status status
+  }
+  public_course_offerings {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+    public_offering_status status
+  }
+  public_course_prerequisites {
+    uuid id PK
+    uuid institution_id
+    public_record_status status
+  }
+  public_course_results {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+    uuid student_id
+  }
+  public_courses {
+    uuid id PK
+    uuid institution_id FK
+    public_record_status status
+  }
+  public_cumulative_results {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+    uuid student_id
+  }
+  public_departments {
+    uuid id PK
+    uuid institution_id FK
+    public_record_status status
+  }
+  public_document_requirements {
+    uuid id PK
+    uuid institution_id
+    public_record_status status
+  }
+  public_enrollment_decisions {
+    uuid id PK
+    uuid institution_id
+  }
+  public_enrollment_periods {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+    public_record_status status
+  }
+  public_enrollment_policies {
+    uuid id PK
+    uuid institution_id FK
+    public_record_status status
+  }
+  public_enrollment_request_items {
+    uuid id PK
+    uuid institution_id
+  }
+  public_enrollment_requests {
+    uuid id PK
+    uuid institution_id FK
+    uuid campus_id
+    uuid student_id
+  }
+  public_enrollments {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+    uuid student_id
+  }
+  public_grade_scales {
+    uuid id PK
+    uuid institution_id
+  }
+  public_grading_policies {
+    uuid id PK
+    uuid institution_id FK
+    public_record_status status
+  }
+  public_hec_report_settings {
+    uuid id PK
+    uuid institution_id FK
+    public_record_status status
+  }
+  public_institution_settings {
+    uuid id PK
+    uuid institution_id FK
+    public_record_status status
+  }
+  public_institutions {
+    uuid id PK
+    public_record_status status
+  }
+  public_mark_correction_requests {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+  }
+  public_marks_approval_history {
+    uuid id PK
+    uuid institution_id
+  }
+  public_marks_batch_files {
+    uuid id PK
+    uuid institution_id
+  }
+  public_marks_batches {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+  }
+  public_marks_validation_issues {
+    uuid id PK
+    uuid institution_id
+  }
+  public_notification_settings {
+    uuid id PK
+    uuid institution_id FK
+    public_record_status status
+  }
+  public_permission_grants {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+    public_assignment_status status
+  }
+  public_prerequisite_evidence {
+    uuid id PK
+    uuid institution_id
+  }
+  public_programs {
+    uuid id PK
+    uuid institution_id FK
+    public_record_status status
+  }
+  public_role_assignments {
+    uuid id PK
+    uuid institution_id FK
+    public_assignment_status status
+  }
+  public_rooms {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+    public_record_status status
+  }
+  public_section_schedules {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+  }
+  public_sections {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+    public_section_status status
+  }
+  public_semester_results {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+    uuid student_id
+  }
+  public_staff_profiles {
+    uuid id PK
+    public_record_status status
+  }
+  public_student_auth_links {
+    uuid id PK
+    uuid institution_id
+    uuid student_id
+    public_record_status status
+  }
+  public_student_contacts {
+    uuid id PK
+    uuid institution_id
+    uuid student_id
+    public_record_status status
+  }
+  public_student_documents {
+    uuid id PK
+    uuid institution_id
+    uuid student_id
+  }
+  public_student_marks {
+    uuid id PK
+    uuid institution_id
+    uuid student_id
+  }
+  public_student_profile_requests {
+    uuid id PK
+    uuid institution_id FK
+    uuid campus_id
+    uuid student_id
+  }
+  public_student_program_registrations {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+    uuid student_id
+  }
+  public_students {
+    uuid id PK
+    uuid institution_id FK
+    uuid campus_id
+    public_student_status status
+  }
+  public_teacher_assignments {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+    public_assignment_status status
+  }
+  public_terms {
+    uuid id PK
+    uuid institution_id
+    public_record_status status
+  }
+  public_timetable_conflict_evidence {
+    uuid id PK
+    uuid institution_id
+  }
+  public_transcript_delivery_records {
+    uuid id PK
+    uuid institution_id
+  }
+  public_transcript_documents {
+    uuid id PK
+    uuid institution_id
+  }
+  public_transcript_requests {
+    uuid id PK
+    uuid institution_id FK
+    uuid campus_id
+    uuid student_id
+  }
+  public_transcript_settings {
+    uuid id PK
+    uuid institution_id FK
+    public_record_status status
+  }
+  public_waitlist_entries {
+    uuid id PK
+    uuid institution_id
+    uuid campus_id
+    uuid student_id
+  }
+  auth_users ||--o{ public_institutions : "created_by"
+  auth_users ||--o{ public_institutions : "updated_by"
+  public_institutions ||--o{ public_campuses : "institution_id"
+  auth_users ||--o{ public_campuses : "created_by"
+  auth_users ||--o{ public_campuses : "updated_by"
+  public_institutions ||--o{ public_institution_settings : "institution_id"
+  auth_users ||--o{ public_institution_settings : "created_by"
+  auth_users ||--o{ public_institution_settings : "updated_by"
+  public_institutions ||--o{ public_academic_years : "institution_id"
+  auth_users ||--o{ public_academic_years : "created_by"
+  auth_users ||--o{ public_academic_years : "updated_by"
+  auth_users ||--o{ public_terms : "created_by"
+  auth_users ||--o{ public_terms : "updated_by"
+  public_institutions ||--o{ public_terms : "institution_id"
+  public_academic_years ||--o{ public_terms : "institution_id_academic_year_id"
+  auth_users ||--o{ public_enrollment_periods : "created_by"
+  auth_users ||--o{ public_enrollment_periods : "updated_by"
+  public_institutions ||--o{ public_enrollment_periods : "institution_id"
+  public_campuses ||--o{ public_enrollment_periods : "institution_id_campus_id"
+  public_terms ||--o{ public_enrollment_periods : "institution_id_term_id"
+  public_institution_settings ||--o{ public_enrollment_periods : "institution_id_settings_version"
+  auth_users ||--o{ public_staff_profiles : "auth_user_id"
+  auth_users ||--o{ public_staff_profiles : "created_by"
+  auth_users ||--o{ public_staff_profiles : "updated_by"
+  public_staff_profiles ||--o{ public_role_assignments : "staff_profile_id"
+  public_institutions ||--o{ public_role_assignments : "institution_id"
+  auth_users ||--o{ public_role_assignments : "created_by"
+  auth_users ||--o{ public_role_assignments : "updated_by"
+  auth_users ||--o{ public_campus_assignments : "created_by"
+  auth_users ||--o{ public_campus_assignments : "updated_by"
+  public_role_assignments ||--o{ public_campus_assignments : "institution_id_role_assignment_id"
+  public_campuses ||--o{ public_campus_assignments : "institution_id_campus_id"
+  auth_users ||--o{ public_permission_grants : "created_by"
+  auth_users ||--o{ public_permission_grants : "updated_by"
+  public_role_assignments ||--o{ public_permission_grants : "institution_id_role_assignment_id"
+  public_campuses ||--o{ public_permission_grants : "institution_id_campus_id"
+  auth_users ||--o{ audit_authorization_events : "auth_user_id"
+  public_staff_profiles ||--o{ audit_authorization_events : "staff_profile_id"
+  public_institutions ||--o{ audit_authorization_events : "institution_id"
+  public_campuses ||--o{ audit_authorization_events : "campus_id"
+  public_institutions ||--o{ public_departments : "institution_id"
+  auth_users ||--o{ public_departments : "created_by"
+  auth_users ||--o{ public_departments : "updated_by"
+  public_institutions ||--o{ public_programs : "institution_id"
+  auth_users ||--o{ public_programs : "created_by"
+  auth_users ||--o{ public_programs : "updated_by"
+  public_departments ||--o{ public_programs : "institution_id_department_id"
+  public_institutions ||--o{ public_grading_policies : "institution_id"
+  auth_users ||--o{ public_grading_policies : "created_by"
+  auth_users ||--o{ public_grading_policies : "updated_by"
+  public_programs ||--o{ public_grading_policies : "institution_id_program_id"
+  public_grading_policies ||--o{ public_grade_scales : "institution_id_grading_policy_id"
+  public_grading_policies ||--o{ public_academic_standing_rules : "institution_id_grading_policy_id"
+  public_institutions ||--o{ public_enrollment_policies : "institution_id"
+  auth_users ||--o{ public_enrollment_policies : "created_by"
+  auth_users ||--o{ public_enrollment_policies : "updated_by"
+  public_programs ||--o{ public_enrollment_policies : "institution_id_program_id"
+  public_institutions ||--o{ public_transcript_settings : "institution_id"
+  public_institutions ||--o{ public_notification_settings : "institution_id"
+  public_institutions ||--o{ public_hec_report_settings : "institution_id"
+  public_campuses ||--o{ public_rooms : "institution_id_campus_id"
+  public_institutions ||--o{ public_courses : "institution_id"
+  public_departments ||--o{ public_courses : "institution_id_department_id"
+  public_courses ||--o{ public_course_prerequisites : "institution_id_course_id"
+  public_courses ||--o{ public_course_prerequisites : "institution_id_prerequisite_course_id"
+  public_courses ||--o{ public_course_equivalencies : "institution_id_course_id"
+  public_courses ||--o{ public_course_equivalencies : "institution_id_equivalent_course_id"
+  auth_users ||--o{ public_course_offerings : "created_by"
+  auth_users ||--o{ public_course_offerings : "updated_by"
+  public_campuses ||--o{ public_course_offerings : "institution_id_campus_id"
+  public_terms ||--o{ public_course_offerings : "institution_id_term_id"
+  public_courses ||--o{ public_course_offerings : "institution_id_course_id"
+  public_programs ||--o{ public_course_offerings : "institution_id_program_id"
+  public_grading_policies ||--o{ public_course_offerings : "institution_id_grading_policy_id"
+  public_enrollment_policies ||--o{ public_course_offerings : "institution_id_enrollment_policy_id"
+  auth_users ||--o{ public_sections : "created_by"
+  auth_users ||--o{ public_sections : "updated_by"
+  public_campuses ||--o{ public_sections : "institution_id_campus_id"
+  public_course_offerings ||--o{ public_sections : "institution_id_offering_id"
+  public_rooms ||--o{ public_sections : "institution_id_room_id"
+  public_campuses ||--o{ public_section_schedules : "institution_id_campus_id"
+  public_sections ||--o{ public_section_schedules : "institution_id_section_id"
+  public_rooms ||--o{ public_section_schedules : "institution_id_room_id"
+  public_staff_profiles ||--o{ public_teacher_assignments : "staff_profile_id"
+  public_campuses ||--o{ public_teacher_assignments : "institution_id_campus_id"
+  public_course_offerings ||--o{ public_teacher_assignments : "institution_id_offering_id"
+  public_sections ||--o{ public_teacher_assignments : "institution_id_section_id"
+  public_grading_policies ||--o{ public_assessment_components : "institution_id_grading_policy_id"
+  public_campuses ||--o{ public_assessments : "institution_id_campus_id"
+  public_course_offerings ||--o{ public_assessments : "institution_id_offering_id"
+  public_sections ||--o{ public_assessments : "institution_id_section_id"
+  public_assessment_components ||--o{ public_assessments : "institution_id_component_id"
+  public_institutions ||--o{ public_students : "institution_id"
+  auth_users ||--o{ public_students : "created_by"
+  auth_users ||--o{ public_students : "updated_by"
+  public_campuses ||--o{ public_students : "institution_id_campus_id"
+  auth_users ||--o{ public_student_auth_links : "auth_user_id"
+  public_students ||--o{ public_student_auth_links : "institution_id_student_id"
+  public_students ||--o{ public_student_contacts : "institution_id_student_id"
+  auth_users ||--o{ public_student_program_registrations : "created_by"
+  auth_users ||--o{ public_student_program_registrations : "updated_by"
+  public_campuses ||--o{ public_student_program_registrations : "institution_id_campus_id"
+  public_students ||--o{ public_student_program_registrations : "institution_id_student_id"
+  public_programs ||--o{ public_student_program_registrations : "institution_id_program_id"
+  public_academic_years ||--o{ public_student_program_registrations : "institution_id_academic_year_id"
+  public_terms ||--o{ public_student_program_registrations : "institution_id_start_term_id"
+  public_terms ||--o{ public_student_program_registrations : "institution_id_end_term_id"
+  public_programs ||--o{ public_document_requirements : "institution_id_program_id"
+  auth_users ||--o{ public_student_documents : "verified_by"
+  public_students ||--o{ public_student_documents : "institution_id_student_id"
+  public_document_requirements ||--o{ public_student_documents : "institution_id_requirement_id"
+  public_institutions ||--o{ public_student_profile_requests : "institution_id"
+  public_campuses ||--o{ public_student_profile_requests : "institution_id_campus_id"
+  public_students ||--o{ public_student_profile_requests : "institution_id_student_id"
+  public_institutions ||--o{ public_enrollment_requests : "institution_id"
+  public_campuses ||--o{ public_enrollment_requests : "institution_id_campus_id"
+  public_students ||--o{ public_enrollment_requests : "institution_id_student_id"
+  public_enrollment_periods ||--o{ public_enrollment_requests : "institution_id_enrollment_period_id"
+  public_terms ||--o{ public_enrollment_requests : "institution_id_term_id"
+  public_student_program_registrations ||--o{ public_enrollment_requests : "institution_id_program_registration_id"
+  public_enrollment_requests ||--o{ public_enrollment_request_items : "institution_id_enrollment_request_id"
+  public_course_offerings ||--o{ public_enrollment_request_items : "institution_id_course_offering_id"
+  public_sections ||--o{ public_enrollment_request_items : "institution_id_preferred_section_id"
+  public_sections ||--o{ public_enrollment_request_items : "institution_id_assigned_section_id"
+  public_campuses ||--o{ public_enrollments : "institution_id_campus_id"
+  public_students ||--o{ public_enrollments : "institution_id_student_id"
+  public_student_program_registrations ||--o{ public_enrollments : "institution_id_program_registration_id"
+  public_terms ||--o{ public_enrollments : "institution_id_term_id"
+  public_course_offerings ||--o{ public_enrollments : "institution_id_course_offering_id"
+  public_sections ||--o{ public_enrollments : "institution_id_section_id"
+  public_enrollment_request_items ||--o{ public_enrollments : "institution_id_enrollment_request_item_i"
+  auth_users ||--o{ public_enrollment_decisions : "decided_by"
+  public_enrollment_requests ||--o{ public_enrollment_decisions : "institution_id_enrollment_request_id"
+  public_enrollment_request_items ||--o{ public_enrollment_decisions : "institution_id_enrollment_request_item_i"
+  public_campuses ||--o{ public_waitlist_entries : "institution_id_campus_id"
+  public_students ||--o{ public_waitlist_entries : "institution_id_student_id"
+  public_enrollment_request_items ||--o{ public_waitlist_entries : "institution_id_enrollment_request_item_i"
+  public_course_offerings ||--o{ public_waitlist_entries : "institution_id_course_offering_id"
+  public_sections ||--o{ public_waitlist_entries : "institution_id_preferred_section_id"
+  public_enrollment_request_items ||--o{ public_timetable_conflict_evidence : "institution_id_enrollment_request_item_i"
+  public_sections ||--o{ public_timetable_conflict_evidence : "institution_id_requested_section_id"
+  public_enrollments ||--o{ public_timetable_conflict_evidence : "institution_id_conflicting_enrollment_id"
+  public_section_schedules ||--o{ public_timetable_conflict_evidence : "institution_id_requested_schedule_id"
+  public_section_schedules ||--o{ public_timetable_conflict_evidence : "institution_id_conflicting_schedule_id"
+  public_enrollment_request_items ||--o{ public_prerequisite_evidence : "institution_id_enrollment_request_item_i"
+  public_course_prerequisites ||--o{ public_prerequisite_evidence : "institution_id_prerequisite_id"
+  public_staff_profiles ||--o{ public_marks_batches : "submitted_by_staff_profile_id"
+  auth_users ||--o{ public_marks_batches : "approved_by"
+  public_campuses ||--o{ public_marks_batches : "institution_id_campus_id"
+  public_course_offerings ||--o{ public_marks_batches : "institution_id_offering_id"
+  public_sections ||--o{ public_marks_batches : "institution_id_section_id"
+  public_marks_batches ||--o{ public_marks_batch_files : "institution_id_marks_batch_id"
+  public_marks_batches ||--o{ public_student_marks : "institution_id_marks_batch_id"
+  public_assessments ||--o{ public_student_marks : "institution_id_assessment_id"
+  public_students ||--o{ public_student_marks : "institution_id_student_id"
+  public_enrollments ||--o{ public_student_marks : "institution_id_enrollment_id"
+  public_marks_batches ||--o{ public_marks_validation_issues : "institution_id_marks_batch_id"
+  auth_users ||--o{ public_marks_approval_history : "decided_by"
+  public_marks_batches ||--o{ public_marks_approval_history : "institution_id_marks_batch_id"
+  public_staff_profiles ||--o{ public_mark_correction_requests : "requested_by_staff_profile_id"
+  auth_users ||--o{ public_mark_correction_requests : "decided_by"
+  public_campuses ||--o{ public_mark_correction_requests : "institution_id_campus_id"
+  public_marks_batches ||--o{ public_mark_correction_requests : "institution_id_marks_batch_id"
+  public_student_marks ||--o{ public_mark_correction_requests : "institution_id_student_mark_id"
+  public_students ||--o{ public_mark_correction_requests : "institution_id_requested_by_student_id"
+  public_campuses ||--o{ public_course_results : "institution_id_campus_id"
+  public_students ||--o{ public_course_results : "institution_id_student_id"
+  public_terms ||--o{ public_course_results : "institution_id_term_id"
+  public_course_offerings ||--o{ public_course_results : "institution_id_course_offering_id"
+  public_enrollments ||--o{ public_course_results : "institution_id_enrollment_id"
+  public_grading_policies ||--o{ public_course_results : "institution_id_grading_policy_id"
+  public_campuses ||--o{ public_semester_results : "institution_id_campus_id"
+  public_students ||--o{ public_semester_results : "institution_id_student_id"
+  public_student_program_registrations ||--o{ public_semester_results : "institution_id_program_registration_id"
+  public_terms ||--o{ public_semester_results : "institution_id_term_id"
+  public_campuses ||--o{ public_cumulative_results : "institution_id_campus_id"
+  public_students ||--o{ public_cumulative_results : "institution_id_student_id"
+  public_student_program_registrations ||--o{ public_cumulative_results : "institution_id_program_registration_id"
+  public_terms ||--o{ public_cumulative_results : "institution_id_last_term_id"
+  public_students ||--o{ public_academic_standing_history : "institution_id_student_id"
+  public_student_program_registrations ||--o{ public_academic_standing_history : "institution_id_program_registration_id"
+  public_terms ||--o{ public_academic_standing_history : "institution_id_term_id"
+  public_semester_results ||--o{ public_academic_standing_history : "institution_id_semester_result_id"
+  public_grading_policies ||--o{ public_academic_standing_history : "institution_id_grading_policy_id"
+  public_institutions ||--o{ ops_idempotency_records : "institution_id"
+  public_institutions ||--o{ ops_notification_outbox : "institution_id"
+  public_campuses ||--o{ ops_notification_outbox : "institution_id_campus_id"
+  public_institutions ||--o{ ops_notification_deliveries : "institution_id"
+  ops_notification_outbox ||--o{ ops_notification_deliveries : "outbox_id"
+  public_institutions ||--o{ ops_workflow_runs : "institution_id"
+  public_campuses ||--o{ ops_workflow_runs : "institution_id_campus_id"
+  public_institutions ||--o{ ops_incidents : "institution_id"
+  auth_users ||--o{ ops_incidents : "acknowledged_by"
+  auth_users ||--o{ ops_incidents : "resolved_by"
+  public_campuses ||--o{ ops_incidents : "institution_id_campus_id"
+  ops_incidents ||--o{ ops_incident_events : "incident_id"
+  public_institutions ||--o{ ops_hec_report_runs : "institution_id"
+  auth_users ||--o{ ops_hec_report_runs : "requested_by"
+  public_campuses ||--o{ ops_hec_report_runs : "institution_id_campus_id"
+  public_academic_years ||--o{ ops_hec_report_runs : "institution_id_academic_year_id"
+  public_terms ||--o{ ops_hec_report_runs : "institution_id_term_id"
+  public_programs ||--o{ ops_hec_report_runs : "institution_id_program_id"
+  public_institutions ||--o{ ops_generated_report_files : "institution_id"
+  ops_hec_report_runs ||--o{ ops_generated_report_files : "hec_report_run_id"
+  public_institutions ||--o{ ops_dashboard_refresh_runs : "institution_id"
+  public_campuses ||--o{ ops_dashboard_refresh_runs : "institution_id_campus_id"
+  public_institutions ||--o{ public_transcript_requests : "institution_id"
+  auth_users ||--o{ public_transcript_requests : "requested_by_auth_user_id"
+  public_campuses ||--o{ public_transcript_requests : "institution_id_campus_id"
+  public_students ||--o{ public_transcript_requests : "institution_id_student_id"
+  public_transcript_requests ||--o{ public_transcript_documents : "institution_id_transcript_request_id"
+  ops_notification_outbox ||--o{ public_transcript_delivery_records : "outbox_id"
+  public_transcript_requests ||--o{ public_transcript_delivery_records : "institution_id_transcript_request_id"
+  public_transcript_documents ||--o{ public_transcript_delivery_records : "institution_id_transcript_document_id"
+  public_institutions ||--o{ audit_audit_logs : "institution_id"
+  auth_users ||--o{ audit_audit_logs : "actor_auth_user_id"
+  public_staff_profiles ||--o{ audit_audit_logs : "actor_staff_profile_id"
+  public_campuses ||--o{ audit_audit_logs : "institution_id_campus_id"
+  public_students ||--o{ audit_audit_logs : "institution_id_actor_student_id"
+  public_institutions ||--o{ audit_data_change_events : "institution_id"
+  auth_users ||--o{ audit_data_change_events : "changed_by"

@@ -1,0 +1,770 @@
+{
+  "name": "SIS 08 — Notification Dispatcher — Stabilized",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1120,
+        0
+      ],
+      "id": "fd70dbb6-4b23-5922-8683-2da37e6bf539",
+      "name": "Every Minute",
+      "notesInFlow": true,
+      "notes": "Runs the outbox dispatcher every minute after workflow activation. Manual execution is also supported."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const uuid = () =>\n  'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {\n    const r = Math.floor(Math.random() * 16);\n    return (c === 'x' ? r : ((r & 3) | 8)).toString(16);\n  });\n\nconst correlationId = uuid();\nconst configuredBatchSize = Number($env.SIS_NOTIFICATION_BATCH_SIZE || 20);\nconst batchSize = Number.isFinite(configuredBatchSize)\n  ? Math.max(1, Math.min(100, configuredBatchSize))\n  : 20;\n\nreturn [\n  {\n    json: {\n      correlationId,\n      workerId: `n8n:08-notification-dispatcher:${$execution.id}`,\n      batchSize,\n      request: {\n        operation: 'notification.claim',\n        correlation_id: correlationId,\n        submitted_at: new Date().toISOString(),\n        source: { channel: 'n8n_schedule' },\n        payload: {\n          worker_id: `n8n:08-notification-dispatcher:${$execution.id}`,\n          limit: batchSize,\n        },\n      },\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -900,
+        0
+      ],
+      "id": "361c49a8-c14a-51c3-87f3-4288d438087f",
+      "name": "Build Claim Request",
+      "notesInFlow": true,
+      "notes": "Creates one correlation ID and a bounded claim request. Batch size is read from SIS_NOTIFICATION_BATCH_SIZE."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  'p_request': {\n    'operation': 'workflow.run.log',\n    'correlation_id': $('Build Claim Request').item.json.correlationId,\n    'idempotency_key': 'notification-dispatcher:' + $execution.id + ':start',\n    'submitted_at': new Date().toISOString(),\n    'source': { 'channel': 'n8n_schedule' },\n    'payload': {\n      'workflow_code': '08-notification-dispatcher',\n      'n8n_execution_id': $execution.id,\n      'operation': 'notification.dispatch',\n      'run_status': 'started',\n      'input_summary': {\n        'batch_size': $('Build Claim Request').item.json.batchSize\n      }\n    }\n  }\n} }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -680,
+        -80
+      ],
+      "id": "3bc3d395-3667-5641-87bb-dadbb099a4ef",
+      "name": "Log Dispatcher Start",
+      "notesInFlow": true,
+      "notes": "Best-effort dispatcher run evidence. Logging failure does not block delivery.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_claim_notifications'}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  'p_request': $('Build Claim Request').item.json.request\n} }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -440,
+        -80
+      ],
+      "id": "1f94e18e-92e6-554d-9303-ca5f588096b0",
+      "name": "Claim Notification Batch",
+      "notesInFlow": true,
+      "notes": "Claims a bounded batch with database row locks. Transport failures retry; stale uncertain sends are dead-lettered rather than duplicated.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const inputItems = $input.all();\nif (inputItems.length !== 1) {\n  throw new Error('NOTIFICATION_CLAIM_ITEM_COUNT_INVALID');\n}\n\nconst raw = inputItems[0].json ?? {};\nlet body = Object.prototype.hasOwnProperty.call(raw, 'body')\n  ? raw.body\n  : raw;\n\nif (typeof body === 'string') {\n  try {\n    body = JSON.parse(body);\n  } catch {\n    throw new Error('NOTIFICATION_CLAIM_INVALID_RESPONSE');\n  }\n}\n\nif (Array.isArray(body) && body.length === 1 && body[0]) {\n  body = body[0];\n}\n\nif (!body || typeof body !== 'object' || body.success !== true) {\n  const code =\n    body?.error?.code ||\n    body?.code ||\n    raw.error?.message ||\n    raw.message ||\n    'NOTIFICATION_CLAIM_FAILED';\n  throw new Error(String(code));\n}\n\nconst notifications = Array.isArray(body?.data?.notifications)\n  ? body.data.notifications\n  : [];\n\nif (notifications.length === 0) {\n  return [\n    {\n      json: {\n        hasNotification: false,\n        claimedCount: 0,\n        claimResult: body,\n      },\n      pairedItem: { item: 0 },\n    },\n  ];\n}\n\nconst renderMessage = (notification) => {\n  const payload = notification.payload || {};\n  const name = notification.recipient_name\n    ? ` ${notification.recipient_name}`\n    : '';\n\n  const templates = {\n    'student-profile-ack':\n      `Dear${name},\\n\\n` +\n      `Your student profile has been received. Student number: ` +\n      `${payload.student_number || 'pending assignment'}. ` +\n      `Required documents may still need staff verification.\\n\\n` +\n      `Regards,\\nAcademic Administration`,\n\n    'enrollment-decision':\n      `Dear${name},\\n\\n` +\n      `Your enrollment request has been processed. Current outcome: ` +\n      `${String(payload.overall_outcome || 'review pending').replaceAll('_', ' ')}.` +\n      `\\n\\nRegards,\\nAcademic Administration`,\n  };\n\n  return (\n    templates[notification.template_code] ||\n    `Dear${name},\\n\\n` +\n      `There is an update regarding ` +\n      `${String(notification.notification_type || 'your academic record').replaceAll('.', ' ')}. ` +\n      `Please contact academic administration if further information is required.` +\n      `\\n\\nRegards,\\nAcademic Administration`\n  );\n};\n\nreturn notifications.map((notification) => ({\n  json: {\n    hasNotification: true,\n    notification,\n    renderedSubject:\n      notification.subject || 'Academic administration update',\n    renderedMessage: renderMessage(notification),\n  },\n  pairedItem: { item: 0 },\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -200,
+        -80
+      ],
+      "id": "df7e6313-cfbe-59ec-b4fc-cbcc22a10b10",
+      "name": "Render Notification Batch",
+      "notesInFlow": true,
+      "notes": "Expands claimed rows and renders text-only messages from controlled template codes. Empty batches produce one control item."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.hasNotification}}",
+              "operation": "equal",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        40,
+        -80
+      ],
+      "id": "72488526-9ba7-54c9-bb48-2a464e462a69",
+      "name": "Has Claimed Notification?",
+      "notesInFlow": true,
+      "notes": "True: process one claimed notification. False: finish an empty dispatcher run."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_begin_notification_attempt'}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  'p_request': {\n    'operation': 'notification.attempt.begin',\n    'correlation_id': $json.notification.correlation_id,\n    'idempotency_key':\n      'notification:' +\n      $json.notification.outbox_id +\n      ':attempt:' +\n      $json.notification.attempt_number +\n      ':begin',\n    'submitted_at': new Date().toISOString(),\n    'source': { 'channel': 'n8n' },\n    'payload': {\n      'outbox_id': $json.notification.outbox_id,\n      'attempt_number': $json.notification.attempt_number,\n      'worker_id': $json.notification.worker_id,\n      'provider':\n        $json.notification.channel === 'email'\n          ? 'gmail'\n          : $json.notification.channel\n    }\n  }\n} }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        280,
+        -160
+      ],
+      "id": "98fdfcfc-2245-51b5-b368-e0fda72fd3a9",
+      "name": "Begin Delivery Attempt",
+      "notesInFlow": true,
+      "notes": "Reserves the provider attempt before sending. Replayed begin calls return should_send=false and do not duplicate an external message.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source = $('Render Notification Batch').item.json;\nconst raw = $json ?? {};\n\nlet body = Object.prototype.hasOwnProperty.call(raw, 'body')\n  ? raw.body\n  : raw;\n\nif (typeof body === 'string') {\n  try {\n    body = JSON.parse(body);\n  } catch {\n    throw new Error('NOTIFICATION_BEGIN_INVALID_RESPONSE');\n  }\n}\n\nif (Array.isArray(body) && body.length === 1 && body[0]) {\n  body = body[0];\n}\n\nif (!body || typeof body !== 'object' || body.success !== true) {\n  const code =\n    body?.error?.code ||\n    body?.code ||\n    raw.error?.message ||\n    raw.message ||\n    'NOTIFICATION_BEGIN_FAILED';\n  throw new Error(String(code));\n}\n\nreturn {\n  json: {\n    ...source,\n    shouldSend: body.data?.should_send === true,\n    beginResult: body,\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        -160
+      ],
+      "id": "f2069fea-5b97-52ba-a4cd-7ebcf35becc2",
+      "name": "Begin Attempt Decision",
+      "notesInFlow": true,
+      "notes": "Validates the begin-attempt response and restores the claimed notification context."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.shouldSend}}",
+              "operation": "equal",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        760,
+        -160
+      ],
+      "id": "e5ff7596-14c8-5c45-be46-9206ec8a9271",
+      "name": "Should Send?",
+      "notesInFlow": true,
+      "notes": "False means this exact attempt already exists, so the provider call is skipped."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.notification.channel}}",
+              "operation": "equal",
+              "value2": "email"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        -220
+      ],
+      "id": "0cd63b1c-4377-56bd-bad7-217bb3c21521",
+      "name": "Is Email Channel?",
+      "notesInFlow": true,
+      "notes": "Gmail is the only active pilot delivery provider. Other channels are recorded as permanent configuration failures."
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{$json.notification.recipient_address}}",
+        "subject": "={{$json.renderedSubject}}",
+        "emailType": "text",
+        "message": "={{$json.renderedMessage}}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1240,
+        -300
+      ],
+      "id": "97276b2a-51a8-525e-972e-5cc6c05aa6c0",
+      "name": "Send Gmail Message",
+      "notesInFlow": true,
+      "notes": "Sends one text email. Node-level retries are intentionally disabled because the database attempt reservation is the only retry owner.",
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source = $('Begin Attempt Decision').item.json;\nconst notification = source.notification;\nconst raw = $json ?? {};\n\nconst errorText = String(\n  raw.error?.message ||\n  raw.message ||\n  raw.description ||\n  ''\n);\n\nconst providerMessageId =\n  raw.id ||\n  raw.messageId ||\n  raw.threadId ||\n  '';\n\nconst delivered = Boolean(providerMessageId) && !errorText;\n\nconst uncertainOutcome =\n  !delivered &&\n  /(timeout|timed out|network|econn|socket|connection reset|connection closed|no response)/i\n    .test(errorText);\n\nconst explicitTemporaryFailure =\n  !delivered &&\n  !uncertainOutcome &&\n  /(429|rate limit|quota|temporar|unavailable|5\\d\\d|backend error)/i\n    .test(errorText);\n\nlet deliveryStatus;\nlet retryable;\nlet errorCode;\n\nif (delivered) {\n  deliveryStatus = 'delivered';\n  retryable = false;\n  errorCode = '';\n} else if (uncertainOutcome) {\n  deliveryStatus = 'dead_letter';\n  retryable = false;\n  errorCode = 'NOTIFICATION_DELIVERY_OUTCOME_UNKNOWN';\n} else if (explicitTemporaryFailure) {\n  deliveryStatus = 'temporary_failure';\n  retryable = true;\n  errorCode = 'NOTIFICATION_TEMPORARY_FAILURE';\n} else {\n  deliveryStatus = 'permanent_failure';\n  retryable = false;\n  errorCode = 'NOTIFICATION_PROVIDER_REJECTED';\n}\n\nreturn {\n  json: {\n    request: {\n      operation: 'notification.delivery.record',\n      correlation_id: notification.correlation_id,\n      idempotency_key:\n        `notification:${notification.outbox_id}:attempt:` +\n        `${notification.attempt_number}`,\n      submitted_at: new Date().toISOString(),\n      source: {\n        channel: 'n8n',\n        workflow_code: '08-notification-dispatcher',\n      },\n      payload: {\n        outbox_id: notification.outbox_id,\n        attempt_number: notification.attempt_number,\n        delivery_status: deliveryStatus,\n        provider: 'gmail',\n        provider_message_id: providerMessageId || null,\n        error_code: errorCode || null,\n        error_message:\n          delivered\n            ? null\n            : (errorText || 'Gmail did not return a message identifier.').slice(0, 300),\n        retryable,\n      },\n    },\n    deliveryStatus,\n    outboxId: notification.outbox_id,\n    providerMessageId: providerMessageId || null,\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1480,
+        -300
+      ],
+      "id": "7eaaa4f3-018f-5bd7-8347-e26c5f3e4ac9",
+      "name": "Build Gmail Attempt Result",
+      "notesInFlow": true,
+      "notes": "Classifies the Gmail provider result as delivered, temporary failure or permanent failure. Error text is sanitized and truncated."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const notification = $json.notification;\n\nreturn {\n  json: {\n    request: {\n      operation: 'notification.delivery.record',\n      correlation_id: notification.correlation_id,\n      idempotency_key:\n        `notification:${notification.outbox_id}:attempt:` +\n        `${notification.attempt_number}`,\n      submitted_at: new Date().toISOString(),\n      source: {\n        channel: 'n8n',\n        workflow_code: '08-notification-dispatcher',\n      },\n      payload: {\n        outbox_id: notification.outbox_id,\n        attempt_number: notification.attempt_number,\n        delivery_status: 'permanent_failure',\n        provider: notification.channel,\n        provider_message_id: null,\n        error_code: 'NOTIFICATION_CHANNEL_NOT_CONFIGURED',\n        error_message:\n          'The requested notification channel is not configured in this pilot.',\n        retryable: false,\n      },\n    },\n    deliveryStatus: 'permanent_failure',\n    outboxId: notification.outbox_id,\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1240,
+        -100
+      ],
+      "id": "c155b1f5-e411-5187-8382-368b8524e1de",
+      "name": "Build Unsupported Channel Result",
+      "notesInFlow": true,
+      "notes": "Records unsupported channels as permanent failures without attempting an external provider."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_record_notification_attempt'}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  'p_request': $json.request\n} }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1720,
+        -200
+      ],
+      "id": "6b46569d-e89f-52af-883b-ef8657aa373e",
+      "name": "Record Delivery Attempt",
+      "notesInFlow": true,
+      "notes": "Idempotently finalizes the reserved attempt, applies bounded backoff or dead-letter state, and records provider evidence.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  'p_request': {\n    'operation': 'workflow.run.log',\n    'correlation_id': $('Build Claim Request').item.json.correlationId,\n    'idempotency_key':\n      'notification-dispatcher:' +\n      $execution.id +\n      ':delivery:' +\n      $json.outboxId,\n    'submitted_at': new Date().toISOString(),\n    'source': { 'channel': 'n8n_schedule' },\n    'payload': {\n      'workflow_code': '08-notification-dispatcher',\n      'n8n_execution_id': $execution.id,\n      'operation': 'notification.dispatch',\n      'run_status': 'completed',\n      'output_summary': {\n        'outbox_id': $json.outboxId,\n        'delivery_status': $json.deliveryStatus,\n        'recorded': true\n      }\n    }\n  }\n} }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1960,
+        -200
+      ],
+      "id": "36676cd5-29dd-5aef-9a58-015532f744aa",
+      "name": "Log Dispatcher Completion",
+      "notesInFlow": true,
+      "notes": "Best-effort completion evidence after a delivery attempt is durably recorded.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  'p_request': {\n    'operation': 'workflow.run.log',\n    'correlation_id': $('Build Claim Request').item.json.correlationId,\n    'idempotency_key':\n      'notification-dispatcher:' + $execution.id + ':empty',\n    'submitted_at': new Date().toISOString(),\n    'source': { 'channel': 'n8n_schedule' },\n    'payload': {\n      'workflow_code': '08-notification-dispatcher',\n      'n8n_execution_id': $execution.id,\n      'operation': 'notification.dispatch',\n      'run_status': 'completed',\n      'output_summary': { 'claimed_count': 0 }\n    }\n  }\n} }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        280,
+        80
+      ],
+      "id": "ebd18a22-fcee-5510-9719-c9d59c6a9165",
+      "name": "Log Empty Dispatcher Run",
+      "notesInFlow": true,
+      "notes": "Closes the workflow-run record when the outbox is empty.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  'p_request': {\n    'operation': 'workflow.run.log',\n    'correlation_id': $('Build Claim Request').item.json.correlationId,\n    'idempotency_key':\n      'notification-dispatcher:' +\n      $execution.id +\n      ':deduplicated:' +\n      $json.notification.outbox_id,\n    'submitted_at': new Date().toISOString(),\n    'source': { 'channel': 'n8n_schedule' },\n    'payload': {\n      'workflow_code': '08-notification-dispatcher',\n      'n8n_execution_id': $execution.id,\n      'operation': 'notification.dispatch',\n      'run_status': 'completed',\n      'output_summary': {\n        'provider_send_skipped': true,\n        'outbox_id': $json.notification.outbox_id\n      }\n    }\n  }\n} }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1000,
+        -20
+      ],
+      "id": "a309fe4b-a464-5612-82c1-6bdc149a9c10",
+      "name": "Log Deduplicated Attempt",
+      "notesInFlow": true,
+      "notes": "Closes a run where an idempotent begin-attempt replay correctly prevented a duplicate provider call.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source =\n  $('Build Gmail Attempt Result').isExecuted\n    ? $('Build Gmail Attempt Result').item.json\n    : $('Build Unsupported Channel Result').item.json;\n\nconst raw = $json ?? {};\nlet body = Object.prototype.hasOwnProperty.call(raw, 'body')\n  ? raw.body\n  : raw;\n\nif (typeof body === 'string') {\n  try {\n    body = JSON.parse(body);\n  } catch {\n    throw new Error('NOTIFICATION_RECORD_INVALID_RESPONSE');\n  }\n}\n\nif (Array.isArray(body) && body.length === 1 && body[0]) {\n  body = body[0];\n}\n\nif (!body || typeof body !== 'object' || body.success !== true) {\n  const code =\n    body?.error?.code ||\n    body?.code ||\n    raw.error?.message ||\n    raw.message ||\n    'NOTIFICATION_RECORD_FAILED';\n  throw new Error(String(code));\n}\n\nreturn {\n  json: {\n    ...source,\n    recordResult: body,\n    recordSuccess: true,\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        -80
+      ],
+      "id": "95d2b2dc-d6d1-49dd-ad8d-c2f6ffd26a53",
+      "name": "Validate Delivery Record",
+      "notesInFlow": true,
+      "notes": "Stops the execution when the terminal delivery outcome was not durably recorded in Supabase."
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Every Minute": {
+      "main": [
+        [
+          {
+            "node": "Build Claim Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Claim Request": {
+      "main": [
+        [
+          {
+            "node": "Log Dispatcher Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Dispatcher Start": {
+      "main": [
+        [
+          {
+            "node": "Claim Notification Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim Notification Batch": {
+      "main": [
+        [
+          {
+            "node": "Render Notification Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render Notification Batch": {
+      "main": [
+        [
+          {
+            "node": "Has Claimed Notification?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Claimed Notification?": {
+      "main": [
+        [
+          {
+            "node": "Begin Delivery Attempt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Empty Dispatcher Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Begin Delivery Attempt": {
+      "main": [
+        [
+          {
+            "node": "Begin Attempt Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Begin Attempt Decision": {
+      "main": [
+        [
+          {
+            "node": "Should Send?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Send?": {
+      "main": [
+        [
+          {
+            "node": "Is Email Channel?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Deduplicated Attempt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Email Channel?": {
+      "main": [
+        [
+          {
+            "node": "Send Gmail Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Unsupported Channel Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Gmail Message": {
+      "main": [
+        [
+          {
+            "node": "Build Gmail Attempt Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Gmail Attempt Result": {
+      "main": [
+        [
+          {
+            "node": "Record Delivery Attempt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Unsupported Channel Result": {
+      "main": [
+        [
+          {
+            "node": "Record Delivery Attempt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Delivery Attempt": {
+      "main": [
+        [
+          {
+            "node": "Validate Delivery Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Delivery Record": {
+      "main": [
+        [
+          {
+            "node": "Log Dispatcher Completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": true,
+    "timezone": "Asia/Karachi"
+  },
+  "tags": []
+}

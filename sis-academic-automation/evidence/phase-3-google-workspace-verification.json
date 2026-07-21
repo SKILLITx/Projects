@@ -1,0 +1,12 @@
+{
+  "suite": "phase3-google-workspace-verification",
+  "success": true,
+  "forms": 6,
+  "response_spreadsheets": 6,
+  "form_submit_triggers": 6,
+  "folders": 12,
+  "transcript_templates": 1,
+  "hec_templates": 1,
+  "dashboard_templates": 1,
+  "missing": []
+}

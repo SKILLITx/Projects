@@ -1,0 +1,30 @@
+﻿{
+    "package_name":  "SIS Academic Automation - Controlled Pilot Final Submission",
+    "created_at_utc":  "2026-07-21T22:13:41.2089253Z",
+    "classification":  "controlled_institutional_pilot",
+    "completed_workflows":  [
+                                "01",
+                                "02",
+                                "03",
+                                "04",
+                                "05",
+                                "07",
+                                "08",
+                                "09"
+                            ],
+    "deferred_workflows":  [
+                               "06",
+                               "10"
+                           ],
+    "secrets_included":  false,
+    "runtime_database_included":  false,
+    "private_configuration_included":  false,
+    "private_backup_included":  false,
+    "notes":  [
+                  "Workflow 06 HEC Reporting is deferred.",
+                  "Workflow 10 Global Error Handler is deferred.",
+                  "Five obsolete workflow variants remain inactive and are not required for the pilot.",
+                  "Private recovery backups are stored separately and must not be shared.",
+                  "The Zoom video may be submitted beside this ZIP or placed in submission-assets before packaging."
+              ]
+}

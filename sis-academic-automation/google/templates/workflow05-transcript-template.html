@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>DMU Transcript Demo</title>
+</head>
+<body>
+  <!--
+    Workflow 05 populates an equivalent styled template at runtime from the
+    complete Supabase transcript model. This file documents the maintained
+    template contract; no student data or Google file IDs are stored here.
+  -->
+  <header>
+    <div>{{INSTITUTION_LOGO_OR_CODE}}</div>
+    <h1>{{INSTITUTION_NAME}}</h1>
+    <p>{{CAMPUS_NAME}}</p>
+    <p>ACADEMIC TRANSCRIPT</p>
+  </header>
+
+  <section>
+    <p>Reference: {{REFERENCE_NUMBER}}</p>
+    <p>Issue date: {{ISSUE_DATE}}</p>
+    <p>Student: {{STUDENT_NAME}}</p>
+    <p>Student number: {{STUDENT_NUMBER}}</p>
+    <p>Program: {{PROGRAM_NAME}} ({{PROGRAM_CODE}})</p>
+  </section>
+
+  <section>
+    {{TERM_AND_COURSE_TABLES}}
+  </section>
+
+  <section>
+    <p>CGPA: {{CGPA}}</p>
+    <p>Academic standing: {{ACADEMIC_STANDING}}</p>
+    <p>Verification code: {{VERIFICATION_CODE}}</p>
+  </section>
+
+  <footer>
+    <strong>CONTROLLED PILOT / DEMONSTRATION DOCUMENT</strong>
+    <p>{{TRANSCRIPT_DISCLAIMER}}</p>
+  </footer>
+</body>
+</html>

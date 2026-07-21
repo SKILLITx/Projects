@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "linked_response_spreadsheet_per_form": true,
+  "tabs": {
+    "Form Responses 1": "Google-managed original form response rows.",
+    "Automation Queue": "Stable normalized queue consumed by n8n.",
+    "Setup Metadata": "Asset IDs, operation and provisioning metadata."
+  },
+  "automation_queue_columns": [
+    "Form Response ID",
+    "Submitted At UTC",
+    "Respondent Email",
+    "Operation",
+    "Source Form ID",
+    "Source Spreadsheet ID",
+    "Raw Response JSON",
+    "Processing Status",
+    "Processed At UTC",
+    "Correlation ID",
+    "Idempotency Key",
+    "Error Code",
+    "Error Message",
+    "Retry Count",
+    "Last Attempt At UTC",
+    "n8n Execution ID"
+  ],
+  "processing_status_values": [
+    "pending",
+    "processing",
+    "completed",
+    "failed",
+    "dead_letter",
+    "ignored"
+  ],
+  "idempotency_key_format": "google-form:{form_id}:{form_response_id}",
+  "notes": [
+    "n8n should process Automation Queue rather than relying on Google-managed header order.",
+    "The trigger records the immutable Google Form response ID.",
+    "Detailed errors remain sanitized in Sheets; technical details belong in Supabase operations tables."
+  ]
+}

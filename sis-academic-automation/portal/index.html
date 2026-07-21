@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>SIS Staff Portal</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">University and School Chain Administration</p>
+      <h1>SIS Staff Portal</h1>
+    </div>
+    <div class="session-actions">
+      <span id="session-label">Signed out</span>
+      <button id="sign-out-button" type="button" class="secondary" hidden>Sign out</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="configuration-panel" class="notice" hidden>
+      <h2>Portal configuration required</h2>
+      <p>Run <code>scripts\Initialize-PortalConfig.ps1</code> locally, then refresh this page.</p>
+      <pre id="configuration-error"></pre>
+    </section>
+
+    <section id="login-panel" class="panel narrow">
+      <h2>Staff sign in</h2>
+      <form id="login-form">
+        <label>Email
+          <input id="login-email" type="email" autocomplete="username" required>
+        </label>
+        <label>Password
+          <input id="login-password" type="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit">Sign in</button>
+      </form>
+      <p id="login-status" class="status" aria-live="polite"></p>
+    </section>
+
+    <section id="portal-panel" hidden>
+      <div class="scope-bar panel">
+        <div>
+          <h2 id="staff-name">Staff account</h2>
+          <p id="staff-role-summary" class="muted"></p>
+        </div>
+        <label>Institution
+          <select id="institution-select" aria-label="Institution"></select>
+        </label>
+        <label>Campus
+          <select id="campus-select" aria-label="Campus"></select>
+        </label>
+      </div>
+
+      <nav class="tabs" aria-label="Portal functions">
+        <button type="button" data-panel="dashboard-view" class="active">Dashboard</button>
+        <button type="button" data-panel="student-search-view">Student search</button>
+        <button type="button" data-panel="enrollment-view">Enrollment decision</button>
+        <button type="button" data-panel="marks-view">Marks decision</button>
+        <button type="button" data-panel="correction-view">Correction decision</button>
+        <button type="button" data-panel="publication-view">Publish results</button>
+        <button type="button" data-panel="session-view">Session and scope</button>
+      </nav>
+
+      <section id="dashboard-view" class="panel view">
+        <div class="view-heading">
+          <div>
+            <h2>Basic administrative dashboard</h2>
+            <p>Read-only academic and operational metrics for the selected permitted scope.</p>
+          </div>
+          <button id="refresh-dashboard-button" type="button">Refresh dashboard</button>
+        </div>
+        <div class="dashboard-controls">
+          <label>Academic term
+            <select id="dashboard-term-select">
+              <option value="">Current active term</option>
+            </select>
+          </label>
+          <p id="dashboard-scope-label" class="scope-summary">Scope will appear after refresh.</p>
+        </div>
+        <p id="dashboard-status" class="status" aria-live="polite"></p>
+        <div id="dashboard-cards" class="cards" aria-live="polite"></div>
+        <div class="dashboard-details">
+          <section>
+            <h3>Grade distribution</h3>
+            <div id="dashboard-grades" class="table-scroll"></div>
+          </section>
+          <section>
+            <h3>Course and section capacity</h3>
+            <div id="dashboard-capacity" class="table-scroll"></div>
+          </section>
+        </div>
+        <details class="support-details">
+          <summary>Sanitized support details</summary>
+          <pre id="dashboard-output"></pre>
+        </details>
+      </section>
+
+      <section id="student-search-view" class="panel view" hidden>
+        <div class="view-heading">
+          <div>
+            <h2>Student search</h2>
+            <p>Search only within the selected institution and campus scope.</p>
+          </div>
+        </div>
+        <form id="student-search-form" class="search-form">
+          <label>Search text
+            <input id="student-search-query" type="search" placeholder="Example: DMU-0001 or Demo University Student" required>
+          </label>
+          <label>Search type
+            <select id="student-search-type">
+              <option value="auto">Auto</option>
+              <option value="student_number">Student number</option>
+              <option value="name">Name</option>
+              <option value="email">Email</option>
+              <option value="identity_reference">CNIC / identity reference</option>
+            </select>
+          </label>
+          <div class="button-row">
+            <button type="submit">Search</button>
+            <button id="student-search-clear" type="button" class="quiet">Clear</button>
+          </div>
+        </form>
+        <p class="muted compact">CNIC or identity-reference searches require an exact value. Stored identity values are never displayed in full.</p>
+        <p id="student-search-status" class="status" aria-live="polite"></p>
+        <div id="student-results" class="table-scroll"></div>
+        <details class="support-details">
+          <summary>Sanitized support details</summary>
+          <pre id="student-search-output"></pre>
+        </details>
+      </section>
+
+      <section id="enrollment-view" class="panel view" hidden>
+        <h2>Enrollment decision</h2>
+        <form id="enrollment-form" class="form-grid">
+          <label>Enrollment request item ID
+            <input id="enrollment-item-id" type="text" required>
+          </label>
+          <label>Decision
+            <select id="enrollment-decision" required>
+              <option value="enrolled">Enroll</option>
+              <option value="rejected">Reject</option>
+              <option value="cancelled">Cancel</option>
+            </select>
+          </label>
+          <label>Section ID (required when enrolling)
+            <input id="enrollment-section-id" type="text">
+          </label>
+          <label class="wide">Reason
+            <textarea id="enrollment-reason"></textarea>
+          </label>
+          <button type="submit">Submit decision</button>
+        </form>
+        <pre id="enrollment-output"></pre>
+      </section>
+
+      <section id="marks-view" class="panel view" hidden>
+        <h2>Marks-batch decision</h2>
+        <form id="marks-form" class="form-grid">
+          <label>Marks batch ID
+            <input id="marks-batch-id" type="text" required>
+          </label>
+          <label>Decision
+            <select id="marks-decision" required>
+              <option value="approved">Approve</option>
+              <option value="rejected">Reject</option>
+              <option value="returned">Return for correction</option>
+            </select>
+          </label>
+          <label class="wide">Reason
+            <textarea id="marks-reason"></textarea>
+          </label>
+          <button type="submit">Submit decision</button>
+        </form>
+        <pre id="marks-output"></pre>
+      </section>
+
+      <section id="correction-view" class="panel view" hidden>
+        <h2>Mark-correction decision</h2>
+        <form id="correction-form" class="form-grid">
+          <label>Correction request ID
+            <input id="correction-request-id" type="text" required>
+          </label>
+          <label>Decision
+            <select id="correction-decision" required>
+              <option value="approved">Approve and apply</option>
+              <option value="rejected">Reject</option>
+            </select>
+          </label>
+          <label class="wide">Reason
+            <textarea id="correction-reason"></textarea>
+          </label>
+          <button type="submit">Submit decision</button>
+        </form>
+        <pre id="correction-output"></pre>
+      </section>
+
+      <section id="publication-view" class="panel view" hidden>
+        <h2>Publish course results</h2>
+        <form id="publication-form" class="form-grid">
+          <label>Course offering ID
+            <input id="publication-offering-id" type="text" required>
+          </label>
+          <label class="checkbox-label">
+            <input id="publication-force" type="checkbox">
+            Force recalculation before publication
+          </label>
+          <p class="wide muted">Normal repeated submissions are idempotent. Use force recalculation only after an approved correction or a deliberate grading-data change.</p>
+          <button type="submit">Publish results</button>
+        </form>
+        <pre id="publication-output"></pre>
+      </section>
+
+      <section id="session-view" class="panel view" hidden>
+        <h2>Authenticated session and authorization scope</h2>
+        <p class="muted">Only human-readable account and scope information is shown here.</p>
+        <pre id="session-output"></pre>
+      </section>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./config.local.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

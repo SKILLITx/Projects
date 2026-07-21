@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-07-21T01:24:51.597Z",
+  "actor_email": "zaidrizwan.278@gmail.com",
+  "require_live_monitoring_run": true,
+  "tests": [
+    {
+      "name": "authorized DMU operations snapshot",
+      "passed": true,
+      "http_status": 200,
+      "correlation_id": "5d869370-cee3-4882-a367-2dc7d6c62bd3",
+      "n8n_execution_id": null,
+      "note": "pending=0; incidents=0; backup=not_recorded"
+    },
+    {
+      "name": "snapshot metrics are zero-safe numbers",
+      "passed": true,
+      "http_status": 200,
+      "correlation_id": "5d869370-cee3-4882-a367-2dc7d6c62bd3",
+      "n8n_execution_id": null,
+      "note": null
+    },
+    {
+      "name": "super administrator global snapshot",
+      "passed": true,
+      "http_status": 200,
+      "correlation_id": "1feacf7d-c49b-4763-bb05-375983b622e0",
+      "n8n_execution_id": null,
+      "note": null
+    },
+    {
+      "name": "latest n8n monitoring run completed",
+      "passed": true,
+      "http_status": 200,
+      "correlation_id": "9ec35691-ce10-4379-9be2-0c8e9917ffa2",
+      "n8n_execution_id": "1301",
+      "note": "status=completed"
+    },
+    {
+      "name": "latest maintenance run completed",
+      "passed": true,
+      "http_status": 200,
+      "correlation_id": "9ec35691-ce10-4379-9be2-0c8e9917ffa2",
+      "n8n_execution_id": null,
+      "note": "status=completed"
+    },
+    {
+      "name": "invalid institution UUID is sanitized",
+      "passed": true,
+      "http_status": 200,
+      "correlation_id": "4441012a-f90c-4689-bd5d-66d2529b2ce9",
+      "n8n_execution_id": null,
+      "note": null
+    },
+    {
+      "name": "authenticated browser actor cannot run maintenance",
+      "passed": true,
+      "http_status": 403,
+      "correlation_id": null,
+      "n8n_execution_id": null,
+      "note": null
+    }
+  ],
+  "coverage_notes": [
+    "Host backup execution remains outside n8n. Workflow 09 reports the latest backup.verify maintenance record but does not run backup commands.",
+    "Automatic Google Sheets dashboard refresh and retention deletion remain deferred and are reported explicitly in the snapshot."
+  ]
+}

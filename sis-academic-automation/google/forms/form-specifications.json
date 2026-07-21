@@ -1,0 +1,637 @@
+{
+  "schema_version": 1,
+  "generated_for": "University and School Chain Administration Automation",
+  "forms": [
+    {
+      "code": "student-profile",
+      "title": "SIS \u2014 Student Profile and Admission",
+      "operation": "student.profile.submit",
+      "audience": "student_or_admissions_staff",
+      "collect_email": true,
+      "confirmation": "Your profile submission has been recorded. Keep the response receipt for reference.",
+      "description": "Collects new-student admission information and controlled profile updates. Submission does not guarantee admission.",
+      "fields": [
+        {
+          "key": "institution_code",
+          "title": "Institution code",
+          "type": "list",
+          "required": true,
+          "choices": [
+            "DMU",
+            "DCS"
+          ]
+        },
+        {
+          "key": "campus_code",
+          "title": "Campus code",
+          "type": "list",
+          "required": true,
+          "choices": [
+            "ISB",
+            "FSD",
+            "NORTH",
+            "SOUTH"
+          ]
+        },
+        {
+          "key": "submission_type",
+          "title": "Submission type",
+          "type": "multiple_choice",
+          "required": true,
+          "choices": [
+            "New admission/profile",
+            "Update existing profile"
+          ]
+        },
+        {
+          "key": "student_number",
+          "title": "Student number (leave blank only for a new admission)",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "full_name",
+          "title": "Full legal name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "date_of_birth",
+          "title": "Date of birth",
+          "type": "date",
+          "required": true
+        },
+        {
+          "key": "gender",
+          "title": "Gender",
+          "type": "list",
+          "required": false,
+          "choices": [
+            "Female",
+            "Male",
+            "Other",
+            "Prefer not to say"
+          ]
+        },
+        {
+          "key": "primary_email",
+          "title": "Primary email address",
+          "type": "text",
+          "required": true,
+          "validation": "email"
+        },
+        {
+          "key": "mobile_phone",
+          "title": "Mobile phone number",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "guardian_name",
+          "title": "Guardian name (required for school students)",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "guardian_phone",
+          "title": "Guardian phone (required for school students)",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "identity_reference",
+          "title": "Institution-approved identity reference",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "program_code",
+          "title": "Program or qualification code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "academic_year_code",
+          "title": "Academic year code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "admission_term_code",
+          "title": "Admission term code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "previous_qualification",
+          "title": "Previous qualification or school",
+          "type": "paragraph",
+          "required": false
+        },
+        {
+          "key": "document_links",
+          "title": "Required document Drive links (one per line)",
+          "type": "paragraph",
+          "required": false
+        },
+        {
+          "key": "additional_notes",
+          "title": "Additional notes",
+          "type": "paragraph",
+          "required": false
+        },
+        {
+          "key": "consent",
+          "title": "I confirm that the information is accurate and may be processed for academic administration.",
+          "type": "checkbox",
+          "required": true,
+          "choices": [
+            "I confirm"
+          ]
+        }
+      ]
+    },
+    {
+      "code": "enrollment-request",
+      "title": "SIS \u2014 Course or Subject Enrollment Request",
+      "operation": "enrollment.submit",
+      "audience": "student",
+      "collect_email": true,
+      "confirmation": "Your enrollment request has been recorded for validation and allocation.",
+      "description": "Supports university course registration and school/Cambridge subject enrollment.",
+      "fields": [
+        {
+          "key": "institution_code",
+          "title": "Institution code",
+          "type": "list",
+          "required": true,
+          "choices": [
+            "DMU",
+            "DCS"
+          ]
+        },
+        {
+          "key": "campus_code",
+          "title": "Campus code",
+          "type": "list",
+          "required": true,
+          "choices": [
+            "ISB",
+            "FSD",
+            "NORTH",
+            "SOUTH"
+          ]
+        },
+        {
+          "key": "student_number",
+          "title": "Student number",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "program_code",
+          "title": "Program or qualification code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "term_code",
+          "title": "Term or semester code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "requested_course_codes",
+          "title": "Requested course or subject codes (comma-separated)",
+          "type": "paragraph",
+          "required": true
+        },
+        {
+          "key": "preferred_section_codes",
+          "title": "Preferred section codes in the same order (optional, comma-separated)",
+          "type": "paragraph",
+          "required": false
+        },
+        {
+          "key": "allow_fallback",
+          "title": "Allow another valid section when the preferred section is unavailable?",
+          "type": "multiple_choice",
+          "required": true,
+          "choices": [
+            "Yes",
+            "No"
+          ]
+        },
+        {
+          "key": "request_notes",
+          "title": "Enrollment notes",
+          "type": "paragraph",
+          "required": false
+        },
+        {
+          "key": "consent",
+          "title": "I understand that prerequisites, capacity, timetable, document and load rules will be checked.",
+          "type": "checkbox",
+          "required": true,
+          "choices": [
+            "I confirm"
+          ]
+        }
+      ]
+    },
+    {
+      "code": "teacher-marks",
+      "title": "SIS \u2014 Teacher Marks Submission",
+      "operation": "marks.batch.submit",
+      "audience": "authorized_teacher",
+      "collect_email": true,
+      "confirmation": "The marks submission has been recorded. Final submissions remain subject to authorization and validation.",
+      "description": "Manual class marks entry for small batches. Use the file-upload form for larger classes.",
+      "fields": [
+        {
+          "key": "institution_code",
+          "title": "Institution code",
+          "type": "list",
+          "required": true,
+          "choices": [
+            "DMU",
+            "DCS"
+          ]
+        },
+        {
+          "key": "campus_code",
+          "title": "Campus code",
+          "type": "list",
+          "required": true,
+          "choices": [
+            "ISB",
+            "FSD",
+            "NORTH",
+            "SOUTH"
+          ]
+        },
+        {
+          "key": "term_code",
+          "title": "Term or semester code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "course_offering_code",
+          "title": "Course offering code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "section_code",
+          "title": "Section code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "assessment_code",
+          "title": "Assessment code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "submission_state",
+          "title": "Submission state",
+          "type": "multiple_choice",
+          "required": true,
+          "choices": [
+            "Draft",
+            "Finalize after validation"
+          ]
+        },
+        {
+          "key": "marks_lines",
+          "title": "Marks \u2014 one line per student: student_number,marks,absent,remarks",
+          "type": "paragraph",
+          "required": true
+        },
+        {
+          "key": "teacher_notes",
+          "title": "Teacher notes",
+          "type": "paragraph",
+          "required": false
+        },
+        {
+          "key": "declaration",
+          "title": "I confirm that I am assigned to this class and that these marks are accurate.",
+          "type": "checkbox",
+          "required": true,
+          "choices": [
+            "I confirm"
+          ]
+        }
+      ]
+    },
+    {
+      "code": "marks-file-upload",
+      "title": "SIS \u2014 Marks CSV or Excel Upload",
+      "operation": "marks.file.submit",
+      "audience": "authorized_teacher",
+      "collect_email": true,
+      "confirmation": "The marks-file submission has been recorded.",
+      "description": "Upload the CSV/XLSX to the designated Uploaded Marks folder, then paste its Drive URL below.",
+      "fields": [
+        {
+          "key": "institution_code",
+          "title": "Institution code",
+          "type": "list",
+          "required": true,
+          "choices": [
+            "DMU",
+            "DCS"
+          ]
+        },
+        {
+          "key": "campus_code",
+          "title": "Campus code",
+          "type": "list",
+          "required": true,
+          "choices": [
+            "ISB",
+            "FSD",
+            "NORTH",
+            "SOUTH"
+          ]
+        },
+        {
+          "key": "term_code",
+          "title": "Term or semester code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "course_offering_code",
+          "title": "Course offering code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "section_code",
+          "title": "Section code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "assessment_code",
+          "title": "Assessment code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "submission_state",
+          "title": "Submission state",
+          "type": "multiple_choice",
+          "required": true,
+          "choices": [
+            "Draft",
+            "Finalize after validation"
+          ]
+        },
+        {
+          "key": "file_drive_url",
+          "title": "Uploaded CSV or Excel Google Drive URL",
+          "type": "text",
+          "required": true,
+          "validation": "url"
+        },
+        {
+          "key": "original_file_name",
+          "title": "Original file name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "file_notes",
+          "title": "File notes",
+          "type": "paragraph",
+          "required": false
+        },
+        {
+          "key": "declaration",
+          "title": "I confirm that I am authorized to submit this class file.",
+          "type": "checkbox",
+          "required": true,
+          "choices": [
+            "I confirm"
+          ]
+        }
+      ]
+    },
+    {
+      "code": "mark-correction",
+      "title": "SIS \u2014 Mark Correction Request",
+      "operation": "marks.correction.request",
+      "audience": "authorized_teacher",
+      "collect_email": true,
+      "confirmation": "The correction request has been recorded for review.",
+      "description": "Requests a controlled correction after marks finalization or approval.",
+      "fields": [
+        {
+          "key": "institution_code",
+          "title": "Institution code",
+          "type": "list",
+          "required": true,
+          "choices": [
+            "DMU",
+            "DCS"
+          ]
+        },
+        {
+          "key": "campus_code",
+          "title": "Campus code",
+          "type": "list",
+          "required": true,
+          "choices": [
+            "ISB",
+            "FSD",
+            "NORTH",
+            "SOUTH"
+          ]
+        },
+        {
+          "key": "marks_batch_id",
+          "title": "Marks batch ID",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "student_mark_id",
+          "title": "Student mark ID",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "student_number",
+          "title": "Student number",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "assessment_code",
+          "title": "Assessment code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "current_marks",
+          "title": "Current marks",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "proposed_marks",
+          "title": "Proposed corrected marks",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "reason",
+          "title": "Detailed reason for correction",
+          "type": "paragraph",
+          "required": true
+        },
+        {
+          "key": "evidence_drive_url",
+          "title": "Supporting evidence Drive URL (optional)",
+          "type": "text",
+          "required": false,
+          "validation": "url"
+        },
+        {
+          "key": "declaration",
+          "title": "I confirm that this request is accurate and auditable.",
+          "type": "checkbox",
+          "required": true,
+          "choices": [
+            "I confirm"
+          ]
+        }
+      ]
+    },
+    {
+      "code": "transcript-request",
+      "title": "SIS \u2014 Transcript Request",
+      "operation": "transcript.request",
+      "audience": "student_or_authorized_staff",
+      "collect_email": true,
+      "confirmation": "Your transcript request has been recorded. Delivery occurs only after identity and record checks.",
+      "description": "Requests an official academic transcript for an approved recipient.",
+      "fields": [
+        {
+          "key": "institution_code",
+          "title": "Institution code",
+          "type": "list",
+          "required": true,
+          "choices": [
+            "DMU",
+            "DCS"
+          ]
+        },
+        {
+          "key": "campus_code",
+          "title": "Campus code",
+          "type": "list",
+          "required": true,
+          "choices": [
+            "ISB",
+            "FSD",
+            "NORTH",
+            "SOUTH"
+          ]
+        },
+        {
+          "key": "student_number",
+          "title": "Student number",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "requester_relationship",
+          "title": "Requester relationship",
+          "type": "multiple_choice",
+          "required": true,
+          "choices": [
+            "Student",
+            "Parent/guardian",
+            "Authorized institutional staff"
+          ]
+        },
+        {
+          "key": "student_date_of_birth",
+          "title": "Student date of birth",
+          "type": "date",
+          "required": true
+        },
+        {
+          "key": "recipient_email",
+          "title": "Approved recipient email",
+          "type": "text",
+          "required": true,
+          "validation": "email"
+        },
+        {
+          "key": "purpose",
+          "title": "Purpose of transcript",
+          "type": "list",
+          "required": true,
+          "choices": [
+            "Personal record",
+            "Admission",
+            "Employment",
+            "Scholarship",
+            "HEC/official verification",
+            "Other"
+          ]
+        },
+        {
+          "key": "purpose_details",
+          "title": "Purpose details",
+          "type": "paragraph",
+          "required": false
+        },
+        {
+          "key": "delivery_preference",
+          "title": "Delivery preference",
+          "type": "multiple_choice",
+          "required": true,
+          "choices": [
+            "PDF by email",
+            "PDF saved for staff collection"
+          ]
+        },
+        {
+          "key": "consent",
+          "title": "I authorize verification and delivery to the stated recipient.",
+          "type": "checkbox",
+          "required": true,
+          "choices": [
+            "I authorize"
+          ]
+        }
+      ]
+    }
+  ],
+  "automation_queue_columns": [
+    "Form Response ID",
+    "Submitted At UTC",
+    "Respondent Email",
+    "Operation",
+    "Source Form ID",
+    "Source Spreadsheet ID",
+    "Raw Response JSON",
+    "Processing Status",
+    "Processed At UTC",
+    "Correlation ID",
+    "Idempotency Key",
+    "Error Code",
+    "Error Message",
+    "Retry Count",
+    "Last Attempt At UTC",
+    "n8n Execution ID"
+  ]
+}

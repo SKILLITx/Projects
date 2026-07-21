@@ -1,0 +1,10 @@
+{
+  "suite": "phase3-authenticated-authorization-verification",
+  "success": true,
+  "campuses_visible": 4,
+  "dashboard_operation": "dashboard.snapshot.get",
+  "institutions_visible": 2,
+  "dashboard_rpc_success": true,
+  "staff_profiles_visible": 7,
+  "role_assignments_visible": 7
+}

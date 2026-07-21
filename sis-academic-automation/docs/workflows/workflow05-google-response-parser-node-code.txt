@@ -1,0 +1,38 @@
+=== Classify Google Doc Creation ===
+const ctx=$('Populate Transcript Google Docs Template').item.json;
+const raw=$json||{};
+const status=Number(raw.statusCode||raw.status||0);
+let body=raw.body!==undefined?raw.body:raw;
+if(typeof body==='string'){try{body=JSON.parse(body);}catch{}}
+const failed=Boolean(raw.error||raw.errorMessage||status>=400||!body?.id);
+return [{json:{...ctx,google_doc_created:!failed,google_doc_id:body?.id||null,google_doc_url:body?.webViewLink||null,external_error:failed?{code:'GOOGLE_DOC_CREATION_FAILED',message:'The transcript Google Doc could not be created.',retryable:status===429||status>=500,stage:'google_doc_create'}:null}}];
+
+=== Classify PDF Upload ===
+const ctx=$('Compute Transcript PDF SHA256').item.json;
+const raw=$json||{};
+const status=Number(raw.statusCode||raw.status||0);
+let body=raw.body!==undefined?raw.body:raw;
+if(typeof body==='string'){try{body=JSON.parse(body);}catch{}}
+const failed=Boolean(raw.error||raw.errorMessage||status>=400||!body?.id);
+return [{json:{...ctx,pdf_uploaded:!failed,pdf_drive_file_id:body?.id||null,pdf_initial_url:body?.webViewLink||body?.webContentLink||null,external_error:failed?{code:'GOOGLE_PDF_UPLOAD_FAILED',message:'The transcript PDF could not be stored in Google Drive.',retryable:status===429||status>=500,stage:'pdf_upload'}:null}}];
+
+=== Build Transcript Artifact ===
+const ctx=$('Classify PDF Upload').item.json;
+const raw=$json||{};
+const status=Number(raw.statusCode||raw.status||0);
+let body=raw.body!==undefined?raw.body:raw;
+if(typeof body==='string'){try{body=JSON.parse(body);}catch{}}
+const failed=Boolean(raw.error||raw.errorMessage||status>=400||!body?.id);
+const url=body?.webViewLink||body?.webContentLink||ctx.pdf_initial_url||(ctx.pdf_drive_file_id?`https://drive.google.com/file/d/${ctx.pdf_drive_file_id}/view`:null);
+return [{json:{...ctx,artifact_ready:!failed,pdf_file_url:url,pdf_drive_file_id:body?.id||ctx.pdf_drive_file_id,external_error:failed?{code:'GOOGLE_PDF_METADATA_FAILED',message:'The transcript PDF was uploaded but its Drive metadata could not be finalized.',retryable:status===429||status>=500,stage:'pdf_metadata'}:null}}];
+
+=== Classify Document Registration ===
+const ctx=$('Build Transcript Artifact').item.json;
+const raw=$json||{};
+const status=Number(raw.statusCode||raw.status||0);
+let body=raw.body!==undefined?raw.body:raw;
+if(typeof body==='string'){try{body=JSON.parse(body);}catch{}}
+const rpc=Array.isArray(body)?(body[0]||{}):(body||{});
+const success=rpc.success===true&&!(raw.error||raw.errorMessage||(status>=400&&!rpc.success));
+const error=rpc.error||{};
+return [{json:{...ctx,document_recorded:success,record_rpc:rpc,record_data:rpc.data||{},external_error:success?null:{code:error.code||'TRANSCRIPT_DOCUMENT_RECORD_FAILED',message:error.message||'The transcript document could not be registered.',retryable:Boolean(error.retryable||status>=500),stage:'document_record'}}}];

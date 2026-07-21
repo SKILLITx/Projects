@@ -1,0 +1,456 @@
+{
+  "name": "SIS 01 — Student Intake and Profile Management — Stabilized",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "={{$env.SIS_STUDENT_PROFILE_RESPONSE_SHEET_ID}},",: null,
+          "mode": "list",
+          "cachedResultName": "SIS â€” Student Profile and Admission â€” Responses",
+          "cachedResultUrl": "URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "=",
+          { { "$env.SIS_STUDENT_PROFILE_QUEUE_TAB_ID" } },
+          "mode": "list",
+          "cachedResultName": "Automation Queue",
+          "cachedResultUrl": "URL"
+        },
+        "event": "rowAdded",
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "A1:P"
+            }
+          },
+          "valueRender": "UNFORMATTED_VALUE",
+          "dateTimeRenderOption": "FORMATTED_STRING"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -928,
+        -80
+      ],
+      "id": "af77b645-84b6-5793-88c0-4c01bebf6db3",
+      "name": "Google Sheets Queue Trigger",
+      "notesInFlow": true,
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "CtTdqlzynu63s0RN",
+          "name": "SIS Google Sheets Trigger OAuth"
+        }
+      },
+      "notes": "Input: one newly appended Automation Queue row. Output: named queue columns. Errors: trigger credential or sheet access failure."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const row = $json;\nconst text = (value) => value == null ? '' : String(value).trim();\nconst uuid = () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {\n  const r = Math.floor(Math.random() * 16);\n  return (c === 'x' ? r : ((r & 3) | 8)).toString(16);\n});\n\nconst status = text(row['Processing Status']).toLowerCase();\nconst operation = text(row['Operation']);\nconst formResponseId = text(row['Form Response ID']);\nconst retryCountValue = Number(row['Retry Count'] || 0);\n\nconst queue = {\n  formResponseId,\n  retryCount: Number.isFinite(retryCountValue) ? retryCountValue : 0,\n  incomingStatus: status,\n  operation,\n};\n\nconst processable = status === 'pending' && operation === 'student.profile.submit';\n\nif (!processable) {\n  return {\n    json: {\n      processable: false,\n      queue,\n      skipReason: status !== 'pending'\n        ? 'QUEUE_ROW_NOT_PENDING'\n        : 'QUEUE_OPERATION_MISMATCH',\n    },\n  };\n}\n\nif (!formResponseId) throw new Error('VALIDATION_FORM_RESPONSE_ID_REQUIRED');\n\nlet raw = row['Raw Response JSON'];\nif (typeof raw === 'string') {\n  try {\n    raw = JSON.parse(raw);\n  } catch {\n    throw new Error('VALIDATION_RAW_RESPONSE_JSON');\n  }\n}\n\nif (!raw || typeof raw !== 'object' || Array.isArray(raw)) {\n  throw new Error('VALIDATION_RAW_RESPONSE_OBJECT');\n}\n\nconst get = (title) => text(raw[title]);\nconst lines = get('Required document Drive links (one per line)')\n  .split(/\\r?\\n/)\n  .map((value) => value.trim())\n  .filter(Boolean);\n\nconst documents = lines.map((line) => {\n  const separator = line.indexOf('|');\n  if (separator < 0) return { document_code: null, url: line };\n  return {\n    document_code: line.slice(0, separator).trim().toUpperCase(),\n    url: line.slice(separator + 1).trim(),\n  };\n});\n\nconst correlationId = uuid();\nconst idempotencyKey =\n  text(row['Idempotency Key']) ||\n  `google-form:${text(row['Source Form ID'])}:${formResponseId}`;\nconst submittedAt = text(row['Submitted At UTC']) || new Date().toISOString();\n\nconst request = {\n  operation: 'student.profile.submit',\n  correlation_id: correlationId,\n  idempotency_key: idempotencyKey,\n  requester: {\n    email: text(row['Respondent Email']),\n    type: 'google_form_respondent',\n  },\n  submitted_at: submittedAt,\n  source: {\n    channel: 'google_forms',\n    source_submission_id: formResponseId,\n    source_form_id: text(row['Source Form ID']),\n    source_spreadsheet_id: text(row['Source Spreadsheet ID']),\n  },\n  payload: {\n    institution_code: get('Institution code'),\n    campus_code: get('Campus code'),\n    submission_type: get('Submission type'),\n    student_number: get('Student number (leave blank only for a new admission)'),\n    full_name: get('Full legal name'),\n    date_of_birth: get('Date of birth'),\n    gender: get('Gender'),\n    primary_email: get('Primary email address'),\n    mobile_phone: get('Mobile phone number'),\n    guardian_name: get('Guardian name (required for school students)'),\n    guardian_phone: get('Guardian phone (required for school students)'),\n    identity_reference: get('Institution-approved identity reference'),\n    program_code: get('Program or qualification code'),\n    academic_year_code: get('Academic year code'),\n    admission_term_code: get('Admission term code'),\n    previous_qualification: get('Previous qualification or school'),\n    documents,\n    additional_notes: get('Additional notes'),\n    submitted_on: submittedAt.slice(0, 10),\n  },\n};\n\nreturn { json: { processable: true, queue, request } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -704,
+        -80
+      ],
+      "id": "463f4abc-6bfd-5c0a-aea8-8eed49449907",
+      "name": "Normalize Student Queue Row",
+      "notesInFlow": true,
+      "notes": "Validates the queue state and operation, parses the Google Form JSON, generates a correlation ID and builds the stable RPC request. Raw identity data is not logged."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.processable}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -80
+      ],
+      "id": "b80a2494-9638-53a2-8c41-dde218c33ee0",
+      "name": "Is Queue Row Processable?",
+      "notesInFlow": true,
+      "notes": "True: pending row for this workflow. False: stale, duplicate or mismatched queue row."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': { 'operation':'workflow.run.log', 'correlation_id': $('Normalize Student Queue Row').item.json.request.correlation_id, 'idempotency_key': $('Normalize Student Queue Row').item.json.request.idempotency_key + ':workflow-start', 'source':{'channel':'n8n'}, 'payload':{ 'workflow_code':'01-student-intake', 'n8n_execution_id':$execution.id, 'operation':'student.profile.submit', 'run_status':'started', 'input_summary':{'form_response_id':$('Normalize Student Queue Row').item.json.queue.formResponseId} } } } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -256,
+        -80
+      ],
+      "id": "e606502e-c712-54b1-becb-51dcd881600f",
+      "name": "Log Workflow Start",
+      "notesInFlow": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "supabaseApi": {
+          "id": "xTspM0wCq6xXMB9X",
+          "name": "Supabase account"
+        }
+      },
+      "continueOnFail": true,
+      "notes": "Best-effort durable workflow start evidence. Failure does not block the primary business operation."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_submit_student_profile_from_form'}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': $('Normalize Student Queue Row').item.json.request } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -32,
+        -80
+      ],
+      "id": "9f33fe57-5f6c-5fa9-8dc1-4961b92d6d29",
+      "name": "Submit Business RPC",
+      "notesInFlow": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "supabaseApi": {
+          "id": "xTspM0wCq6xXMB9X",
+          "name": "Supabase account"
+        }
+      },
+      "continueOnFail": true,
+      "notes": "Calls the stable public Supabase RPC through the server-side service-role credential. Transport failures are retried three times; business failures are not retried."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const source = $('Normalize Student Queue Row').item.json;\nconst raw = $json ?? {};\n\nlet body = Object.prototype.hasOwnProperty.call(raw, 'body') ? raw.body : raw;\n\nif (typeof body === 'string') {\n  try {\n    body = JSON.parse(body);\n  } catch {\n    body = { message: body };\n  }\n}\n\nif (Array.isArray(body) && body.length === 1 && body[0] && typeof body[0] === 'object') {\n  body = body[0];\n}\n\nconst statusValue = raw.statusCode ?? raw.status ?? null;\nconst statusCode = statusValue == null\n  ? (raw.error ? 0 : 200)\n  : Number(statusValue);\n\nconst transportError =\n  typeof raw.error === 'string'\n    ? raw.error\n    : (raw.error?.message || raw.message || '');\n\nconst bodyError =\n  body && typeof body === 'object'\n    ? (body.error && typeof body.error === 'object' ? body.error : body)\n    : {};\n\nconst rpcSuccess =\n  statusCode >= 200 &&\n  statusCode < 300 &&\n  body &&\n  typeof body === 'object' &&\n  body.success === true;\n\nconst errorCode = rpcSuccess\n  ? ''\n  : String(\n      bodyError.code ||\n      bodyError.error_code ||\n      (statusCode > 0 ? `HTTP_${statusCode}` : 'NETWORK_FAILURE')\n    ).slice(0, 100);\n\nconst errorMessage = rpcSuccess\n  ? ''\n  : String(\n      bodyError.message ||\n      bodyError.error_message ||\n      transportError ||\n      'The operation could not be completed.'\n    ).slice(0, 300);\n\nconst now = new Date().toISOString();\n\nreturn {\n  json: {\n    'Form Response ID': source.queue.formResponseId,\n    'Processing Status': rpcSuccess ? 'completed' : 'failed',\n    'Processed At UTC': now,\n    'Correlation ID': body?.correlation_id || source.request.correlation_id,\n    'Error Code': errorCode,\n    'Error Message': errorMessage,\n    'Retry Count': source.queue.retryCount + (rpcSuccess ? 0 : 1),\n    'Last Attempt At UTC': now,\n    'n8n Execution ID': $execution.id,\n    rpcResult: body,\n    httpStatusCode: statusCode,\n    success: rpcSuccess,\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        -80
+      ],
+      "id": "06fa832f-c4df-5f35-9a24-186592acdb01",
+      "name": "Build Student Queue Outcome",
+      "notesInFlow": true,
+      "notes": "Converts the HTTP/RPC response into a sanitized Automation Queue outcome. It never writes stack traces or provider credentials."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': { 'operation':'workflow.run.log', 'correlation_id': $('Normalize Student Queue Row').item.json.request.correlation_id, 'idempotency_key': $('Normalize Student Queue Row').item.json.request.idempotency_key + ':workflow-completion', 'source':{'channel':'n8n'}, 'payload':{ 'workflow_code':'01-student-intake', 'n8n_execution_id':$execution.id, 'operation':'student.profile.submit', 'run_status': $('Build Student Queue Outcome').item.json.success ? 'completed' : 'failed', 'output_summary':{'queue_status':$('Build Student Queue Outcome').item.json['Processing Status']}, 'error_code':$('Build Student Queue Outcome').item.json['Error Code'], 'error_message':$('Build Student Queue Outcome').item.json['Error Message'] } } } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        416,
+        -176
+      ],
+      "id": "5305caa5-5146-5258-bc0b-8f640882d0af",
+      "name": "Log Workflow Completion",
+      "notesInFlow": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "supabaseApi": {
+          "id": "xTspM0wCq6xXMB9X",
+          "name": "Supabase account"
+        }
+      },
+      "continueOnFail": true,
+      "notes": "Best-effort completed/failed workflow evidence. Notification or logging failure cannot undo the already durable business RPC result."
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{$env.SIS_STUDENT_PROFILE_RESPONSE_SHEET_ID}}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{$env.SIS_STUDENT_PROFILE_QUEUE_TAB_ID}}",
+          "mode": "id"
+        },
+        "columnToMatchOn": "Form Response ID",
+        "valueToMatchOn": "={{$json[\"Form Response ID\"]}}",
+        "fieldsUi": {
+          "values": [
+            {
+              "column": "Processing Status",
+              "fieldValue": "={{$json[\"Processing Status\"]}}"
+            },
+            {
+              "column": "Processed At UTC",
+              "fieldValue": "={{$json[\"Processed At UTC\"]}}"
+            },
+            {
+              "column": "Correlation ID",
+              "fieldValue": "={{$json[\"Correlation ID\"]}}"
+            },
+            {
+              "column": "Error Code",
+              "fieldValue": "={{$json[\"Error Code\"]}}"
+            },
+            {
+              "column": "Error Message",
+              "fieldValue": "={{$json[\"Error Message\"]}}"
+            },
+            {
+              "column": "Retry Count",
+              "fieldValue": "={{$json[\"Retry Count\"]}}"
+            },
+            {
+              "column": "Last Attempt At UTC",
+              "fieldValue": "={{$json[\"Last Attempt At UTC\"]}}"
+            },
+            {
+              "column": "n8n Execution ID",
+              "fieldValue": "={{$json[\"n8n Execution ID\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        416,
+        16
+      ],
+      "id": "995e103f-1310-5d08-92ca-21521e5cce6f",
+      "name": "Update Automation Queue",
+      "notesInFlow": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6G5oDuYJLNH1WSn9",
+          "name": "SIS Google Sheets OAuth"
+        }
+      },
+      "notes": "Updates exactly one queue row by immutable Form Response ID. Stores only sanitized status, correlation and error fields.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        112
+      ],
+      "id": "4522edea-fdf6-47fa-9b75-0af1058e8fde",
+      "name": "Skip Non-Pending Queue Row",
+      "notesInFlow": true,
+      "notes": "Expected terminal path for rows already completed/failed/processing or for another operation. No business action is performed."
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Queue Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalize Student Queue Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Student Queue Row": {
+      "main": [
+        [
+          {
+            "node": "Is Queue Row Processable?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Queue Row Processable?": {
+      "main": [
+        [
+          {
+            "node": "Log Workflow Start",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip Non-Pending Queue Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Workflow Start": {
+      "main": [
+        [
+          {
+            "node": "Submit Business RPC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit Business RPC": {
+      "main": [
+        [
+          {
+            "node": "Build Student Queue Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Student Queue Outcome": {
+      "main": [
+        [
+          {
+            "node": "Update Automation Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Automation Queue": {
+      "main": [
+        [
+          {
+            "node": "Log Workflow Completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": true,
+    "timezone": "Asia/Karachi"
+  },
+  "tags": []
+}

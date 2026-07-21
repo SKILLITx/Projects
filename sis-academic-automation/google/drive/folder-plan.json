@@ -1,0 +1,72 @@
+{
+  "root": "SIS Automation Pilot",
+  "folders": [
+    {
+      "code": "forms",
+      "name": "01 Forms",
+      "purpose": "Provisioned Google Forms"
+    },
+    {
+      "code": "responses",
+      "name": "02 Response Sheets",
+      "purpose": "Linked form-response spreadsheets"
+    },
+    {
+      "code": "student_documents",
+      "name": "03 Student Documents",
+      "purpose": "Admission and registration documents"
+    },
+    {
+      "code": "uploaded_marks",
+      "name": "04 Uploaded Marks",
+      "purpose": "CSV/XLSX marks files submitted by teachers"
+    },
+    {
+      "code": "transcript_docs",
+      "name": "05 Transcript Google Docs",
+      "purpose": "Generated editable transcript documents"
+    },
+    {
+      "code": "transcript_pdfs",
+      "name": "06 Transcript PDFs",
+      "purpose": "Final exported transcript PDFs"
+    },
+    {
+      "code": "hec_reports",
+      "name": "07 HEC Reports",
+      "purpose": "Generated HEC enrollment reports"
+    },
+    {
+      "code": "dashboard",
+      "name": "08 Dashboard",
+      "purpose": "Operational dashboard spreadsheet"
+    },
+    {
+      "code": "failed",
+      "name": "09 Failed Files",
+      "purpose": "Rejected or unprocessable files with sanitized failure evidence"
+    },
+    {
+      "code": "archive",
+      "name": "10 Archive",
+      "purpose": "Completed-period assets retained according to policy"
+    },
+    {
+      "code": "templates",
+      "name": "11 Templates",
+      "purpose": "Master Docs and Sheets templates"
+    },
+    {
+      "code": "registry",
+      "name": "12 Asset Registry",
+      "purpose": "Provisioning registry and manifest"
+    }
+  ],
+  "access_principles": [
+    "Do not share the root folder publicly.",
+    "Use institution-controlled Google accounts.",
+    "Teachers receive upload access only where required.",
+    "Transcript and HEC outputs remain restricted to authorized staff.",
+    "n8n OAuth identity receives only the access needed by workflows."
+  ]
+}

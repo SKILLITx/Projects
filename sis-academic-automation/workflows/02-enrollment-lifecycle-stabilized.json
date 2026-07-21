@@ -1,0 +1,426 @@
+{
+  "name": "SIS 02 — Course and Subject Enrollment Lifecycle — Stabilized",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{$env.SIS_ENROLLMENT_RESPONSE_SHEET_ID}}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{$env.SIS_ENROLLMENT_QUEUE_TAB_ID}}",
+          "mode": "id"
+        },
+        "event": "rowAdded",
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "A1:P"
+            }
+          },
+          "valueRender": "UNFORMATTED_VALUE",
+          "dateTimeRenderOption": "FORMATTED_STRING"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -920,
+        0
+      ],
+      "id": "af77b645-84b6-5793-88c0-4c01bebf6db3",
+      "name": "Google Sheets Queue Trigger",
+      "notesInFlow": true,
+      "notes": "Input: one newly appended Automation Queue row. Output: named queue columns. Errors: trigger credential or sheet access failure."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const row = $json;\nconst text = (value) => value == null ? '' : String(value).trim();\nconst upper = (value) => text(value).toUpperCase();\nconst uuid = () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {\n  const r = Math.floor(Math.random() * 16);\n  return (c === 'x' ? r : ((r & 3) | 8)).toString(16);\n});\nconst csvRequired = (value) =>\n  text(value).split(',').map((v) => upper(v)).filter(Boolean);\nconst csvAligned = (value) =>\n  text(value) === '' ? [] : String(value).split(',').map((v) => upper(v));\n\nconst status = text(row['Processing Status']).toLowerCase();\nconst operation = text(row['Operation']);\nconst formResponseId = text(row['Form Response ID']);\nconst retryCountValue = Number(row['Retry Count'] || 0);\n\nconst queue = {\n  formResponseId,\n  retryCount: Number.isFinite(retryCountValue) ? retryCountValue : 0,\n  incomingStatus: status,\n  operation,\n};\n\nconst processable =\n  status === 'pending' &&\n  operation === 'enrollment.submit';\n\nif (!processable) {\n  return {\n    json: {\n      processable: false,\n      queue,\n      skipReason:\n        status !== 'pending'\n          ? 'QUEUE_ROW_NOT_PENDING'\n          : 'QUEUE_OPERATION_MISMATCH',\n    },\n  };\n}\n\nif (!formResponseId) {\n  throw new Error('VALIDATION_FORM_RESPONSE_ID_REQUIRED');\n}\n\nlet raw = row['Raw Response JSON'];\nif (typeof raw === 'string') {\n  try {\n    raw = JSON.parse(raw);\n  } catch {\n    throw new Error('VALIDATION_RAW_RESPONSE_JSON');\n  }\n}\n\nif (!raw || typeof raw !== 'object' || Array.isArray(raw)) {\n  throw new Error('VALIDATION_RAW_RESPONSE_OBJECT');\n}\n\nconst get = (title) => text(raw[title]);\nconst courseCodes = csvRequired(\n  get('Requested course or subject codes (comma-separated)')\n);\nconst preferredSectionCodes = csvAligned(\n  get('Preferred section codes in the same order (optional, comma-separated)')\n);\n\nif (courseCodes.length === 0) {\n  throw new Error('VALIDATION_COURSE_CODES_REQUIRED');\n}\n\nif (new Set(courseCodes).size !== courseCodes.length) {\n  throw new Error('VALIDATION_DUPLICATE_COURSE_CODE');\n}\n\nif (\n  preferredSectionCodes.length > 0 &&\n  preferredSectionCodes.length !== courseCodes.length\n) {\n  throw new Error('VALIDATION_SECTION_ALIGNMENT');\n}\n\nconst correlationId = uuid();\nconst idempotencyKey =\n  text(row['Idempotency Key']) ||\n  `google-form:${text(row['Source Form ID'])}:${formResponseId}`;\nconst submittedAt =\n  text(row['Submitted At UTC']) || new Date().toISOString();\n\nconst request = {\n  operation: 'enrollment.submit',\n  correlation_id: correlationId,\n  idempotency_key: idempotencyKey,\n  requester: {\n    email: text(row['Respondent Email']),\n    type: 'google_form_respondent',\n  },\n  submitted_at: submittedAt,\n  source: {\n    channel: 'google_forms',\n    source_submission_id: formResponseId,\n    source_form_id: text(row['Source Form ID']),\n    source_spreadsheet_id: text(row['Source Spreadsheet ID']),\n  },\n  payload: {\n    institution_code: upper(get('Institution code')),\n    campus_code: upper(get('Campus code')),\n    student_number: upper(get('Student number')),\n    program_code: upper(get('Program or qualification code')),\n    term_code: upper(get('Term or semester code')),\n    course_codes: courseCodes,\n    preferred_section_codes: preferredSectionCodes,\n    allow_fallback:\n      get(\n        'Allow another valid section when the preferred section is unavailable?'\n      ).toLowerCase() === 'yes',\n    request_notes: get('Enrollment notes'),\n  },\n};\n\nreturn { json: { processable: true, queue, request } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        0
+      ],
+      "id": "4c4c5650-ea8c-5370-b5b8-14de26197fc5",
+      "name": "Normalize Enrollment Queue Row",
+      "notesInFlow": true,
+      "notes": "Validates the queue state and operation, parses the Google Form JSON, generates a correlation ID and builds the stable RPC request. Raw identity data is not logged."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.processable}}",
+              "operation": "equal",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -440,
+        0
+      ],
+      "id": "b80a2494-9638-53a2-8c41-dde218c33ee0",
+      "name": "Is Queue Row Processable?",
+      "notesInFlow": true,
+      "notes": "True: pending row for this workflow. False: stale, duplicate or mismatched queue row."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': { 'operation':'workflow.run.log', 'correlation_id': $('Normalize Enrollment Queue Row').item.json.request.correlation_id, 'idempotency_key': $('Normalize Enrollment Queue Row').item.json.request.idempotency_key + ':workflow-start', 'source':{'channel':'n8n'}, 'payload':{ 'workflow_code':'02-enrollment-lifecycle', 'n8n_execution_id':$execution.id, 'operation':'enrollment.submit', 'run_status':'started', 'input_summary':{'form_response_id':$('Normalize Enrollment Queue Row').item.json.queue.formResponseId} } } } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -200,
+        -80
+      ],
+      "id": "e606502e-c712-54b1-becb-51dcd881600f",
+      "name": "Log Workflow Start",
+      "notesInFlow": true,
+      "notes": "Best-effort durable workflow start evidence. Failure does not block the primary business operation.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_submit_enrollment_from_form'}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': $('Normalize Enrollment Queue Row').item.json.request } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        40,
+        -80
+      ],
+      "id": "9f33fe57-5f6c-5fa9-8dc1-4961b92d6d29",
+      "name": "Submit Business RPC",
+      "notesInFlow": true,
+      "notes": "Calls the stable public Supabase RPC through the server-side service-role credential. Transport failures are retried three times; business failures are not retried.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source = $('Normalize Enrollment Queue Row').item.json;\nconst raw = $json ?? {};\n\nlet body = Object.prototype.hasOwnProperty.call(raw, 'body')\n  ? raw.body\n  : raw;\n\nif (typeof body === 'string') {\n  try {\n    body = JSON.parse(body);\n  } catch {\n    body = { message: body };\n  }\n}\n\nif (\n  Array.isArray(body) &&\n  body.length === 1 &&\n  body[0] &&\n  typeof body[0] === 'object'\n) {\n  body = body[0];\n}\n\nconst statusValue = raw.statusCode ?? raw.status ?? null;\nconst statusCode =\n  statusValue == null\n    ? (raw.error ? 0 : 200)\n    : Number(statusValue);\n\nconst transportError =\n  typeof raw.error === 'string'\n    ? raw.error\n    : (raw.error?.message || raw.message || '');\n\nconst bodyError =\n  body && typeof body === 'object'\n    ? (\n        body.error && typeof body.error === 'object'\n          ? body.error\n          : body\n      )\n    : {};\n\nconst rpcSuccess =\n  statusCode >= 200 &&\n  statusCode < 300 &&\n  body &&\n  typeof body === 'object' &&\n  body.success === true;\n\nconst errorCode = rpcSuccess\n  ? ''\n  : String(\n      bodyError.code ||\n      bodyError.error_code ||\n      (statusCode > 0 ? `HTTP_${statusCode}` : 'NETWORK_FAILURE')\n    ).slice(0, 100);\n\nconst errorMessage = rpcSuccess\n  ? ''\n  : String(\n      bodyError.message ||\n      bodyError.error_message ||\n      transportError ||\n      'The enrollment operation could not be completed.'\n    ).slice(0, 300);\n\nconst now = new Date().toISOString();\n\nreturn {\n  json: {\n    'Form Response ID': source.queue.formResponseId,\n    'Processing Status': rpcSuccess ? 'completed' : 'failed',\n    'Processed At UTC': now,\n    'Correlation ID':\n      body?.correlation_id || source.request.correlation_id,\n    'Error Code': errorCode,\n    'Error Message': errorMessage,\n    'Retry Count':\n      source.queue.retryCount + (rpcSuccess ? 0 : 1),\n    'Last Attempt At UTC': now,\n    'n8n Execution ID': $execution.id,\n    rpcResult: body,\n    httpStatusCode: statusCode,\n    success: rpcSuccess,\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        280,
+        -80
+      ],
+      "id": "786863fa-c202-5bf0-8fe1-167cc8852341",
+      "name": "Build Enrollment Queue Outcome",
+      "notesInFlow": true,
+      "notes": "Converts the HTTP/RPC response into a sanitized Automation Queue outcome. It never writes stack traces or provider credentials."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL + '/rest/v1/rpc/rpc_log_workflow_run'}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { 'p_request': { 'operation':'workflow.run.log', 'correlation_id': $('Normalize Enrollment Queue Row').item.json.request.correlation_id, 'idempotency_key': $('Normalize Enrollment Queue Row').item.json.request.idempotency_key + ':workflow-completion', 'source':{'channel':'n8n'}, 'payload':{ 'workflow_code':'02-enrollment-lifecycle', 'n8n_execution_id':$execution.id, 'operation':'enrollment.submit', 'run_status': $('Build Enrollment Queue Outcome').item.json.success ? 'completed' : 'failed', 'output_summary':{'queue_status':$('Build Enrollment Queue Outcome').item.json['Processing Status']}, 'error_code':$('Build Enrollment Queue Outcome').item.json['Error Code'], 'error_message':$('Build Enrollment Queue Outcome').item.json['Error Message'] } } } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        520,
+        -180
+      ],
+      "id": "5305caa5-5146-5258-bc0b-8f640882d0af",
+      "name": "Log Workflow Completion",
+      "notesInFlow": true,
+      "notes": "Best-effort completed/failed workflow evidence. Notification or logging failure cannot undo the already durable business RPC result.",
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "sheet",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{$env.SIS_ENROLLMENT_RESPONSE_SHEET_ID}}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{$env.SIS_ENROLLMENT_QUEUE_TAB_ID}}",
+          "mode": "id"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "Form Response ID",
+        "valueToMatchOn": "={{$json[\"Form Response ID\"]}}",
+        "fieldsUi": {
+          "values": [
+            {
+              "column": "Processing Status",
+              "fieldValue": "={{$json[\"Processing Status\"]}}"
+            },
+            {
+              "column": "Processed At UTC",
+              "fieldValue": "={{$json[\"Processed At UTC\"]}}"
+            },
+            {
+              "column": "Correlation ID",
+              "fieldValue": "={{$json[\"Correlation ID\"]}}"
+            },
+            {
+              "column": "Error Code",
+              "fieldValue": "={{$json[\"Error Code\"]}}"
+            },
+            {
+              "column": "Error Message",
+              "fieldValue": "={{$json[\"Error Message\"]}}"
+            },
+            {
+              "column": "Retry Count",
+              "fieldValue": "={{$json[\"Retry Count\"]}}"
+            },
+            {
+              "column": "Last Attempt At UTC",
+              "fieldValue": "={{$json[\"Last Attempt At UTC\"]}}"
+            },
+            {
+              "column": "n8n Execution ID",
+              "fieldValue": "={{$json[\"n8n Execution ID\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        520,
+        20
+      ],
+      "id": "995e103f-1310-5d08-92ca-21521e5cce6f",
+      "name": "Update Automation Queue",
+      "notesInFlow": true,
+      "notes": "Updates exactly one queue row by immutable Form Response ID. Stores only sanitized status, correlation and error fields.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        112
+      ],
+      "id": "00b1b1b1-1ffd-4bfd-90ce-74e01fa228ed",
+      "name": "Skip Non-Pending Queue Row",
+      "notesInFlow": true,
+      "notes": "Expected terminal for rows already completed, failed, processing, or belonging to a different operation."
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Queue Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalize Enrollment Queue Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Enrollment Queue Row": {
+      "main": [
+        [
+          {
+            "node": "Is Queue Row Processable?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Queue Row Processable?": {
+      "main": [
+        [
+          {
+            "node": "Log Workflow Start",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip Non-Pending Queue Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Workflow Start": {
+      "main": [
+        [
+          {
+            "node": "Submit Business RPC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit Business RPC": {
+      "main": [
+        [
+          {
+            "node": "Build Enrollment Queue Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Enrollment Queue Outcome": {
+      "main": [
+        [
+          {
+            "node": "Update Automation Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Automation Queue": {
+      "main": [
+        [
+          {
+            "node": "Log Workflow Completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": true,
+    "timezone": "Asia/Karachi"
+  },
+  "tags": []
+}

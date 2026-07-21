@@ -1,0 +1,11 @@
+{
+  "suite": "phase4-wave1-code-contract-repair",
+  "success": true,
+  "source_workflows": 3,
+  "code_nodes_checked": 9,
+  "per_item_nodes_repaired": 8,
+  "batch_expansion_nodes_changed_to_all_items": 1,
+  "trigger_range": "A1:P",
+  "live_repair_preserves_credentials": true,
+  "workflows_remain_inactive": true
+}

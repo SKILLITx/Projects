@@ -1,0 +1,24 @@
+{
+  "student-profile-ack": {
+    "subject": "Student profile received",
+    "channel": "email",
+    "format": "text",
+    "required_payload": [
+      "student_number"
+    ]
+  },
+  "enrollment-decision": {
+    "subject": "Enrollment request update",
+    "channel": "email",
+    "format": "text",
+    "required_payload": [
+      "overall_outcome"
+    ]
+  },
+  "generic": {
+    "subject": "Academic administration update",
+    "channel": "email",
+    "format": "text",
+    "required_payload": []
+  }
+}

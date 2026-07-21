@@ -1,0 +1,15 @@
+{
+  "algorithm": "sha256",
+  "immutable_after_remote_application": true,
+  "migrations": {
+    "20260717000100_phase2_foundation_and_tenancy.sql": "8ea1a4c16e78b07fb9bf7deedc0835ef249a3252169d0db490e3b88dbfbadd36",
+    "20260717000200_phase2_identity_and_authorization.sql": "c13c20a860b74b0286cd69125d1e42fe56d4300234a81d774132a71fb0682fef",
+    "20260717000300_phase2_academic_configuration_curriculum.sql": "dc3664ef17193f81133793f2ad596a82ebce042d4b6b99c5f9e601d07bb76681",
+    "20260717000400_phase2_students_documents_enrollment.sql": "9ae26e937f4ef7f681f0f628591f2c5c39e4d65a53c755265ca143320b32a749",
+    "20260717000500_phase2_marks_results.sql": "4dca8ab244fb4988e33a5571db75cba960cc830f2d4d407cd08e2d616d69ebb2",
+    "20260717000600_phase2_documents_reporting_operations.sql": "38d99aa6f50f3e2c2a067ed00f33a2ce8cecfc363923646a74de3606b87ddb6d",
+    "20260717000700_phase2_public_rpc_contract.sql": "d40d3ce71b2e5e4adc163d2ff6fe367a8f298ddbb83a28a28298c55b3ad5d09d",
+    "20260717000800_phase2_demo_seed.sql": "2d49e3a8e47e2194539f51249d5e02bf82259fa3ec11e3055b368abb2a5774c5",
+    "20260717000900_phase4_wave1_form_integration.sql": "d4e16f9fd1acb65177e935b569317d4ed5fbc31924838c17f430740706592a34"
+  }
+}

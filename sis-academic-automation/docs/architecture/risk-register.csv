@@ -1,0 +1,25 @@
+risk_id,risk,likelihood,impact,mitigation
+R-001,n8n 2.4.0 node incompatibility,Medium,High,Verify installed node types before exports
+R-002,Dynamic ngrok URL changes,High,High,Detect URL and control updates
+R-003,Local host downtime,Medium,High,Health/restart procedure and hosted migration
+R-004,Service-role exposure or overuse,Low,Critical,Server-only named RPC access and scanning
+R-005,Cross-tenant RLS leakage,Medium,Critical,Deny-by-default and adversarial scope tests
+R-006,Teacher identity spoofing,Medium,Critical,Restricted Form or authenticated portal
+R-007,Enrollment capacity race,Medium,Critical,Transactional locking and concurrency test
+R-008,Inconsistent idempotency,Medium,High,"Standard key, request hash and unique constraint"
+R-009,Invalid cross-model academic abstraction,Medium,High,Explicit model and versioned policies
+R-010,Ambiguous PostgREST relationships,Medium,High,Explicit FKs and RPC models
+R-011,Empty RPC result stops workflow,Medium,High,Always return one JSON object
+R-012,Permanent error retry storm,Medium,High,"One owner, bounded retry and dead letter"
+R-013,Alert failure hides incident,Low,High,Persist incident before outbox alert
+R-014,Gmail accepted mistaken for delivered,High,Medium,Accurate provider-state wording
+R-015,Google API temporary outage,Medium,Medium,Durable jobs and bounded retry
+R-016,Missing official HEC format,High,High,Demonstration label and institution approval
+R-017,Sensitive data in logs/evidence,Medium,Critical,Redaction and evidence review
+R-018,Unrestorable backup,Medium,Critical,Disposable restore verification
+R-019,Sheets treated as source of truth,Medium,High,Supabase-only authority
+R-020,Workflow fragmentation,Medium,High,Ten domain boundaries and governance
+R-021,Incorrect institution configuration,Medium,Critical,Configuration sign-off and tests
+R-022,Unsafe marks upload,Low,High,Type/size checks and controlled folders
+R-023,Public Form abuse,Medium,Medium,"Validation, rate controls and duplicate checks"
+R-024,Weak transcript requester verification,Medium,Critical,Institution-defined verification/manual review
