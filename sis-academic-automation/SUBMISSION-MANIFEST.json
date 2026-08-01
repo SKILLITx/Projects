@@ -1,0 +1,2021 @@
+﻿{
+    "generated_at_utc":  "2026-07-21T22:13:42.6439741Z",
+    "file_count":  403,
+    "files":  [
+                  {
+                      "path":  ".env.example",
+                      "size_bytes":  1898,
+                      "sha256":  "F07DB00CA7C862112145691CDC4B3F02CCBD86F410DEAA0C25434BBBB42D08B7"
+                  },
+                  {
+                      "path":  ".gitignore",
+                      "size_bytes":  545,
+                      "sha256":  "CDE1A50109C14278D4E412F2EBAA552F81132F17739362AB8B482FC13DE51756"
+                  },
+                  {
+                      "path":  ".workflow09-backups/20260721-060247/CHANGELOG.md",
+                      "size_bytes":  12236,
+                      "sha256":  "314EC159FDA6CD5790CCA6535D0E8F39C7DF3B2579844E08EC6482DC43670779"
+                  },
+                  {
+                      "path":  ".workflow09-backups/20260721-060247/PACKAGE_MANIFEST.sha256",
+                      "size_bytes":  2163,
+                      "sha256":  "2AECC540C468952C97F22CECC9FDB60C6CC3F07CA675F9143E6F13B4396C7838"
+                  },
+                  {
+                      "path":  ".workflow09-backups/20260721-060247/PROJECT_STATE.md",
+                      "size_bytes":  4972,
+                      "sha256":  "FA1F5C9FEF089C588E6DA05C278B10DD761195C07A1BDDE36744A82EE5CBED2F"
+                  },
+                  {
+                      "path":  "CHANGELOG.md",
+                      "size_bytes":  16314,
+                      "sha256":  "B33E608AC760979CDB7194C239FD8F7FDAEF447C7A1D6B9410E617B54849CE4A"
+                  },
+                  {
+                      "path":  "CHANGELOG-PHASE3-COMPLETION.md",
+                      "size_bytes":  495,
+                      "sha256":  "31D86B6E0847DF734E054109771236923BF3BDA3838C56B799A70C9FAF698A1A"
+                  },
+                  {
+                      "path":  "CHANGELOG-PHASE3-PLACEHOLDER-REPAIR.md",
+                      "size_bytes":  542,
+                      "sha256":  "8C8C7DF9700EF9AD42E3D2E5DE39640C37C1374DC7F9DE95822258CB8512F886"
+                  },
+                  {
+                      "path":  "CHANGELOG-PHASE3-REGRESSION-FIXTURE-REPAIR.md",
+                      "size_bytes":  466,
+                      "sha256":  "C3BEDBB0FED4028644280D4BD2BDB82DE01D81B964AC3E0AD4AC9C35AE8B0943"
+                  },
+                  {
+                      "path":  "CHANGELOG-PHASE3-REPAIR.md",
+                      "size_bytes":  493,
+                      "sha256":  "EAB8E5B4E8063335C27F0B2F21654A035AB68A8AEFE249EACC28E35493AE0FF4"
+                  },
+                  {
+                      "path":  "database/diagnostics/workflow04-publication-diagnostic.sql",
+                      "size_bytes":  5480,
+                      "sha256":  "9FF54DFBA4979A8961D4EDC48623B4CF9671BB892EC6310E7CA7C0D517D1F540"
+                  },
+                  {
+                      "path":  "database/migrations/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "database/migrations/20260720000500_phase4_workflow05_transcript_delivery.sql",
+                      "size_bytes":  31579,
+                      "sha256":  "CAD16B71D06EA806D5F51EA5545328FA558328884F90E911CA7EBA6F7925062E"
+                  },
+                  {
+                      "path":  "database/migrations/20260720000600_phase4_workflow05_verification_code_generation_fix.sql",
+                      "size_bytes":  8925,
+                      "sha256":  "35DB7D304E7780F81A1FF3B592A794F64F3156E054BAF97D8F06B783D42CBDC8"
+                  },
+                  {
+                      "path":  "database/migrations/20260721000100_phase4_workflow07_admin_search_dashboard.sql",
+                      "size_bytes":  16160,
+                      "sha256":  "410ACC5016B55FF9DEE48613EC36A1BC39723BA6ADD3D6F1D2DE52AB699586FD"
+                  },
+                  {
+                      "path":  "database/migrations/20260721000200_phase4_workflow07_admin_search_dashboard_complete.sql",
+                      "size_bytes":  26576,
+                      "sha256":  "5F968FB85BB103302166FE50A4CB2C3F4F1E8BD086838D7DC3D96EC22DA7D268"
+                  },
+                  {
+                      "path":  "database/migrations/20260721000300_phase4_workflow09_operations_monitoring.sql",
+                      "size_bytes":  27854,
+                      "sha256":  "77C61EAFFD34BF42F2A29AD6E715DEF24DB0C2E153F7A1405FBD8C1E2756ABBE"
+                  },
+                  {
+                      "path":  "database/queries/workflow02-student-number-lookup.sql",
+                      "size_bytes":  376,
+                      "sha256":  "A3A68F38603CD2E25C0878921C9B5EA085779984B09695A03DB21EA37F411404"
+                  },
+                  {
+                      "path":  "database/queries/workflow03-marks-status.sql",
+                      "size_bytes":  1812,
+                      "sha256":  "9D7A0FDF7D3ED6CBA23B1E4C707F8B248B1362EE6C44411758EEDBA8E0E4AB68"
+                  },
+                  {
+                      "path":  "database/queries/workflow03-preflight.sql",
+                      "size_bytes":  3056,
+                      "sha256":  "A9F8FC7DC4A9DE46F133FD25ABE69A8C4B458CA54EC1FF7823D6468DAFE20400"
+                  },
+                  {
+                      "path":  "database/queries/workflow04-correction-decision-inputs.sql",
+                      "size_bytes":  2990,
+                      "sha256":  "D50EB370234F26F62DFF7920D23A0A2FC5A4653B663C605BE98A90654156592B"
+                  },
+                  {
+                      "path":  "database/queries/workflow04-correction-pilot-inputs.sql",
+                      "size_bytes":  2788,
+                      "sha256":  "4BECD0ED423F04928E910BD724AE5B0F6574D38C629DCBC790FD81C86FE36654"
+                  },
+                  {
+                      "path":  "database/queries/workflow04-pilot-inputs.sql",
+                      "size_bytes":  794,
+                      "sha256":  "BC09C21C951CDC7A80B5911B2E00A4FD8A6C564CBBB5E716DB460FE5F2006127"
+                  },
+                  {
+                      "path":  "database/queries/workflow04-results-preflight.sql",
+                      "size_bytes":  8102,
+                      "sha256":  "F16E64F23C60D48EE68B1DDAA0379BEDACC9D394DEBD2DE9AF399C92F5B02B4D"
+                  },
+                  {
+                      "path":  "database/queries/workflow05-delivery-status.sql",
+                      "size_bytes":  2095,
+                      "sha256":  "980ED60CF24FD491012E2340AA70FE04FEDE8EB2D742EB0A27A80A14B85BC554"
+                  },
+                  {
+                      "path":  "database/queries/workflow05-hosted-verification.sql",
+                      "size_bytes":  2626,
+                      "sha256":  "A32C484CA07DEEE2B4B68306087E6C6A1C6F6E6EBCDFF914CCDE2C5156768FAE"
+                  },
+                  {
+                      "path":  "database/queries/workflow05-preflight.sql",
+                      "size_bytes":  11998,
+                      "sha256":  "C53FBCAC187F39BE3C19FF939D1F8D6130C00481D94414CFCA04F015C9BFA407"
+                  },
+                  {
+                      "path":  "database/queries/workflow05-transcript-contract-snapshot.sql",
+                      "size_bytes":  9003,
+                      "sha256":  "3E1AC7ACC8207B40690C11182550EFF542B7D90A7358458E34EF567FDAFA00A2"
+                  },
+                  {
+                      "path":  "database/queries/workflow05-verification-code-fix-verification.sql",
+                      "size_bytes":  1284,
+                      "sha256":  "D004757C643806C8FD3B70447025EC4C21C6E51580CE5A3A7491A31CC6BC16A0"
+                  },
+                  {
+                      "path":  "database/queries/workflow07-contract-snapshot.sql",
+                      "size_bytes":  4025,
+                      "sha256":  "CF5C62633FBB29B1722D579DFCE92EF436835C392674E7A1A0426F9AEF4B60AB"
+                  },
+                  {
+                      "path":  "database/queries/workflow07-pilot-inputs.sql",
+                      "size_bytes":  966,
+                      "sha256":  "00358B27725DAAD8C16F27493270493BF8C137911E5B265004F6B1A223E3366A"
+                  },
+                  {
+                      "path":  "database/queries/workflow07-verification.sql",
+                      "size_bytes":  4478,
+                      "sha256":  "D23696C4D22A52923F0C0E6CB2F2D1E83E11FD105D8A280102206B746406E6AD"
+                  },
+                  {
+                      "path":  "database/queries/workflow08-notification-status.sql",
+                      "size_bytes":  544,
+                      "sha256":  "89A4A46D0ADFFBCE9DF1D28930BE61008DC2085626FE12D020BBDA1591406A15"
+                  },
+                  {
+                      "path":  "database/queries/workflow09-contract-snapshot.sql",
+                      "size_bytes":  3781,
+                      "sha256":  "83611858A58B6501862018AAED5985FCD597FA4A6E25131997B7665A4F3B69A2"
+                  },
+                  {
+                      "path":  "database/queries/workflow09-verification.sql",
+                      "size_bytes":  5437,
+                      "sha256":  "306572AE589DDA9BBA95B52B3A01281E8767EC7B3B27DA7895B56565F8856833"
+                  },
+                  {
+                      "path":  "database/queries/workflow10-operational-snapshot.sql",
+                      "size_bytes":  1987,
+                      "sha256":  "5F76B0127ABBAE563B2F3195098C3E90EC7500736F01E18ABA78CA1F3F2599A4"
+                  },
+                  {
+                      "path":  "database/queries/workflow10-rpc-inspection.sql",
+                      "size_bytes":  2273,
+                      "sha256":  "C04E40856847279AB9AF351BD31665A84F06A1F6807C7D62DB7E93DD5117F980"
+                  },
+                  {
+                      "path":  "database/queries/workflow10-schema-inspection.sql",
+                      "size_bytes":  3324,
+                      "sha256":  "7F17A6F10801C8A8028905AD53549B0CB2363D9A1587262BB4A6B856F47C70BA"
+                  },
+                  {
+                      "path":  "database/schema/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "database/schema/data-dictionary.csv",
+                      "size_bytes":  180172,
+                      "sha256":  "2FF801BC7C779945CE492E8D02C90703336E4A29E2E4A2CB63D7EA2476FFDA55"
+                  },
+                  {
+                      "path":  "database/schema/migration-checksums.json",
+                      "size_bytes":  1217,
+                      "sha256":  "0B3CDD4A786582655166170654FF468947BCF1AF0B39032C89EAFEEF73379B54"
+                  },
+                  {
+                      "path":  "database/schema/phase2-erd.mmd",
+                      "size_bytes":  24056,
+                      "sha256":  "73E2B1D39F1EE52EEBD9EA2312B8A7E81DAEB55FBFEF715E0D449D3EA2F2053F"
+                  },
+                  {
+                      "path":  "database/schema/rpc-dictionary.csv",
+                      "size_bytes":  5796,
+                      "sha256":  "679B86EBEAF34A3B0326A948DE0C039E447D229C1EB257B21B38CDEDF88B9884"
+                  },
+                  {
+                      "path":  "database/seeds/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "database/seeds/phase2-demo-seed-manifest.json",
+                      "size_bytes":  859,
+                      "sha256":  "E553643A39E8758F3A4B62A73E358656AFDAD76474B8C70BAC360183832719B3"
+                  },
+                  {
+                      "path":  "database/seeds/README.md",
+                      "size_bytes":  393,
+                      "sha256":  "1C299B03D0C89F73767CECA879E74A8AC2795565031E395BA76C38846D3DC915"
+                  },
+                  {
+                      "path":  "database/tests/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "database/tests/phase2-hosted-verification.sql",
+                      "size_bytes":  6366,
+                      "sha256":  "C30B5675894E5C5830B83CE13E5613C61786542269D69148AD4BAF1A72C6D165"
+                  },
+                  {
+                      "path":  "database/tests/phase4-service-role-claim-verification.sql",
+                      "size_bytes":  1060,
+                      "sha256":  "A79E2435C8E7CAA522419B0998D29FA1802A61D13C1DD44EA5FC0D16A0BEC457"
+                  },
+                  {
+                      "path":  "database/tests/phase4-wave1-hosted-verification.sql",
+                      "size_bytes":  18349,
+                      "sha256":  "2E505BCAEF594813F4D1943B2D1350EAB4D8B5BCCF1C914C116ECA767FD899F1"
+                  },
+                  {
+                      "path":  "database/tests/phase4-workflow03-pilot-teacher-verification.sql",
+                      "size_bytes":  1517,
+                      "sha256":  "E3AD238505488E9A5C1D8A3D055BCA21BF0931753788B9CEEA38FD7E247AD8EC"
+                  },
+                  {
+                      "path":  "database/tests/workflow04-audit-outcome-fix-verification.sql",
+                      "size_bytes":  1035,
+                      "sha256":  "ECF8432D2C13B595FC6058B7C2FE3B738F9C7B1D376C1E39D626D056D672D85F"
+                  },
+                  {
+                      "path":  "database/tests/workflow04-correction-notification-enum-fix-verification.sql",
+                      "size_bytes":  1036,
+                      "sha256":  "43AC960BE897707FFAF5062F01D65F8DB7D674C5665C01AEFE57E64F0F1FBFF3"
+                  },
+                  {
+                      "path":  "database/tests/workflow04-hosted-verification.sql",
+                      "size_bytes":  2587,
+                      "sha256":  "FA412C0601EFFF0E35C0B39CEB1C008E04A37E4B72CA6BAEDAEEE1D34F695489"
+                  },
+                  {
+                      "path":  "database/tests/workflow04-publication-notification-enum-fix-verification.sql",
+                      "size_bytes":  989,
+                      "sha256":  "07078B9625346B7E26DE7AFE93F33CD33DB17D2298476A372C6158C062D8E1BF"
+                  },
+                  {
+                      "path":  "database/tests/workflow07-admin-dashboard.sql",
+                      "size_bytes":  5209,
+                      "sha256":  "026447AF029605071B8C68E2B911732E3B37C9BC7086B77FD13F6FCB777738FB"
+                  },
+                  {
+                      "path":  "database/tests/workflow07-hosted-verification.sql",
+                      "size_bytes":  2539,
+                      "sha256":  "73FAB1FC8CB4438F236AEC1F7636C121350FE752067970C96176CADF18B52E6D"
+                  },
+                  {
+                      "path":  "database/tests/workflow09-operations-monitoring.sql",
+                      "size_bytes":  5721,
+                      "sha256":  "1568F39D6446E769C73D27885009B7267CED09BF480F29C5CD37C8937B488D54"
+                  },
+                  {
+                      "path":  "docs/architecture/00-confirmed-requirements-and-assumptions.md",
+                      "size_bytes":  5914,
+                      "sha256":  "F38466B45C23F27CDB6E565C2842B473CECF9070174C25970EA278ABD365EB61"
+                  },
+                  {
+                      "path":  "docs/architecture/01-final-architecture.md",
+                      "size_bytes":  5912,
+                      "sha256":  "4495F25FDABF400E0C4C4217B4C144D3AF469092ED6283C55D02EEF98D3A6CE9"
+                  },
+                  {
+                      "path":  "docs/architecture/02-workflow-boundaries.md",
+                      "size_bytes":  7906,
+                      "sha256":  "72C7596B2A8927D32E8C445A2C795D62634E65483C6F554547E9069300A0D947"
+                  },
+                  {
+                      "path":  "docs/architecture/03-data-flow-diagrams.md",
+                      "size_bytes":  4955,
+                      "sha256":  "AFD86B927C485AC644D109EA178173D3F4660A86FC00C2020A34FB439AC65477"
+                  },
+                  {
+                      "path":  "docs/architecture/04-role-authorization-matrix.md",
+                      "size_bytes":  3930,
+                      "sha256":  "56CAD085CED36537909F21D58C18164BE1D323C15F31602444C7F1EC76134243"
+                  },
+                  {
+                      "path":  "docs/architecture/05-database-entity-catalog.md",
+                      "size_bytes":  7220,
+                      "sha256":  "A2DDC84DD5B426EAF15142425FE36301715BCE46BD1C381E8FAA7211E538FFC4"
+                  },
+                  {
+                      "path":  "docs/architecture/06-public-rpc-contract.md",
+                      "size_bytes":  5765,
+                      "sha256":  "0D6CE31B8075159BFE5B324D3B6135669070B638FC50194C9F38C8A66888009C"
+                  },
+                  {
+                      "path":  "docs/architecture/07-google-workspace-structure.md",
+                      "size_bytes":  4829,
+                      "sha256":  "B9436BA854F3AFC5191B4A647A5440A61C0A8A5CCA1D88D161312AB3CD0B818D"
+                  },
+                  {
+                      "path":  "docs/architecture/08-repository-plan.md",
+                      "size_bytes":  2671,
+                      "sha256":  "F11E2A902B5DC3E9605FDB6279CCA669317D4AA88948614FB1973CF5860232D3"
+                  },
+                  {
+                      "path":  "docs/architecture/09-risk-register.md",
+                      "size_bytes":  4401,
+                      "sha256":  "0D48E430EA0F6DEC9449191845B54D065665C86CE47A14F194747135882C8675"
+                  },
+                  {
+                      "path":  "docs/architecture/10-implementation-sequence.md",
+                      "size_bytes":  3970,
+                      "sha256":  "C346B6B7E9855FFB4C5F942BED255A988B6CA2F629BA44A29386C3D933A854C0"
+                  },
+                  {
+                      "path":  "docs/architecture/11-phase-0-review-checklist.md",
+                      "size_bytes":  2269,
+                      "sha256":  "4FD742D9E9236A18B3F8E562B309FD2CEDA3D1F544829057B7F137B0B8EAAF31"
+                  },
+                  {
+                      "path":  "docs/architecture/entity-catalog.csv",
+                      "size_bytes":  1851,
+                      "sha256":  "A5E5838C56DA4FF4D14208B5B85F8C2EF12B606D33B0818EF11212D1AF7D4484"
+                  },
+                  {
+                      "path":  "docs/architecture/risk-register.csv",
+                      "size_bytes":  2129,
+                      "sha256":  "83B2C51A34212FA1C7C542D5175F844A8C7F0E7EDCE76C03197B795CABC2E291"
+                  },
+                  {
+                      "path":  "docs/architecture/rpc-catalog.csv",
+                      "size_bytes":  1624,
+                      "sha256":  "ED040C711634C715F25AE829360BAEF6ECBCCFA0FE487B11394FFE7E0F5A97CB"
+                  },
+                  {
+                      "path":  "docs/architecture/user-role-matrix.csv",
+                      "size_bytes":  655,
+                      "sha256":  "E810BCAFC5401FE163844517E069D938F6356B781EC9B05AD0A9765E1679804E"
+                  },
+                  {
+                      "path":  "docs/database/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "docs/database/01-foundation-and-tenancy.md",
+                      "size_bytes":  1433,
+                      "sha256":  "04E5CEAD9769B887FC450CB59DAFACF89B1488FD72595BB3E95AD433851DD22B"
+                  },
+                  {
+                      "path":  "docs/database/01-foundation-catalog-check.sql",
+                      "size_bytes":  923,
+                      "sha256":  "7C4449525F893C8B68542DE0F21B74FB32A88FD57914BC7876433CFA443EA8B4"
+                  },
+                  {
+                      "path":  "docs/database/02-identity-and-authorization.md",
+                      "size_bytes":  1446,
+                      "sha256":  "6AB6C64ECD2D0DAF09EB056F6E056F5042CC8D6A517DB683FA52C53A08227CEE"
+                  },
+                  {
+                      "path":  "docs/database/02-identity-authorization-catalog-check.sql",
+                      "size_bytes":  1611,
+                      "sha256":  "C64B63128FFE2FC6610C7732B8B86FA454C580B0E81D0F3894278AC865D1AAE7"
+                  },
+                  {
+                      "path":  "docs/database/03-phase2-accelerated-completion.md",
+                      "size_bytes":  1172,
+                      "sha256":  "21271A7B7B17C6DAA6E41463C12133465672CDF2F4C26BF25B8BF2E1267A583B"
+                  },
+                  {
+                      "path":  "docs/database/04-pgcrypto-extension-schema-repair.md",
+                      "size_bytes":  1651,
+                      "sha256":  "5FD1A275D2C6584EF2B73DA1E21745D16442C71367B507CF8D8C7D6326D35B28"
+                  },
+                  {
+                      "path":  "docs/database/05-phase4-wave1-rpc-support.md",
+                      "size_bytes":  513,
+                      "sha256":  "1DFB2A157C8F9A2E8890B8FD2A352B5511CB937067843BEBC189A0A9F5344DFB"
+                  },
+                  {
+                      "path":  "docs/database/phase2-completeness-matrix.md",
+                      "size_bytes":  1586,
+                      "sha256":  "73426DBAD5D612D524B25CAC77421DF21B52C6F75C1BC4FA4C69BB14108CCD4E"
+                  },
+                  {
+                      "path":  "docs/database/phase2-data-dictionary.md",
+                      "size_bytes":  11750,
+                      "sha256":  "A9F1826242C68BB3E52430E6146DD0D57978D2B5AA331A65E9E926D0197BBF06"
+                  },
+                  {
+                      "path":  "docs/database/phase2-erd.md",
+                      "size_bytes":  654,
+                      "sha256":  "43C523E139BFBBEF76020AB08CCA721C8B05CBE2E54B436A0ACAC517B149766C"
+                  },
+                  {
+                      "path":  "docs/database/phase2-rls-permissions.md",
+                      "size_bytes":  1350,
+                      "sha256":  "4475DE53FBE81324FCA1A9473584B0308D82256130E0AE557E9A9D8B61F74A44"
+                  },
+                  {
+                      "path":  "docs/database/phase2-rpc-dictionary.md",
+                      "size_bytes":  4051,
+                      "sha256":  "932D90C838D1D13D62273E6D7FAF5C292D248079C302813F1A259E318F9B31DF"
+                  },
+                  {
+                      "path":  "docs/database/phase2-testing-guide.md",
+                      "size_bytes":  1298,
+                      "sha256":  "BA7E2DC1B8E08E6DE1D37171F7B78D2A83D298A253BC012B85469DF34196F23A"
+                  },
+                  {
+                      "path":  "docs/final/FINAL-PILOT-STATUS.md",
+                      "size_bytes":  1539,
+                      "sha256":  "4AEDFF29C51AFE6E62CC9FF1AACEE68895BC0F6DDBC2BB872A0EFFFEE98850E0"
+                  },
+                  {
+                      "path":  "docs/final/KNOWN-LIMITATIONS.md",
+                      "size_bytes":  1336,
+                      "sha256":  "C8A8F347C4EFD6B9E89C6EF01E09395DD42E2B8752DC687D5FFB2F92E0AB8FD5"
+                  },
+                  {
+                      "path":  "docs/final/OPERATOR-HANDOVER.md",
+                      "size_bytes":  1357,
+                      "sha256":  "0D1C7C19ACC804A3BB6469CD92F851565A1D3C0AF8E78A1DD3335A099F0717E2"
+                  },
+                  {
+                      "path":  "docs/final/PRODUCTION-MIGRATION-PLAN.md",
+                      "size_bytes":  1323,
+                      "sha256":  "D606428C4AF9753B3D8309C19876560C9B540F66863AD6F36112FCBF502A7CF8"
+                  },
+                  {
+                      "path":  "docs/final/STARTUP-AND-RECOVERY.md",
+                      "size_bytes":  1623,
+                      "sha256":  "1A8084F85698EB66638313A85D9BC8F45088B16CBF8BEEC9FA6011F6A9175199"
+                  },
+                  {
+                      "path":  "docs/final/TESTING-AND-EVIDENCE.md",
+                      "size_bytes":  1122,
+                      "sha256":  "9C76ACA31CFC3D03FC46FAA8C9712888C6C55D987E968EB964D1893080C82DF3"
+                  },
+                  {
+                      "path":  "docs/handover/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "docs/setup/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "docs/setup/01-local-runtime-setup.md",
+                      "size_bytes":  2183,
+                      "sha256":  "106EC7D4C31289F5245ACA13B123EF26E5AFA7D2E03A522E716FE2800240AB2C"
+                  },
+                  {
+                      "path":  "docs/setup/02-ngrok-setup.md",
+                      "size_bytes":  1499,
+                      "sha256":  "96193259527BBB7A573F3B9EF389E5F9ED74042EA7C78E60FD3312F69C6F129C"
+                  },
+                  {
+                      "path":  "docs/setup/03-n8n-2.4.0-compatibility.md",
+                      "size_bytes":  3394,
+                      "sha256":  "2652E7F12E9783B928D3AA8214C046AA2DAEE9A2B24510E76DACE151F8E7D1AC"
+                  },
+                  {
+                      "path":  "docs/setup/04-phase-1-test-guide.md",
+                      "size_bytes":  2518,
+                      "sha256":  "58FB2DAA93B8783A0804212B1A91A3BC899165911F07956D85FF60641B6A9716"
+                  },
+                  {
+                      "path":  "docs/setup/05-phase3-google-workspace-and-staff-access.md",
+                      "size_bytes":  915,
+                      "sha256":  "3D739903041911D65D42BBC8A463A5CE7424F9AFD8E621CAE248AC682525BF60"
+                  },
+                  {
+                      "path":  "docs/setup/06-google-workspace-provisioning.md",
+                      "size_bytes":  737,
+                      "sha256":  "AE105931A3FFE8CE0BFF2F8B67B3EAA941B4E34C56D4BDBCCB08BD19EF208053"
+                  },
+                  {
+                      "path":  "docs/setup/07-supabase-auth-staff-portal.md",
+                      "size_bytes":  933,
+                      "sha256":  "69784EC1F0EDC7AB6B462F3C082C19CDF6800F263F7C21616C60C303B1F38204"
+                  },
+                  {
+                      "path":  "docs/setup/09-phase4-wave1-credential-binding.md",
+                      "size_bytes":  1270,
+                      "sha256":  "2AC80EDAC9EFED06C15F61BC308269CDF57610AD4BABF00EFC7A8A524591B641"
+                  },
+                  {
+                      "path":  "docs/setup/10-phase4-wave1-import-and-activation.md",
+                      "size_bytes":  917,
+                      "sha256":  "E9E44FF4094C82398A687B47DB0F5410B3532FE029F595D52DE58BECE96C74F9"
+                  },
+                  {
+                      "path":  "docs/setup/phase3-completion-report.md",
+                      "size_bytes":  773,
+                      "sha256":  "424B9D6F33FE0A6A2F1AD62532204968004B4A8BA36215DD3AC98697DEC0D7FD"
+                  },
+                  {
+                      "path":  "docs/setup/phase3-package-readme.md",
+                      "size_bytes":  532,
+                      "sha256":  "16F1C1FAE862B204F381CCD4D6CE4E0653564D0252C642939E69BF79E494A025"
+                  },
+                  {
+                      "path":  "docs/testing/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "docs/testing/phase3-authorization-test-guide.md",
+                      "size_bytes":  1483,
+                      "sha256":  "E1D781C9DD26F48D2A0FA3FFAEF165F8F2249AB83644C8B04A0A33479E8373C9"
+                  },
+                  {
+                      "path":  "docs/testing/phase3-authorization-test-matrix.csv",
+                      "size_bytes":  1606,
+                      "sha256":  "05D9A630357A4CE315F0B3906080D4515ADEB9B0935099839408A3BE7CDA3825"
+                  },
+                  {
+                      "path":  "docs/testing/phase4-wave1-test-guide.md",
+                      "size_bytes":  1647,
+                      "sha256":  "0E9EBC766CC25143C214A695C137FEF9436D03E6E97E6E6FCE04DD1B4BF2D635"
+                  },
+                  {
+                      "path":  "docs/testing/workflow03-pilot-teacher-assignment.md",
+                      "size_bytes":  551,
+                      "sha256":  "7458A1DC1F06B2299E2388C06AC6B0B6EE975A2F9B5429FDBA21F6686676627C"
+                  },
+                  {
+                      "path":  "docs/testing/workflow03-preflight.md",
+                      "size_bytes":  383,
+                      "sha256":  "F32105F8D1C94A4A5CE6D4CC03A105BF086D94076CEF6C0F6A064E726A702089"
+                  },
+                  {
+                      "path":  "docs/testing/workflow04-acceptance-guide.md",
+                      "size_bytes":  1117,
+                      "sha256":  "87E5BAF484194D30DF2F4C1C286658DD468CB6FECD2321FF01B4451BD890D4B5"
+                  },
+                  {
+                      "path":  "docs/testing/workflow07-acceptance.md",
+                      "size_bytes":  4228,
+                      "sha256":  "F356FAAEDD0A56378A1DDBC5EAA4773ECBC4889F3E13FD7E3AEE74A0E3D71B3C"
+                  },
+                  {
+                      "path":  "docs/testing/workflow09-acceptance.md",
+                      "size_bytes":  4045,
+                      "sha256":  "217F10669E5A0038F759970957F777F5DF9FF8B81A026A90F52D85B1E8541E07"
+                  },
+                  {
+                      "path":  "docs/testing/workflow10-preflight.md",
+                      "size_bytes":  1354,
+                      "sha256":  "F28075885374E9059AFFEA63372E2D6162E1A8972FD6F9A44245AF9B9F5C1995"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/google-oauth-callback-host-repair.md",
+                      "size_bytes":  1055,
+                      "sha256":  "4A7AC8292A2054AC68B80912C64589564D149400DBB2E9CF490D9FFFA21087FF"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/phase3-local-secret-scan-repair.md",
+                      "size_bytes":  1141,
+                      "sha256":  "941F0F2B62DF0A28E03000B5ED63A8A60047B24222C520EB6A3B8AAF5ECFE2F0"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/phase3-placeholder-secret-scan-repair.md",
+                      "size_bytes":  1137,
+                      "sha256":  "EDB9E55676C34EAF2C79D1DA8DA0E6E0528312350C445C06996836EE5239FC02"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/phase3-portal-url-normalization-repair.md",
+                      "size_bytes":  597,
+                      "sha256":  "A518533E155F44A0F4E646C0F669ACD4DDBE939C0B9042FC7B056E3E594C2D4D"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/phase3-regression-fixture-repair.md",
+                      "size_bytes":  883,
+                      "sha256":  "9365CA8B3C78E7531A4988B6B2559889C07EB4190ADB6D0731624584C97D427B"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/phase4-service-role-claim-root-cause.md",
+                      "size_bytes":  913,
+                      "sha256":  "DCCD8D3A3D96129DE5AF320E971752341A8C253F955DF58B3A4A4440D61B6579"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/phase4-supabase-url-network-failure.md",
+                      "size_bytes":  750,
+                      "sha256":  "716D6DA386F2B4F5B34B52C4CF7858E610B454ED9666AB11F728BA75FF9D24F5"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/phase4-supabase-url-test-correction.md",
+                      "size_bytes":  611,
+                      "sha256":  "7A4313C382FE5A5CC321ACCE508ED312B7AB235CBE0C05A0C21C85F8BF5DFB89"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/phase4-wave1-code-contract-recovery.md",
+                      "size_bytes":  810,
+                      "sha256":  "9917EC7E030F50921FAB8895E92DFF4F1F2EFD3916A57208F0F6F07E5EBDCB04"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/phase4-wave1-code-node-output-contract.md",
+                      "size_bytes":  1384,
+                      "sha256":  "B22D16F8533608A5CE8195C79FAAAAD3628272FB0FDA35A1BD0534E97E263E9A"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/phase4-wave1-google-sheets-trigger-range.md",
+                      "size_bytes":  1073,
+                      "sha256":  "0A3F76CF0B96A3BB16470C5F6F455A33FBD9F9E2303FDB1EB2C28F5C77BFDBE7"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/phase4-wave1-optional-credential-property.md",
+                      "size_bytes":  581,
+                      "sha256":  "F2593A4B60DEEB478C83AA0A790DF1FAFC8D974C3A4B797812C5C3F8B5AC62E7"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/phase4-wave1-recovery-test-correction.md",
+                      "size_bytes":  703,
+                      "sha256":  "F04E31B805B3956A90BF29220AC230122F820C8DF4C76720A78E23C4E5E8EBB5"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/sis-01-workflow-audit.md",
+                      "size_bytes":  3096,
+                      "sha256":  "A2D98DE88F480B5E24EA1B59F39B0D4D07364E5165ED7219281481EF156753C9"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/sis-02-stabilization.md",
+                      "size_bytes":  889,
+                      "sha256":  "85B20A7F734E919965279E1473BDD5CBBC599273C730CEFAD0EF3924B132A9F4"
+                  },
+                  {
+                      "path":  "docs/troubleshooting/sis-08-stabilization.md",
+                      "size_bytes":  931,
+                      "sha256":  "5F9FE1FCA9FE2E6938251996F51E29AEAD011360B41EE718858E9F9AA51412C2"
+                  },
+                  {
+                      "path":  "docs/workflows/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "docs/workflows/01-student-intake.md",
+                      "size_bytes":  1252,
+                      "sha256":  "E85CA93919774F50019D50CF48A0774FB941E677662E2143991A0C3B692E24CA"
+                  },
+                  {
+                      "path":  "docs/workflows/02-enrollment-lifecycle.md",
+                      "size_bytes":  1119,
+                      "sha256":  "BAA98C933A2A683B70F9C4754A708D7F1F2FCD32ABF4F30D5291497474AD35AF"
+                  },
+                  {
+                      "path":  "docs/workflows/03-marks-intake-complete.md",
+                      "size_bytes":  932,
+                      "sha256":  "2051202B12E1D405410DC57A6157C8EC6988596405331D1B169A30A850985F7F"
+                  },
+                  {
+                      "path":  "docs/workflows/03-marks-intake-manual-pilot.md",
+                      "size_bytes":  1057,
+                      "sha256":  "C9FA0ADBD2BE477C307BA22DE0F2972B5665503E80BC2E694D6FBA1032537E56"
+                  },
+                  {
+                      "path":  "docs/workflows/04-results-approval-and-publication.md",
+                      "size_bytes":  1952,
+                      "sha256":  "C1126D328662AA5F8428757F568CFD385D21FE5468E01376BD85DD98CD2CEC48"
+                  },
+                  {
+                      "path":  "docs/workflows/04-results-preflight.md",
+                      "size_bytes":  807,
+                      "sha256":  "172086A58CD3AE5351CD517177272FC6E64CD26D3BFCB6F6F17DA0D65F8094C9"
+                  },
+                  {
+                      "path":  "docs/workflows/05-transcript-delivery.md",
+                      "size_bytes":  2147,
+                      "sha256":  "D8F0F69AB66A368958C94EE0B5E738A7D6FB66BC149E2487F63D7F29E2691697"
+                  },
+                  {
+                      "path":  "docs/workflows/07-admin-dashboard.md",
+                      "size_bytes":  4404,
+                      "sha256":  "A54590563C0A45F7F63943B300B0C756720EED02EEDBE63B1A32F9017FC92DF4"
+                  },
+                  {
+                      "path":  "docs/workflows/08-notification-dispatcher.md",
+                      "size_bytes":  1320,
+                      "sha256":  "06CE683CFB20457E1470A5516ADFD4B6E72FC009835FD6834A0FDF80CEB232B2"
+                  },
+                  {
+                      "path":  "docs/workflows/09-operations-monitoring.md",
+                      "size_bytes":  4670,
+                      "sha256":  "54A1F10F59059C4970F56FAF612847179FFCD6A263722E11791A2A6D135B4D17"
+                  },
+                  {
+                      "path":  "docs/workflows/10-global-error-handler-preflight.md",
+                      "size_bytes":  2458,
+                      "sha256":  "A19D57E0D195F55EE05E4E040824873E30F177E8CE09E58289E3A303497019FB"
+                  },
+                  {
+                      "path":  "docs/workflows/phase4-wave1-catalog.md",
+                      "size_bytes":  543,
+                      "sha256":  "6B17A9E98F1C061E55FCED76B36463ABA32668178260E3764A4366130A1A69E6"
+                  },
+                  {
+                      "path":  "docs/workflows/workflow05-google-response-parser-node-code.txt",
+                      "size_bytes":  2925,
+                      "sha256":  "DC9E934C3948C6F757EA6AAA070444C5A7CB75B161CFD463982869ED13A8D6DD"
+                  },
+                  {
+                      "path":  "emails/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "emails/wave1-template-library.json",
+                      "size_bytes":  499,
+                      "sha256":  "6445CEC413F21D32F5DD807C8D5192A1C8F5DD63D0F87FF156385B3C8A6DD8AB"
+                  },
+                  {
+                      "path":  "evidence/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "evidence/final-documentation-install-20260721T220841681Z.json",
+                      "size_bytes":  267,
+                      "sha256":  "0D051B077046FAD3B4A752CE3F74FB4AAFDD6DC1B215416E5E154F116D69F6DF"
+                  },
+                  {
+                      "path":  "evidence/final-documentation-verification-20260721T220842045Z.json",
+                      "size_bytes":  3184,
+                      "sha256":  "485CB53099CB9DE8F99E3A214C3572AFF9F908058218238D66C3030E824915E5"
+                  },
+                  {
+                      "path":  "evidence/FINAL-EVIDENCE-INDEX.json",
+                      "size_bytes":  11937,
+                      "sha256":  "843B83D7E13334D3AD20175A80B2EF613B17B775BFCD57FE8D2A0D909B5FFB08"
+                  },
+                  {
+                      "path":  "evidence/phase-0-manifest.json",
+                      "size_bytes":  3561,
+                      "sha256":  "7B4F34CC304D818EFB01E2DCEEB7D8BB1D79243995B2930571C78FC4E6E507A9"
+                  },
+                  {
+                      "path":  "evidence/phase-1-manifest.json",
+                      "size_bytes":  10168,
+                      "sha256":  "0CD049D74449DBAD16827BEF83DCD71FDFB25E5B2EE89E5D8773C3CA408B375A"
+                  },
+                  {
+                      "path":  "evidence/phase-1-runtime-verification.md",
+                      "size_bytes":  1041,
+                      "sha256":  "6DB8097056E2E3251272ED8A905A9C5DE7D564FA27C18D5E54A6ABB44B21D454"
+                  },
+                  {
+                      "path":  "evidence/phase-1-static-regression.txt",
+                      "size_bytes":  559,
+                      "sha256":  "1BF33001EEE9201BB0CD0F4E4C62F13B86076149B569FDAE500D3F99042C8925"
+                  },
+                  {
+                      "path":  "evidence/phase-1-static-test.txt",
+                      "size_bytes":  34,
+                      "sha256":  "C055165C055CF357EE2C72E5B360333531284ACC652ECEBF8BB99FE58D9E7FC0"
+                  },
+                  {
+                      "path":  "evidence/phase-2-accelerated-package-validation.md",
+                      "size_bytes":  2109,
+                      "sha256":  "D2E6DD31C5E9174B97F1A93686CB3391470AB654DDB8040D2E5B44F4515EC753"
+                  },
+                  {
+                      "path":  "evidence/phase-2-hosted-verification.json",
+                      "size_bytes":  349,
+                      "sha256":  "6876FBF2B1C148E6E4E9C5F8C645104469C761984DD78B8C386AD55AF1669177"
+                  },
+                  {
+                      "path":  "evidence/phase-2-hosted-verification.md",
+                      "size_bytes":  719,
+                      "sha256":  "CFA30861D5B6DCF8F8852810931CA6BCD3A3B0CB08E8F3234ED823ACB1A60D46"
+                  },
+                  {
+                      "path":  "evidence/phase-2-pgcrypto-repair-validation.md",
+                      "size_bytes":  732,
+                      "sha256":  "A09447CAE9DE39693F934BD32909E9FC70C5EA9FB9AAF656135174C4B33431FE"
+                  },
+                  {
+                      "path":  "evidence/phase-2-tranche-1-state.md",
+                      "size_bytes":  625,
+                      "sha256":  "AAAF234A87078FBF554900DE59EAA54CE18F67716620803FCB647FED7AC56660"
+                  },
+                  {
+                      "path":  "evidence/phase-3-authorization-verification.json",
+                      "size_bytes":  286,
+                      "sha256":  "1A888766A76F602A36AB518781ACF7E118ACBB5E5A2F74C676BDB69C423C7ADD"
+                  },
+                  {
+                      "path":  "evidence/phase-3-completion.md",
+                      "size_bytes":  1303,
+                      "sha256":  "D55F6B9C0DB6B9D13EBDBFA12AC2E5011F5AAFAC76EFACB704D59055078096D2"
+                  },
+                  {
+                      "path":  "evidence/phase-3-google-workspace-verification.json",
+                      "size_bytes":  259,
+                      "sha256":  "B54C1237F1CEC973A95F57826F2EFCF289053E55D857B58AE5847A3B2E7693A6"
+                  },
+                  {
+                      "path":  "evidence/phase-3-package-static-validation.md",
+                      "size_bytes":  739,
+                      "sha256":  "5F8B6A1DC732B7A1A1FB3827F276AF79573190E2ACD5B253BC828C9AD6589FB5"
+                  },
+                  {
+                      "path":  "evidence/phase-3-placeholder-secret-scan-repair.md",
+                      "size_bytes":  469,
+                      "sha256":  "F6C377D9E3917C7B9E0ECBCA308E4C111A688B8F4A431256BA740EF3B0299FAD"
+                  },
+                  {
+                      "path":  "evidence/phase-3-regression-fixture-repair.md",
+                      "size_bytes":  365,
+                      "sha256":  "53689356C9BC9E3FE3060B2BBA29992F83CE9A90061282E92B555060E0BCD901"
+                  },
+                  {
+                      "path":  "evidence/phase-3-repair-state.md",
+                      "size_bytes":  515,
+                      "sha256":  "D9E2D6FEDCD69B7FC5791323083860885D8F5F8754560D6C126ECEB9295D34FA"
+                  },
+                  {
+                      "path":  "evidence/phase-3-secret-scan-repair.md",
+                      "size_bytes":  346,
+                      "sha256":  "E6F2C94FFDEFCF1819072151C2B715A0C19A2EA90BD34224B5759C184F01726E"
+                  },
+                  {
+                      "path":  "evidence/phase-4-wave1-code-contract-repair.json",
+                      "size_bytes":  314,
+                      "sha256":  "7E5C7CDEF34750FE3BC2643AE09CFE696B6DF1D669BE67D5FA2FDD43C8288EEB"
+                  },
+                  {
+                      "path":  "evidence/phase-4-wave1-construction-validation.md",
+                      "size_bytes":  1729,
+                      "sha256":  "6B35B260F122878F331C93FF330F8A9E11A9839D0BC1A3ED98D7D0C412794C77"
+                  },
+                  {
+                      "path":  "evidence/phase-4-wave1-prepackage-verification.json",
+                      "size_bytes":  1084,
+                      "sha256":  "B0EE3232C583C289E82CD565BFB5FAE3A37138D8AB7439909AB2AB588D1F3DFE"
+                  },
+                  {
+                      "path":  "evidence/phase-4-wave1-trigger-range-repair.json",
+                      "size_bytes":  264,
+                      "sha256":  "3B33E8D9AFFB4398A4872602F17749FDB4DD12A68A4AD5B7722BDB490D3FC1AB"
+                  },
+                  {
+                      "path":  "evidence/restore-verification-20260721T214514695Z.json",
+                      "size_bytes":  429,
+                      "sha256":  "056524BBFA1E2134C90D4A19AC85BC8C2E0D80C705467EC95C24C24F1B7F72A9"
+                  },
+                  {
+                      "path":  "evidence/workflow07-negative-2026-07-21T00-14-40-318Z.json",
+                      "size_bytes":  3981,
+                      "sha256":  "146433DB273569AF466F6F15CCE16E443E67F78F75AB643E1BF28C1583FAA40B"
+                  },
+                  {
+                      "path":  "evidence/workflow07-positive-2026-07-21T00-13-51-290Z.json",
+                      "size_bytes":  2247,
+                      "sha256":  "986A35A93414E217A1F0B9806896431FE36632AF3BCC5D3BF9EE92C5B578C8E1"
+                  },
+                  {
+                      "path":  "evidence/workflow09-acceptance-2026-07-21T01-24-11-426Z.json",
+                      "size_bytes":  2113,
+                      "sha256":  "3587B4716B39A7CB0865DB795F6697938A88925E9BD43E19B8B9C96A40662DAC"
+                  },
+                  {
+                      "path":  "evidence/workflow09-acceptance-2026-07-21T01-24-53-009Z.json",
+                      "size_bytes":  2113,
+                      "sha256":  "01014B625973CB540F6CE1BE656263AFE118A9AD77CAE4A817D56245E7D1BF66"
+                  },
+                  {
+                      "path":  "evidence/workflow09-freeze-2026-07-21.md",
+                      "size_bytes":  1102,
+                      "sha256":  "B80A9D39F322376E1A81D07C140A766EDCC03085A4AAC59C859E654D663669E4"
+                  },
+                  {
+                      "path":  "evidence/workflow10-local-preflight-2026-07-21T01-57-09-670Z.json",
+                      "size_bytes":  63248,
+                      "sha256":  "31BDC19359275F775503B8AFA55D9D6256065577DF1174D460D7FDD7BEA66083"
+                  },
+                  {
+                      "path":  "evidence/workflow10-local-preflight-2026-07-21T02-00-09-961Z.json",
+                      "size_bytes":  63248,
+                      "sha256":  "0003E062FCAC84370A899D8D6DF9096F0790776A5695F3FB63DFAB0940415723"
+                  },
+                  {
+                      "path":  "evidence/workflow10-local-preflight-2026-07-21T02-15-40-901Z.json",
+                      "size_bytes":  62733,
+                      "sha256":  "FC985E1164BD0F180656DCAD391664949B86D80BBD76171D99A2275356968471"
+                  },
+                  {
+                      "path":  "FINAL-SUBMISSION-REPORT.json",
+                      "size_bytes":  1360,
+                      "sha256":  "CB61CFAC86D0F37E4BC1B6BE46563B09B2094F568A214803599AC8EC9BC7FEC4"
+                  },
+                  {
+                      "path":  "google/drive/folder-plan.json",
+                      "size_bytes":  1975,
+                      "sha256":  "30747EA95ED2C23DD7BF75DAFEAFCC5F30DCBE9B655CC899770EE39498180E46"
+                  },
+                  {
+                      "path":  "google/drive/folder-plan.md",
+                      "size_bytes":  915,
+                      "sha256":  "930118F0D4AEF040DA2569469431D74F6224F2B7FCEAEDDE14DC59BC3150AD0C"
+                  },
+                  {
+                      "path":  "google/forms/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "google/forms/form-field-catalog.csv",
+                      "size_bytes":  7406,
+                      "sha256":  "28263E19B0FCBCC84F561780547CFE4F1B2EA4026F101B5650EA40745712828F"
+                  },
+                  {
+                      "path":  "google/forms/form-specifications.json",
+                      "size_bytes":  17246,
+                      "sha256":  "2EEB70655A316A3ED31D5EBB4DA86612667F0BED3A4738F7178A161243BEA1B9"
+                  },
+                  {
+                      "path":  "google/forms/form-specifications.md",
+                      "size_bytes":  6374,
+                      "sha256":  "66740E1C3C783F6EF719F2B76DACA99553A8C59F61B2EE2E9EA9101D8C03410B"
+                  },
+                  {
+                      "path":  "google/provisioning/appsscript.json",
+                      "size_bytes":  388,
+                      "sha256":  "23195A9DDC1DCAE367EBA5294C14F232FFCF90312B6D116A88CF897FE9405AD4"
+                  },
+                  {
+                      "path":  "google/provisioning/README.md",
+                      "size_bytes":  1027,
+                      "sha256":  "A4D758515A8772BBF4817DD98792ED111A2F26A93D5D81DD3CD42A7CCE6A71E7"
+                  },
+                  {
+                      "path":  "google/provisioning/SIS-Wave1ConfigHelper.gs",
+                      "size_bytes":  1367,
+                      "sha256":  "F08C026C3196F2A310A68E6B4ECDF80C73F3C0BAEB7EAD1327EB4EC126BB6285"
+                  },
+                  {
+                      "path":  "google/provisioning/SIS-WorkspaceProvisioner.gs",
+                      "size_bytes":  35871,
+                      "sha256":  "D4D1783E820D9B691F3CCB7AD779748BC0BFB7661CED347A6489962808D1D9FA"
+                  },
+                  {
+                      "path":  "google/setup/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "google/sheets/response-sheet-contract.json",
+                      "size_bytes":  1197,
+                      "sha256":  "A1E89BBE41BAAAABD5AC9F88F370B712609E47A6BEF5FC510325F843085798A4"
+                  },
+                  {
+                      "path":  "google/sheets/response-sheet-structures.md",
+                      "size_bytes":  1513,
+                      "sha256":  "2E76FF21567E451FFFF88B771CD78D453B61B4E2F679EDBB2402C5036790DBD4"
+                  },
+                  {
+                      "path":  "google/templates/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "google/templates/dashboard-template-guide.md",
+                      "size_bytes":  448,
+                      "sha256":  "02DF012C0174D040DFE060DD4379EDDC13D65253C96EA3C4CAB11DE31AA68C3F"
+                  },
+                  {
+                      "path":  "google/templates/hec-template-guide.md",
+                      "size_bytes":  471,
+                      "sha256":  "B767FFC3BBE53F9005D68EFBA794064BEBDF134B27952BE338F59202378F78B8"
+                  },
+                  {
+                      "path":  "google/templates/transcript-template-guide.md",
+                      "size_bytes":  1034,
+                      "sha256":  "D081CF1F4F7FC0D72BD5AEA75B94DAE9EA9747A938B145B0C50F7E8795E8D516"
+                  },
+                  {
+                      "path":  "google/templates/workflow05-transcript-template.html",
+                      "size_bytes":  1104,
+                      "sha256":  "9E8FB251C8DD8572EF29B3E6F343A0C50887F3FFA638D345C809F961D01283EF"
+                  },
+                  {
+                      "path":  "package.json",
+                      "size_bytes":  1386,
+                      "sha256":  "D10E4C8CBBF2C106533B3A3B6D3FE42F3EDFEC3DAEF398340EABBF7A319D3C55"
+                  },
+                  {
+                      "path":  "PACKAGE_MANIFEST.sha256",
+                      "size_bytes":  41178,
+                      "sha256":  "68B5D83EA6C0CB0AC18D0D5ED0D837C708300B484C6781CA7C4E838A10BE8F33"
+                  },
+                  {
+                      "path":  "package-lock.json",
+                      "size_bytes":  979757,
+                      "sha256":  "0CAD65D24567D3D96F7BEB2F0F7E385B3E8AD08647EA33C03579AD78300962A0"
+                  },
+                  {
+                      "path":  "patches/workflow03-build-file-marks-request-queue-safe.js",
+                      "size_bytes":  6988,
+                      "sha256":  "DAFE5029B5B9E3BDE68A496752647D98F5F2A30617EC59794E58707E67B5E258"
+                  },
+                  {
+                      "path":  "portal/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "portal/app.js",
+                      "size_bytes":  25929,
+                      "sha256":  "CFD55D83383FC90D3F35E43CA1F701F4F911B82BCC972809FD9173D1298AA0BD"
+                  },
+                  {
+                      "path":  "portal/app.js.before-workflow04",
+                      "size_bytes":  15829,
+                      "sha256":  "85700D893498A0B5E9BA0FBF78B6DFB552F261B2152C73A47873CCB0286BE190"
+                  },
+                  {
+                      "path":  "portal/config.example.js",
+                      "size_bytes":  239,
+                      "sha256":  "4844E947F9E1048CA1090C58F0D9B7CB49B88006A203D558AF9021350B9685BA"
+                  },
+                  {
+                      "path":  "portal/config.example.js.before-workflow04",
+                      "size_bytes":  224,
+                      "sha256":  "099CE12307D143EBB97A7E09F770A826F03A75F2B3209ED5D6765DE97F31B856"
+                  },
+                  {
+                      "path":  "portal/index.html",
+                      "size_bytes":  9280,
+                      "sha256":  "14B1F8014E31AC086A9B25D11FF3ACB6EA5A97FF3F0FB15A64DC5FBD2CEACAAC"
+                  },
+                  {
+                      "path":  "portal/index.html.before-workflow04",
+                      "size_bytes":  6488,
+                      "sha256":  "1F404B8538A5EF4E5388E30479039DBF1F2F144DB9D9D4C3E4C1F27C926AC52A"
+                  },
+                  {
+                      "path":  "portal/README.md",
+                      "size_bytes":  909,
+                      "sha256":  "7D7FDA96D22BB8D201CE229840D6C03B5EF156F829D41E536506E0801A7AFB27"
+                  },
+                  {
+                      "path":  "portal/styles.css",
+                      "size_bytes":  5031,
+                      "sha256":  "9FF59784CB7262B3A5A285D549FC7166E431B590E1442F3BE4459E84AE3638A2"
+                  },
+                  {
+                      "path":  "portal/styles.css.before-workflow04",
+                      "size_bytes":  3695,
+                      "sha256":  "4E12912BC79C92F43AF30EEF3AC83905C0DB4E1D3312092010E16CC5133F6FAC"
+                  },
+                  {
+                      "path":  "portal/transcript-pilot.html",
+                      "size_bytes":  10098,
+                      "sha256":  "5B2D2316CB4CC0FDBE72FB2047DF10D2D192E1AC5C51D7AC77BC8556A6BD43A5"
+                  },
+                  {
+                      "path":  "PROJECT_STATE.md",
+                      "size_bytes":  4496,
+                      "sha256":  "B228D9FDDA7F984B79E128C6FE64BB1A29DCE57943EF51780F5E69BC6050C7FB"
+                  },
+                  {
+                      "path":  "README.md",
+                      "size_bytes":  1718,
+                      "sha256":  "43A72052E290B7C48A6A580C9FAE40BA991C2A65C69EC3B57AC0034301D04B34"
+                  },
+                  {
+                      "path":  "README-workflow03-queue-safe-patch.md",
+                      "size_bytes":  745,
+                      "sha256":  "A73FCCAF649920DE7C1EE8D2AA2EF1F1405D0A2E7C7FEA9ECE40BDA1B10D8627"
+                  },
+                  {
+                      "path":  "scripts/Apply-GoogleOAuthCallbackRepair.ps1",
+                      "size_bytes":  2551,
+                      "sha256":  "FF19DBE6D06D4D4790EF60CCC97FA50CFD5969548C346CC54314E3AC2359E611"
+                  },
+                  {
+                      "path":  "scripts/Apply-Phase2Repair.ps1",
+                      "size_bytes":  1315,
+                      "sha256":  "E559617CC414228BF968E69393709F1579ADD6DC62D65D5CD4DAFAFC45449076"
+                  },
+                  {
+                      "path":  "scripts/Apply-Phase4ServiceRoleClaimPatch.ps1",
+                      "size_bytes":  1025,
+                      "sha256":  "E396285CD9E7B1891C5CE84597F78FD761A181AFDF0E128560B0D71A2B61DDF5"
+                  },
+                  {
+                      "path":  "scripts/Apply-Sis03ManualMarksDatabase.ps1",
+                      "size_bytes":  851,
+                      "sha256":  "5BBD359214C47FCD809EB53C842CD92CAB2077547AF9B84B9AE6CCE62B99AC67"
+                  },
+                  {
+                      "path":  "scripts/Apply-Sis03QueueSafeNegativeValidationPatch.ps1",
+                      "size_bytes":  1512,
+                      "sha256":  "FE9F2C8CD72098CFACA3CC89563B92D43994F7E687BFC29844EB7EA82C658AD3"
+                  },
+                  {
+                      "path":  "scripts/Apply-Workflow03PilotTeacherAssignment.ps1",
+                      "size_bytes":  892,
+                      "sha256":  "03D80EE1E9323F8522F565541BD5824B65EF08746FB0A0568067AAD821516403"
+                  },
+                  {
+                      "path":  "scripts/Configure-Workflow04PortalWebhookMode.ps1",
+                      "size_bytes":  1416,
+                      "sha256":  "8EA67CE6D3CE0E72F791DEF4EF00264295FBB420E0594F7EC1A76EE85EA07305"
+                  },
+                  {
+                      "path":  "scripts/Copy-FirstStaffBootstrap.ps1",
+                      "size_bytes":  5017,
+                      "sha256":  "7B2E16EE8508667EE2FFBE176E8D842E0D63297D8392DE4B56A2F9151ED7A86F"
+                  },
+                  {
+                      "path":  "scripts/Copy-Phase2Verification.ps1",
+                      "size_bytes":  512,
+                      "sha256":  "A0A7F7AFE7A873C75850667E8CA8518F706FBF4EF20FB4613E784CE5E7272A97"
+                  },
+                  {
+                      "path":  "scripts/Copy-Phase3AuthorizationTest.ps1",
+                      "size_bytes":  2759,
+                      "sha256":  "CCF0CFBADDBCB928F905C96D918329642216F58028C7D28AC4E1BE40DD42B04E"
+                  },
+                  {
+                      "path":  "scripts/Copy-Phase3Provisioner.ps1",
+                      "size_bytes":  434,
+                      "sha256":  "1203C5F88F7F2B999D7B4C14651816720A78F5DFF170D70E12182375F0B77D08"
+                  },
+                  {
+                      "path":  "scripts/Copy-Phase4ServiceRoleClaimVerification.ps1",
+                      "size_bytes":  521,
+                      "sha256":  "40E45E8AE34FD824A2C540B559B54930CE0DEC4BEFEB053A2B05C05F4D84B486"
+                  },
+                  {
+                      "path":  "scripts/Copy-Phase4Wave1Verification.ps1",
+                      "size_bytes":  330,
+                      "sha256":  "3A28059050D5E811122426042D79940CECFF39F52752A28CEB5E125F3B6C56DD"
+                  },
+                  {
+                      "path":  "scripts/Copy-Sis03QueueSafeBuildFileMarksCode.ps1",
+                      "size_bytes":  549,
+                      "sha256":  "53E82CF3D0BFE732BD525AB41AF3B368A22D31713FC2BCAADA66BF90A5A9EDEA"
+                  },
+                  {
+                      "path":  "scripts/Copy-Wave1GoogleConfigHelper.ps1",
+                      "size_bytes":  319,
+                      "sha256":  "CD11F0D4CEC63DA40744754967370D32E2B6B94E68BA8A20EE9974982695C881"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow02StudentLookup.ps1",
+                      "size_bytes":  506,
+                      "sha256":  "42235C6EBEE4F1C6976125AF0A3AD59914E424E981CA164EA565A3BF8FE9A1F0"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow03MarksStatus.ps1",
+                      "size_bytes":  529,
+                      "sha256":  "131B8DB4CB4696ED64E6A9C5C4E997C2A11CA9FBA2954A0494D60481B29563DB"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow03PilotTeacherVerification.ps1",
+                      "size_bytes":  556,
+                      "sha256":  "AF3DED744693337AC007C8C895817F2A5A64DD8C94AEBEC526A886BA1BA0FE9F"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow03Preflight.ps1",
+                      "size_bytes":  526,
+                      "sha256":  "6ED186B9B06054679DC742B473174129CBB93BBD879746AA871873ECFB4C9266"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow04AuditOutcomeFix.ps1",
+                      "size_bytes":  551,
+                      "sha256":  "5F31A75D3F38914835A19F40E247FF3A147BC0BD3CD13E5D9E304159A716155E"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow04CorrectionDecisionInputs.ps1",
+                      "size_bytes":  567,
+                      "sha256":  "A0D610EDDF3DD28AC40DDB091E6F4339BA3AF30895DAA989B69F4568B51A04FD"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow04CorrectionNotificationEnumFix.ps1",
+                      "size_bytes":  597,
+                      "sha256":  "361BF3A7AAA80BBDCBD43E020BB93A03FFE34F9C5B7484045B2CC61D91973B0F"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow04CorrectionPilotInputs.ps1",
+                      "size_bytes":  558,
+                      "sha256":  "BA837CD795E2418DB152C500E8CA3A9DCD30AE3BB1C606EA19FB918E4E45379A"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow04PublicationDiagnostic.ps1",
+                      "size_bytes":  617,
+                      "sha256":  "9CF89D0C40F517C2B8E4AD44467754FF8248BCC4B9D0418AE18C18B663EDB980"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow04PublicationNotificationEnumFix.ps1",
+                      "size_bytes":  600,
+                      "sha256":  "ED5703B0EE53CD56D9F986974DE681F8CF35A51712DBCD81DE923D6A0BEF9AB9"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow04ResultsMigration.ps1",
+                      "size_bytes":  528,
+                      "sha256":  "BA28E6182B03C700C173ED066C8EE58257577C0ECD75010D396284903E000312"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow04ResultsPreflight.ps1",
+                      "size_bytes":  606,
+                      "sha256":  "CCE7119434551CE1AE49C1F565F8C00CEFA8109146F99B4BF50DB8C1BC47BB5C"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow05DeliveryStatus.ps1",
+                      "size_bytes":  542,
+                      "sha256":  "BA91E8EB63BDA08D0D2EE4ACC6D71D51E5E80C8361231D9C81BCD1273D0E82C8"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow05DurableOutcomes.ps1",
+                      "size_bytes":  525,
+                      "sha256":  "40B275D99944794A63F9AA477D2BB112253505C76F5D8151553A5C5AEBB6EF32"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow05HostedVerification.ps1",
+                      "size_bytes":  539,
+                      "sha256":  "1E48BF60B447E71B5EE2454E621FB5A50DF93FBDD614C16C2460729EC597857B"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow05Migration.ps1",
+                      "size_bytes":  537,
+                      "sha256":  "FFBC38F22A20B5FAB77A6A4BE36BD35ED58910EF36F6FA9B467B0C12563C7DDE"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow05Preflight.ps1",
+                      "size_bytes":  533,
+                      "sha256":  "75FB7B6061248D036AB014B370694CBD91C7267F1D0E60228210263830FD464A"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow05TranscriptContractSnapshot.ps1",
+                      "size_bytes":  568,
+                      "sha256":  "0B84D77BDD8678292D0E388296F42899134D9C79AFDAE67E656D27C77688D8D2"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow05VerificationCodeFix.ps1",
+                      "size_bytes":  559,
+                      "sha256":  "15F6AD759DBE3A9EFFA5A0BDD6007681241FEDED0C5AC5CF2BB5DE07C56E3450"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow05VerificationCodeFixVerification.ps1",
+                      "size_bytes":  582,
+                      "sha256":  "71707BBDD2A8AE74CE562B4E01C8531CEAFE3BD5E5D9A600DC65E17FE270A492"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow07ContractSnapshot.ps1",
+                      "size_bytes":  583,
+                      "sha256":  "3F5475251B363CA707B8C2B40CD35FD7194D01DF942AD5A710F1B76115382C20"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow07DurableOutcomes.ps1",
+                      "size_bytes":  490,
+                      "sha256":  "E37D91826B1BBFA5C00C371DFFC3A3EF1718305FF72A8C99FD4FC0F4E5A9AB4A"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow07HostedVerification.ps1",
+                      "size_bytes":  494,
+                      "sha256":  "254742CB0029B5A4159D9B71140218C4AB7479B6364F3B0730A62777D165F691"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow07Migration.ps1",
+                      "size_bytes":  583,
+                      "sha256":  "CD533A24754561E1E8FBE0E41510709BE53948E9F496798081DC31741D5F3D2C"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow07PilotInputs.ps1",
+                      "size_bytes":  482,
+                      "sha256":  "1F0ADCCDAB243B70256EDDA51E7DDCB8224313E9C1330FDF78EB4CFA2E612133"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow07Verification.ps1",
+                      "size_bytes":  555,
+                      "sha256":  "B5DC8104804F18F9487192FF13F1F0C84EC121A5B0E47A25CE34E56D51E872BF"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow08NotificationStatus.ps1",
+                      "size_bytes":  514,
+                      "sha256":  "441BE3EEE0311539879E52A69938C8552AB810F51B963C8AE3F41AB3BD197D73"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow09ContractSnapshot.ps1",
+                      "size_bytes":  570,
+                      "sha256":  "0468E5CDBFE862959E475479DDDEE44875D4E1626E0F8CC094BF53C0B00DC023"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow09Migration.ps1",
+                      "size_bytes":  568,
+                      "sha256":  "2DA2DCFD5C2562CA2F3DC69DEFD29C6717333E5F6B3B4F67506BFEC80F1D1B21"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow09Verification.ps1",
+                      "size_bytes":  543,
+                      "sha256":  "DFB570FC525D8D6110E8BB10554AF307001831E59CA139FA407B36FBADD1A962"
+                  },
+                  {
+                      "path":  "scripts/Copy-Workflow10PreflightSql.ps1",
+                      "size_bytes":  921,
+                      "sha256":  "69DF8FB4288282ED9ED9B0D08B753BECA729A76B817EB057F76D23ADCE4311C9"
+                  },
+                  {
+                      "path":  "scripts/Import-Phase4Wave1.ps1",
+                      "size_bytes":  1037,
+                      "sha256":  "3B1714DBFBB72225E3FBA9C748C1118E1FAC5E25B32A103119C81028ABFCF710"
+                  },
+                  {
+                      "path":  "scripts/Initialize-Environment.ps1",
+                      "size_bytes":  1688,
+                      "sha256":  "53B02497C5756BD72B85C19FBC0A9B4E03C1EAC7FE44D06C7FCB14C72086DC0D"
+                  },
+                  {
+                      "path":  "scripts/Initialize-PortalConfig.ps1",
+                      "size_bytes":  2762,
+                      "sha256":  "7296411B36DF1B8BE3FF9BF6B88D5EA3DA2B247F3317BE5AE0C31807C7ACE157"
+                  },
+                  {
+                      "path":  "scripts/Inspect-N8nRuntimeCatalogue.mjs",
+                      "size_bytes":  4053,
+                      "sha256":  "08A05412DCECEA3571FDE7405DFA471607CD96FAA5522D8E418186C6A2718BD1"
+                  },
+                  {
+                      "path":  "scripts/Install-Workflow07AdminDashboard.ps1",
+                      "size_bytes":  4393,
+                      "sha256":  "0A878EDD65E8FEB5025282AA6DFEAFFBBF9541691F548377AF66180FEA5482B5"
+                  },
+                  {
+                      "path":  "scripts/Install-Workflow09OperationsMonitoring.ps1",
+                      "size_bytes":  3896,
+                      "sha256":  "125EFFA7DEB2581E4503479B7E96CE1876581B07E9E833D7972CD5093C97913A"
+                  },
+                  {
+                      "path":  "scripts/lib/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "scripts/lib/Sis.Runtime.ps1",
+                      "size_bytes":  7066,
+                      "sha256":  "C5B4FCF0B4352020C7D87B47D2AB90C9EE4A4ABEFBEF0A7606E03291AE96761A"
+                  },
+                  {
+                      "path":  "scripts/Recover-Phase4Wave1CodeContractRepair.ps1",
+                      "size_bytes":  7901,
+                      "sha256":  "6CCBDF289329FA1584A1E99D1C3E2CA9400C968B56FAA790F2096AEC1083F894"
+                  },
+                  {
+                      "path":  "scripts/Repair-LivePhase4Wave1CodeContracts.ps1",
+                      "size_bytes":  5506,
+                      "sha256":  "511E694405187B48ED2B37258DAD8FDD1BEFCBC8F3EEAB752EF995C2DA62BB1D"
+                  },
+                  {
+                      "path":  "scripts/Repair-Phase4SupabaseUrl.ps1",
+                      "size_bytes":  3202,
+                      "sha256":  "460223DE184EAE1026487791B97056F460B08F41C7355CB910208E0EB7F16240"
+                  },
+                  {
+                      "path":  "scripts/Restart-N8nForGoogleOAuth.ps1",
+                      "size_bytes":  1549,
+                      "sha256":  "6417B4FFAA6DABA06FBEAAE411AD0F2C58C77D870EAB4D178487CFA30FEFB14F"
+                  },
+                  {
+                      "path":  "scripts/Run-Workflow07Acceptance.ps1",
+                      "size_bytes":  1574,
+                      "sha256":  "52F39C2BFD664A140BBE173C95B40FD614FD667DF6D68AC599F765B2C0C3D338"
+                  },
+                  {
+                      "path":  "scripts/Run-Workflow09Acceptance.ps1",
+                      "size_bytes":  1617,
+                      "sha256":  "9EE46C4F6C764DFD4F075E7866E71E18F450EB5393E3960578E469AC7D51FCF0"
+                  },
+                  {
+                      "path":  "scripts/serve-portal.js",
+                      "size_bytes":  1388,
+                      "sha256":  "4299310DB041B42A985EFE16DEA3E5C332ABDD89613173C4635E7AEEADED19C2"
+                  },
+                  {
+                      "path":  "scripts/Set-Phase4Wave1Config.ps1",
+                      "size_bytes":  1704,
+                      "sha256":  "DEB6DAE0ABCAD4EB9048849D502B14CEC6B91F9327EF16FEA35CCCB873299790"
+                  },
+                  {
+                      "path":  "scripts/Start-N8n.ps1",
+                      "size_bytes":  3689,
+                      "sha256":  "458B3951A39FFA2876531D6F88E4BD995BC305B52EE01BB91A3435B48DB328C7"
+                  },
+                  {
+                      "path":  "scripts/Start-Ngrok.ps1",
+                      "size_bytes":  3364,
+                      "sha256":  "F0B6C053771A46ECC3E8944629B126BB94DE9C0ACE610A7C8B39ADB7D12128BD"
+                  },
+                  {
+                      "path":  "scripts/Start-Portal.ps1",
+                      "size_bytes":  430,
+                      "sha256":  "6242A01FB9ED071D4EC3136293569BCB34BED8122928440D930C91E77254A612"
+                  },
+                  {
+                      "path":  "scripts/Start-SIS.ps1",
+                      "size_bytes":  1253,
+                      "sha256":  "6A79DB82F666A3FFBAF8A15EA39BF625214C5C8528F4CD4D86D0C89FB044F9BF"
+                  },
+                  {
+                      "path":  "scripts/Start-SIS-All.ps1",
+                      "size_bytes":  1752,
+                      "sha256":  "8456EB2435505BCDAC3A3DB98CE714748298B599EB7B374DFFBD48221340BDA4"
+                  },
+                  {
+                      "path":  "scripts/Stop-SIS.ps1",
+                      "size_bytes":  788,
+                      "sha256":  "61FA07E2DFAC0450B88D996B2B536D5760534B792F989B77969852F5194F9D7D"
+                  },
+                  {
+                      "path":  "scripts/Test-Environment.ps1",
+                      "size_bytes":  4621,
+                      "sha256":  "853F65E88C1AC9BF8806841FF0C0ABE2858DE6749FD3956949E608805184418A"
+                  },
+                  {
+                      "path":  "scripts/Test-GoogleOAuthCallbackRepair.ps1",
+                      "size_bytes":  1208,
+                      "sha256":  "94B99144068199C7B139A80CA493C12BB58C865B0F6D5D6D395A3E36F602A232"
+                  },
+                  {
+                      "path":  "scripts/Test-Phase2Package.ps1",
+                      "size_bytes":  1309,
+                      "sha256":  "2389EB8CDD5EFC1B7E3BC236620C5E88DE3FF8165D07432453FD57BDC8037998"
+                  },
+                  {
+                      "path":  "scripts/Test-Phase3Completion.ps1",
+                      "size_bytes":  2012,
+                      "sha256":  "0B0085BFE4DF977209E0AAD70455B04F36FAB9EDC71FAE82FAEACF295D3A2309"
+                  },
+                  {
+                      "path":  "scripts/Test-Phase3Package.ps1",
+                      "size_bytes":  4210,
+                      "sha256":  "EBBFC3B95EBAE032A2312DB083AAA4A744FE493E27B5E41720C9AB5558B29022"
+                  },
+                  {
+                      "path":  "scripts/Test-Phase3SecretScan.ps1",
+                      "size_bytes":  1703,
+                      "sha256":  "8441A98984F05E20DAD34CA880AA18B48C78C727D5B3C12C83319802D5CA0037"
+                  },
+                  {
+                      "path":  "scripts/Test-Phase4ServiceRoleClaimPatch.ps1",
+                      "size_bytes":  1675,
+                      "sha256":  "B628E30D68BCE2BE2C7F7B5210AEF96B921AA430B78C310F0ABFDF19937266D9"
+                  },
+                  {
+                      "path":  "scripts/Test-Phase4SupabaseUrlRepair.ps1",
+                      "size_bytes":  1054,
+                      "sha256":  "F43E12C267B1AA5E44FC27E6080AD8A0E9C2BBB9DEDA8C2590ACA3CEDD0003C1"
+                  },
+                  {
+                      "path":  "scripts/Test-Phase4Wave1CodeContractRecovery.ps1",
+                      "size_bytes":  2276,
+                      "sha256":  "E6E7D879C8FB9172749013189842AD0DA12CACF99F0B781888F78389CE9FA1AF"
+                  },
+                  {
+                      "path":  "scripts/Test-Phase4Wave1CodeContractRepair.ps1",
+                      "size_bytes":  1020,
+                      "sha256":  "6EBFA428328072CC84D33C65F11C0ABBBDC2EC9BDF0D03512C52713410F71D2F"
+                  },
+                  {
+                      "path":  "scripts/test-phase4-wave1-code-contracts.js",
+                      "size_bytes":  1857,
+                      "sha256":  "FF34AD64119FF04B405C19EE42DFA95E28E007BE870AE168BFE41F738C31ED13"
+                  },
+                  {
+                      "path":  "scripts/Test-Phase4Wave1CredentialPropertyRepair.ps1",
+                      "size_bytes":  1867,
+                      "sha256":  "33E3516DB8ED7A85BC7EF77A809F0853AF6CE46FF0FDFC1BC4F6DC8CB0093E0E"
+                  },
+                  {
+                      "path":  "scripts/Test-Phase4Wave1Package.ps1",
+                      "size_bytes":  2732,
+                      "sha256":  "1514460854C1DCFEC01D20243A0512A07FFCFD4AC2EBB8DD56391FA3E854CE74"
+                  },
+                  {
+                      "path":  "scripts/Test-Phase4Wave1TriggerRangeRepair.ps1",
+                      "size_bytes":  1158,
+                      "sha256":  "1439340DF3661149CA54F7DDF6641DC62A76CFC46F965735E9F9FF01B5A654BB"
+                  },
+                  {
+                      "path":  "scripts/Test-PortalUrlRepair.ps1",
+                      "size_bytes":  634,
+                      "sha256":  "BB6104E7471A9F23A5A0A0A372EC38CFEC0CF90DD8CCC9E9B52DB4FAE0CCBA02"
+                  },
+                  {
+                      "path":  "scripts/Test-SIS.ps1",
+                      "size_bytes":  1228,
+                      "sha256":  "1420D159704F0DB7CFE38FB726FA0F180B1072E8418DE8EC7E974F5944F1447E"
+                  },
+                  {
+                      "path":  "scripts/Test-Sis01StabilizedWorkflow.ps1",
+                      "size_bytes":  3126,
+                      "sha256":  "4E39ED167F46A4DB3A708C76410EBE8254774BE8D49610CE866ED9CD2365ED11"
+                  },
+                  {
+                      "path":  "scripts/Test-Sis02StabilizedWorkflow.ps1",
+                      "size_bytes":  4018,
+                      "sha256":  "375720F38AF72C349360841ED3B1F3A2FDF844C96201DD7154BCF7D942EC1A9E"
+                  },
+                  {
+                      "path":  "scripts/Test-Sis03CompleteMarksWorkflow.ps1",
+                      "size_bytes":  5671,
+                      "sha256":  "D59B652C2E394DEF0A2A94D3D1343AE63264118002EBC06F22BC7429BBB8AA94"
+                  },
+                  {
+                      "path":  "scripts/Test-Sis03ManualMarksPackage.ps1",
+                      "size_bytes":  4594,
+                      "sha256":  "323CA278B30BE0AA67B45A679F0FE959014DD7AF1084B24323DFC1873498E0F8"
+                  },
+                  {
+                      "path":  "scripts/Test-Sis03QueueSafeNegativeValidationPatch.ps1",
+                      "size_bytes":  1529,
+                      "sha256":  "F81033E88ABE057DA33F4EDE2EB4BA3453EF7D2F0B14F09C45946A89EE1D87AF"
+                  },
+                  {
+                      "path":  "scripts/Test-Sis08StabilizedWorkflow.ps1",
+                      "size_bytes":  4805,
+                      "sha256":  "BB6489C39DA815AB0DB16B7946FABCA6958F9308461B611E1E143AA29ECB3D2A"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow03PilotTeacherAssignment.ps1",
+                      "size_bytes":  1524,
+                      "sha256":  "EEAB28F2A32001C08C1A601BDF3B5EEE9FD59632C787E8551B6233CE8717BF21"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow04AuditOutcomeFix.ps1",
+                      "size_bytes":  1560,
+                      "sha256":  "60D263A11B9FE743252F2354879223847851D36458D2F75322A7C4D0C78366CD"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow04CompletePackage.ps1",
+                      "size_bytes":  4351,
+                      "sha256":  "B6F2192A4C6450D677D0069D8F25F9953C65AA43321FACEE5977E70785A1A096"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow04CorrectionDecisionInputs.ps1",
+                      "size_bytes":  1166,
+                      "sha256":  "708BE805B8AA5315699B55D79779F125B3854270ED26BA661C6843E538FB5FEE"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow04CorrectionNotificationEnumFix.ps1",
+                      "size_bytes":  1128,
+                      "sha256":  "CFB11CCB3DCAA320CC8CCA859AC53F46E5EA7B5FBA3D17573375AC027E9576BB"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow04CorrectionPilotInputs.ps1",
+                      "size_bytes":  1177,
+                      "sha256":  "B1EF922065E75808665E27E79522A4CB09712D5D1C5060891A3404CA099D9735"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow04PublicationNotificationEnumFix.ps1",
+                      "size_bytes":  1158,
+                      "sha256":  "56945BAEFC7B886D0451D352955793656AE12BBE66FAFBA0123087B1B24E52BA"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow04ResultsPreflightPackage.ps1",
+                      "size_bytes":  1515,
+                      "sha256":  "BAA0B6DBC6BA5EE79FE9FF9BB6D18C1FCCD229B8DF45D055C060DBEAB6F0AB65"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow05Complete.ps1",
+                      "size_bytes":  473,
+                      "sha256":  "0FCDFC87502FCF82E4744730CA637664B7A38D280C7591277DC8E6C8FF905776"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow05DriveResolutionStabilized.ps1",
+                      "size_bytes":  1835,
+                      "sha256":  "83AB68A25921626FED097009ECF8C30AE4F12F6FD19E24B73846BE3DD4046835"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow05FriendlyPilotPortal.ps1",
+                      "size_bytes":  1152,
+                      "sha256":  "0CCFC16A32CF1F5E95C91E9CDC00BFD8FB1ABF07291C2600CBF4B7B39D20F50E"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow05GoogleResponseBodyParserFix.ps1",
+                      "size_bytes":  1108,
+                      "sha256":  "364EBD6D8110D7CEAAFE7A1F27DA6FFDDB9E914E14FA193E27C6CDDB0581E88A"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow05PostgreSqlUuidValidationFix.ps1",
+                      "size_bytes":  1179,
+                      "sha256":  "96DC7BC0CDE986E10E8402BF324D1C9B0BB49F881DE319F6E49D5752AA37A70C"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow05Preflight.ps1",
+                      "size_bytes":  1300,
+                      "sha256":  "D6A883543270BB83835409D3EB42A1A673A493B4453756DA33B7E603B183E9FB"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow05TranscriptContractSnapshot.ps1",
+                      "size_bytes":  1419,
+                      "sha256":  "2019977A82D09A7629210A28F4808C22CE55942E8D0B58B3FB924376AC8D3CD6"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow05VerificationCodeFix.ps1",
+                      "size_bytes":  1459,
+                      "sha256":  "EAEF72918CD7D4051E7E451A32EA356270DC718B7B7B36D9614E868F69077276"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow07Complete.ps1",
+                      "size_bytes":  3849,
+                      "sha256":  "3190FEBAEA4FBF3F9A680046C94C05641E1B080AD80B4623FF35ED68AF589B42"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow07Static.ps1",
+                      "size_bytes":  519,
+                      "sha256":  "F346EF68E716CE8E369A87CBA2AFC9751F331C2867E66BEC852E54BB3E7B64B0"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow09Static.ps1",
+                      "size_bytes":  522,
+                      "sha256":  "A6B287B605DD72C9C5F24B4E5CA304158849CEFDF4980F5447CEC4911C6E92CE"
+                  },
+                  {
+                      "path":  "scripts/Test-Workflow10LocalPreflight.ps1",
+                      "size_bytes":  7914,
+                      "sha256":  "70107BE51FADCE4E1D4C73CC310E6FE435483750D5791B93D6D7C0D1F8B7D9BE"
+                  },
+                  {
+                      "path":  "scripts/Update-GitignorePhase3.ps1",
+                      "size_bytes":  711,
+                      "sha256":  "29EF864DFE3D60DFCF7A107C926C234F589D303BB57153D7E7A5B2D6CE261BD2"
+                  },
+                  {
+                      "path":  "SHA256SUMS.txt",
+                      "size_bytes":  5820,
+                      "sha256":  "1A9A23CA1D723F7C2374E0DBF95F0128EDC430033DAA9F0654DA003711027428"
+                  },
+                  {
+                      "path":  "sis-pilot-demo-data-and-zoom-script.zip",
+                      "size_bytes":  13303,
+                      "sha256":  "7F58B574A2D76D6FBB780051BFC4A50970CD78067C452927D24AF414DA240213"
+                  },
+                  {
+                      "path":  "SUBMISSION-README.txt",
+                      "size_bytes":  556,
+                      "sha256":  "6B664998A21323E3C7AD0E5F7AA61FE7D657FEB5370EB7DC307CEC967260080A"
+                  },
+                  {
+                      "path":  "supabase/.temp/cli-latest",
+                      "size_bytes":  8,
+                      "sha256":  "0DAAAC4EB443724F347B3D1DF0DBACFFB1E0755F345412D1F9032EB664AA9B18"
+                  },
+                  {
+                      "path":  "supabase/.temp/gotrue-version",
+                      "size_bytes":  8,
+                      "sha256":  "F75A75B98E8DFF9C488B13F4DCFE8D335B699FBE091D54F101CA7FD1B97EE68A"
+                  },
+                  {
+                      "path":  "supabase/.temp/linked-project.json",
+                      "size_bytes":  138,
+                      "sha256":  "074858902DC85DCDB4FC72DE2E5AFA88B4C717A7BDE49B40FFED6E04E9C6FAD1"
+                  },
+                  {
+                      "path":  "supabase/.temp/pgdelta/pgdelta-target-ca.crt",
+                      "size_bytes":  4125,
+                      "sha256":  "50A69ECBD3FE8EFBB341D1148DB9D672BE0CE0397BE679BF9C9B19DE5FCDB139"
+                  },
+                  {
+                      "path":  "supabase/.temp/pooler-url",
+                      "size_bytes":  97,
+                      "sha256":  "A902190CB7DE53027ED1F2046483806C192B0B075652C82BC0D71E1B7E7F1761"
+                  },
+                  {
+                      "path":  "supabase/.temp/postgres-version",
+                      "size_bytes":  10,
+                      "sha256":  "C698B0AD787708E9C1334CA246EF8BB2A6FBD69B5863EA8B24F60B3C9E057732"
+                  },
+                  {
+                      "path":  "supabase/.temp/project-ref",
+                      "size_bytes":  20,
+                      "sha256":  "073F6F1A29BE8F3548FD51D422C52CB06C153AA14A3DF0FA9F280A90260BD7CE"
+                  },
+                  {
+                      "path":  "supabase/.temp/rest-version",
+                      "size_bytes":  5,
+                      "sha256":  "B25DE4A023EEF82D4780A9F7816C5685CA35437308A9D457585EECE9945485DC"
+                  },
+                  {
+                      "path":  "supabase/.temp/storage-migration",
+                      "size_bytes":  33,
+                      "sha256":  "5EEFA09F2BF47EDFBD65E0307F2EBF6EEC935A663B45E36CBD9395C3F10695D0"
+                  },
+                  {
+                      "path":  "supabase/.temp/storage-version",
+                      "size_bytes":  7,
+                      "sha256":  "2413C9AA419634FB971140EC25BD16439CE3586C45AF662E8EFB7C2F30611A84"
+                  },
+                  {
+                      "path":  "supabase/config.toml",
+                      "size_bytes":  15604,
+                      "sha256":  "8D8A4A5A4CAE69B84A8976442B8D7924C8EE874D7A03E3D6C1C171F706BC63E4"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260717000100_phase2_foundation_and_tenancy.sql",
+                      "size_bytes":  13091,
+                      "sha256":  "8EA1A4C16E78B07FB9BF7DEEDC0835EF249A3252169D0DB490E3B88DBFBADD36"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260717000200_phase2_identity_and_authorization.sql",
+                      "size_bytes":  20021,
+                      "sha256":  "C13C20A860B74B0286CD69125D1E42FE56D4300234A81D774132A71FB0682FEF"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260717000300_phase2_academic_configuration_curriculum.sql",
+                      "size_bytes":  33599,
+                      "sha256":  "DC3664EF17193F81133793F2AD596A82EBCE042D4B6B99C5F9E601D07BB76681"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260717000400_phase2_students_documents_enrollment.sql",
+                      "size_bytes":  35249,
+                      "sha256":  "9AE26E937F4EF7F681F0F628591F2C5C39E4D65A53C755265CA143320B32A749"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260717000500_phase2_marks_results.sql",
+                      "size_bytes":  35210,
+                      "sha256":  "4DCA8AB244FB4988E33A5571DB75CBA960CC830F2D4D407CD08E2D616D69EBB2"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260717000600_phase2_documents_reporting_operations.sql",
+                      "size_bytes":  29742,
+                      "sha256":  "38D99AA6F50F3E2C2A067ED00F33A2CE8CECFC363923646A74DE3606B87DDB6D"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260717000700_phase2_public_rpc_contract.sql",
+                      "size_bytes":  112217,
+                      "sha256":  "D40D3CE71B2E5E4ADC163D2FF6FE367A8F298DDBB83A28A28298C55B3AD5D09D"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260717000800_phase2_demo_seed.sql",
+                      "size_bytes":  49418,
+                      "sha256":  "2D49E3A8E47E2194539F51249D5E02BF82259FA3EC11E3055B368ABB2A5774C5"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260717000900_phase4_wave1_form_integration.sql",
+                      "size_bytes":  37431,
+                      "sha256":  "D4E16F9FD1ACB65177E935B569317D4ED5FBC31924838C17F430740706592A34"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260718000200_phase4_service_role_claim_compatibility.sql",
+                      "size_bytes":  1245,
+                      "sha256":  "A5247730508B1F8468CA531EFD8EB792745BB9BD7AEF93DA8987CDB00E3224FA"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260718000300_phase4_workflow03_pilot_teacher_assignment.sql",
+                      "size_bytes":  3242,
+                      "sha256":  "AA06A2C90EA4EFAD45D3C13B0C11FC8F574A4CCF6BF02BC8BF8FF2587E4EDB8A"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260718000400_phase4_workflow03_marks_form_integration.sql",
+                      "size_bytes":  15358,
+                      "sha256":  "946ACCD8FCD18690E4CEBFC2A69930183D1B7FEE3DD691B2F6722D5E2844F52F"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260720000100_phase4_workflow04_results_publication.sql",
+                      "size_bytes":  57704,
+                      "sha256":  "2BE3DF502244A621005E3AFBB59CE2D543F466E7214168AC22B850B5FC603DAB"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260720000200_phase4_workflow04_audit_outcome_fix.sql",
+                      "size_bytes":  31050,
+                      "sha256":  "7A20E8CD0D78A9B50A1F9262375010443100B91E677EF414E6D7F2EA12AB462B"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260720000300_phase4_workflow04_publication_notification_enum_fix.sql",
+                      "size_bytes":  7194,
+                      "sha256":  "98B44505839AEC549D0146871BA2079D7E129FEDA1FCF1F8C0C8E2717A5CF76A"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260720000400_phase4_workflow04_correction_notification_enum_fix.sql",
+                      "size_bytes":  9253,
+                      "sha256":  "71A6ED84AD776B725E47F073F0C90A4384B0B821CC38E5B3E2CAEFD9938C4476"
+                  },
+                  {
+                      "path":  "tests/acceptance/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "tests/acceptance/workflow03-fin-marks-upload-template.csv",
+                      "size_bytes":  333,
+                      "sha256":  "3E778F949BFC845EA4A4E9E16B3D5FC7C0BE8083BD7A7A1D5F5B1371619F16DD"
+                  },
+                  {
+                      "path":  "tests/acceptance/workflow03-fin-marks-upload-template.xlsx",
+                      "size_bytes":  5312,
+                      "sha256":  "B7632485900634B0B02DAEEE10B45B2A1D4B4860C8EB48DC443DDE44DAE29673"
+                  },
+                  {
+                      "path":  "tests/acceptance/workflow03-manual-marks-sample.txt",
+                      "size_bytes":  234,
+                      "sha256":  "708CCEF97041262A480910CBA32D322DADD46AF4AE5C2BCAA66E1A9F68F4CDD0"
+                  },
+                  {
+                      "path":  "tests/acceptance/workflow04-durable-outcomes.sql",
+                      "size_bytes":  3763,
+                      "sha256":  "F46DF29F1DDAFEF5A8620056975CFF91B45E6DE1378A0788C42DBB1272AB21D1"
+                  },
+                  {
+                      "path":  "tests/acceptance/workflow05-durable-outcomes.sql",
+                      "size_bytes":  4969,
+                      "sha256":  "EF20B85CEBFCCCD1A57B7A0925F63CE175418588EA2BFD9B45DD5B2844EF0B72"
+                  },
+                  {
+                      "path":  "tests/acceptance/workflow07-admin-dashboard.acceptance.mjs",
+                      "size_bytes":  14727,
+                      "sha256":  "4AC0FA8CC2698551F63C047267F9AAC5BA84F85CF337220F73C67EE656C600C9"
+                  },
+                  {
+                      "path":  "tests/acceptance/workflow07-durable-outcomes.sql",
+                      "size_bytes":  910,
+                      "sha256":  "A9DCB2F38DCC445D31D6D25D52FA49B2AD77DCC7BEC50E7159FE8AADF15BB81B"
+                  },
+                  {
+                      "path":  "tests/acceptance/workflow09-operations-monitoring.acceptance.mjs",
+                      "size_bytes":  9576,
+                      "sha256":  "C932718FB1D3791B066772CA00B8DAFEEE151496C48771EDE8E1801C4C69B43A"
+                  },
+                  {
+                      "path":  "tests/fixtures/enrollment-queue-row.json",
+                      "size_bytes":  1013,
+                      "sha256":  "81B08FC6695438697A874BE6903CF7A3A6A4E270C799B64A42FAA1C62B310303"
+                  },
+                  {
+                      "path":  "tests/fixtures/student-profile-queue-row.json",
+                      "size_bytes":  1433,
+                      "sha256":  "E362DF36BA05C0385D2E8224317520206C1BA2F09C11F527025E0D0802A63003"
+                  },
+                  {
+                      "path":  "tests/integration/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "tests/load/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "tests/manual/workflow05-pilot-request.md",
+                      "size_bytes":  1550,
+                      "sha256":  "0B7B79CF22E300B159C5118251D3C090AA9755130CDDC18677C53001C3448B50"
+                  },
+                  {
+                      "path":  "tests/manual/workflow07-test-payloads.json",
+                      "size_bytes":  829,
+                      "sha256":  "E25BCED7DD360EFD4FD81142F86D8662BB64F194049B86D8F337482A9A02B7AC"
+                  },
+                  {
+                      "path":  "tests/static/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "tests/static/test-wave1-normalizers.js",
+                      "size_bytes":  3441,
+                      "sha256":  "B508D82761EE76E7A671F6197AE83BCEE58FA4E980F026D7E6BA62AFFB92748D"
+                  },
+                  {
+                      "path":  "tests/static/validate-phase1.js",
+                      "size_bytes":  4962,
+                      "sha256":  "5E251AE4B15AE6181C3EED7B6BDB20D85792FF5F3A434970264A38DB97F675B0"
+                  },
+                  {
+                      "path":  "tests/static/validate-phase4-wave1.js",
+                      "size_bytes":  4547,
+                      "sha256":  "4A5771A9C77394A9D698384DCD4392BF11B3D6F76711EB6247DE3DB39D51FD62"
+                  },
+                  {
+                      "path":  "tests/static/validate-workflow05-complete.js",
+                      "size_bytes":  4981,
+                      "sha256":  "6CBFA23DEC176426A861779B5FD5D2DFEB703F5A1BD451DEA104A943A0F06B38"
+                  },
+                  {
+                      "path":  "tests/static/workflow07-admin-dashboard.test.mjs",
+                      "size_bytes":  11007,
+                      "sha256":  "83564FD13E56C7B9E14BF54EB215768B57D90E075557FA29ABF9F1277E4CC9CD"
+                  },
+                  {
+                      "path":  "tests/static/workflow09-operations-monitoring.test.mjs",
+                      "size_bytes":  11819,
+                      "sha256":  "F38F6CC85DF9FA0FF8FDD5F24CF34A6CB04E34BA466B4DB0AEDDA352E037AF43"
+                  },
+                  {
+                      "path":  "tests/static/workflow10-preflight.test.mjs",
+                      "size_bytes":  1187,
+                      "sha256":  "E6790B576252CEA2FC59E6132FD7CB6292BC48A522032DE37F90AD2B97AF22C9"
+                  },
+                  {
+                      "path":  "tests/workflow03-fin-duplicate-student-negative-test.xlsx",
+                      "size_bytes":  5441,
+                      "sha256":  "E1E583224B412B33F8534BE632696FBF773117DFD569C8DFC02ADB024A775905"
+                  },
+                  {
+                      "path":  "tests/workflow03-fin-over-max-negative-test.xlsx",
+                      "size_bytes":  5382,
+                      "sha256":  "4418F71FE31EEB704F5B36DC1911B7BF867EF6B3996E3AEDD777B0935FF8C8F8"
+                  },
+                  {
+                      "path":  "workflows/.gitkeep",
+                      "size_bytes":  0,
+                      "sha256":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+                  },
+                  {
+                      "path":  "workflows/01-student-intake.json",
+                      "size_bytes":  16895,
+                      "sha256":  "D937040B44109FDC3E0E4E22D61F40EDE2B30EABB798DF067ADCA31D14179B8D"
+                  },
+                  {
+                      "path":  "workflows/01-student-intake-stabilized.json",
+                      "size_bytes":  19473,
+                      "sha256":  "EDB0A1CFF3AAD4F9AB8BFBD38C75242294B242CD4DEF32A1F819C7E980C6993F"
+                  },
+                  {
+                      "path":  "workflows/02-enrollment-lifecycle.json",
+                      "size_bytes":  16345,
+                      "sha256":  "822ACF7C22C37AE767E10B37EDF5CDA9488495E9A3B428F8293E476CC96F2762"
+                  },
+                  {
+                      "path":  "workflows/02-enrollment-lifecycle-stabilized.json",
+                      "size_bytes":  18731,
+                      "sha256":  "E8781E306133C44FAE7DA91A9D2E7BF9F1F668291772F714BE0A28F86AE3FBC2"
+                  },
+                  {
+                      "path":  "workflows/03-marks-intake-complete-stabilized.json",
+                      "size_bytes":  122057,
+                      "sha256":  "B0FAC1524B48E0904B730699D0CC24C12F48A055A967E7E17289C6B1B1B2B61C"
+                  },
+                  {
+                      "path":  "workflows/03-marks-intake-complete-stabilized.json.before-queue-safe-negative-validation",
+                      "size_bytes":  63364,
+                      "sha256":  "4C101C04B61F9E79B44FAE54EB8B1AF27996E60A4F788C1972CCB4222CAD98C6"
+                  },
+                  {
+                      "path":  "workflows/03-marks-intake-stabilized.json",
+                      "size_bytes":  21095,
+                      "sha256":  "3447B5AAD13CCB7B24ADB80C8863F8BBE05FAC4E944AA854941CA1D7B880A2C2"
+                  },
+                  {
+                      "path":  "workflows/04-results-publication.json",
+                      "size_bytes":  37528,
+                      "sha256":  "580D16492C2FA668C261A9CD35C2BF142655994983A1F1D4DAF59CE985CD13F5"
+                  },
+                  {
+                      "path":  "workflows/05-transcript-delivery.json",
+                      "size_bytes":  67214,
+                      "sha256":  "F783BA529B73807E411F962B56214086976A1370B8C232E51564F938BFADECB1"
+                  },
+                  {
+                      "path":  "workflows/05-transcript-delivery-drive-resolution-stabilized.json",
+                      "size_bytes":  71807,
+                      "sha256":  "A8140330CA9458D97CEB3B5368E1E637AA7870E4A1F84BC69E1C087714A26B1B"
+                  },
+                  {
+                      "path":  "workflows/07-admin-dashboard.json",
+                      "size_bytes":  57537,
+                      "sha256":  "C5B58FC8B13C99A3801DCD19E268B4C13EF4D07CBEBB0F0ADAC350470D22A185"
+                  },
+                  {
+                      "path":  "workflows/08-notification-dispatcher.json",
+                      "size_bytes":  27268,
+                      "sha256":  "77C7D44B2FBACD9FDB1B6F842B326FB65920CED492FC5B421396D224B312FCA0"
+                  },
+                  {
+                      "path":  "workflows/08-notification-dispatcher-stabilized.json",
+                      "size_bytes":  31869,
+                      "sha256":  "9D0A8430D4D55AF4EC8FD69DC5851BFAB67DC6AF8279927EA05EAAA4479107A5"
+                  },
+                  {
+                      "path":  "workflows/09-operations-monitoring.json",
+                      "size_bytes":  31397,
+                      "sha256":  "7418EAAAF996288B91CEEE5EC444EEC8A208F1671B281595329D506A5ED34D1B"
+                  }
+              ]
+}

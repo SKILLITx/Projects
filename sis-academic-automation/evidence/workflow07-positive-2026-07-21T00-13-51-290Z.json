@@ -1,0 +1,79 @@
+{
+  "generated_at": "2026-07-21T00:13:44.149Z",
+  "mode": "positive",
+  "actor_email": "zaidrizwan.278@gmail.com",
+  "workflow_base_origin": "https://gemma-unfossilised-silverly.ngrok-free.dev",
+  "tests": [
+    {
+      "name": "exact student number",
+      "passed": true,
+      "http_status": 200,
+      "correlation_id": "fb72b69e-9764-4efc-9a89-a09a4b86d6ac",
+      "n8n_execution_id": "1183",
+      "result_count": 1,
+      "error_code": null,
+      "note": null
+    },
+    {
+      "name": "partial student name",
+      "passed": true,
+      "http_status": 200,
+      "correlation_id": "f4668755-4210-4ace-bba2-e9ca0ea1efa3",
+      "n8n_execution_id": "1184",
+      "result_count": 18,
+      "error_code": null,
+      "note": null
+    },
+    {
+      "name": "student email",
+      "passed": true,
+      "http_status": 200,
+      "correlation_id": "57556e0b-d483-48d1-8f29-6897f54b52ee",
+      "n8n_execution_id": "1185",
+      "result_count": 1,
+      "error_code": null,
+      "note": null
+    },
+    {
+      "name": "exact identity reference returns only a mask",
+      "passed": true,
+      "http_status": 200,
+      "correlation_id": "36f88907-1fc6-4f63-a9c0-cf293e5ad622",
+      "n8n_execution_id": "1186",
+      "result_count": 1,
+      "error_code": null,
+      "note": null
+    },
+    {
+      "name": "zero-result search is successful",
+      "passed": true,
+      "http_status": 200,
+      "correlation_id": "ea7aebda-e31f-4d33-9ced-ed1c7768997a",
+      "n8n_execution_id": "1187",
+      "result_count": 0,
+      "error_code": null,
+      "note": null
+    },
+    {
+      "name": "authorized DMU/ISB dashboard snapshot",
+      "passed": true,
+      "http_status": 200,
+      "correlation_id": "0f171ddc-30e1-4927-b884-37d4faecdfe5",
+      "n8n_execution_id": "1188",
+      "result_count": null,
+      "error_code": null,
+      "note": "students=19; average GPA=3.458; average CGPA=3.458"
+    },
+    {
+      "name": "dashboard grade distribution includes the published B result",
+      "passed": true,
+      "http_status": 200,
+      "correlation_id": "0f171ddc-30e1-4927-b884-37d4faecdfe5",
+      "n8n_execution_id": "1188",
+      "result_count": null,
+      "error_code": null,
+      "note": null
+    }
+  ],
+  "coverage_notes": []
+}

@@ -1,0 +1,18 @@
+{
+  "Form Response ID": "phase4-fixture-enrollment-1",
+  "Submitted At UTC": "2026-07-17T00:00:00Z",
+  "Respondent Email": "student.fixture@example.test",
+  "Operation": "enrollment.submit",
+  "Source Form ID": "FORM_ID",
+  "Source Spreadsheet ID": "SHEET_ID",
+  "Raw Response JSON": "{\"Institution code\": \"DMU\", \"Campus code\": \"ISB\", \"Student number\": \"DMU-0001\", \"Program or qualification code\": \"BSBA\", \"Term or semester code\": \"FALL\", \"Requested course or subject codes (comma-separated)\": \"BA101\", \"Preferred section codes in the same order (optional, comma-separated)\": \"A\", \"Allow another valid section when the preferred section is unavailable?\": \"No\", \"Enrollment notes\": \"Fixture request\"}",
+  "Processing Status": "pending",
+  "Processed At UTC": "",
+  "Correlation ID": "",
+  "Idempotency Key": "google-form:FORM_ID:phase4-fixture-enrollment-1",
+  "Error Code": "",
+  "Error Message": "",
+  "Retry Count": 0,
+  "Last Attempt At UTC": "",
+  "n8n Execution ID": ""
+}

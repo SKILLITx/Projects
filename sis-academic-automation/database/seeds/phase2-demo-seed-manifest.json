@@ -1,0 +1,32 @@
+{
+  "canonical_migration": "supabase/migrations/20260717000800_phase2_demo_seed.sql",
+  "synthetic_only": true,
+  "expected_minimums": {
+    "institutions": 2,
+    "campuses": 4,
+    "academic_years": 2,
+    "terms": 4,
+    "programs": 4,
+    "departments": 4,
+    "students": 50,
+    "courses": 10,
+    "course_offerings": 8,
+    "sections": 9,
+    "staff_profiles": 6,
+    "teacher_assignments": 6,
+    "course_prerequisites": 2,
+    "section_schedules": 9,
+    "grading_policies": 2,
+    "grade_scales": 14,
+    "assessment_components": 5,
+    "assessments": 6,
+    "enrollments": 18,
+    "waitlist_entries": 1,
+    "marks_batches": 2,
+    "student_marks": 40,
+    "course_results": 16,
+    "semester_results": 16,
+    "cumulative_results": 16
+  },
+  "privacy": "All names, emails, identifiers, file paths and hashes are fictional demonstration values."
+}

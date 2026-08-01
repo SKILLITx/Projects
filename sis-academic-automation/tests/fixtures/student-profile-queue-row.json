@@ -1,0 +1,18 @@
+{
+  "Form Response ID": "phase4-fixture-student-1",
+  "Submitted At UTC": "2026-07-17T00:00:00Z",
+  "Respondent Email": "student.fixture@example.test",
+  "Operation": "student.profile.submit",
+  "Source Form ID": "FORM_ID",
+  "Source Spreadsheet ID": "SHEET_ID",
+  "Raw Response JSON": "{\"Institution code\": \"DMU\", \"Campus code\": \"ISB\", \"Submission type\": \"New admission/profile\", \"Student number (leave blank only for a new admission)\": \"\", \"Full legal name\": \"Fixture Student\", \"Date of birth\": \"2005-01-15\", \"Gender\": \"Prefer not to say\", \"Primary email address\": \"student.fixture@example.test\", \"Mobile phone number\": \"03000000000\", \"Guardian name (required for school students)\": \"\", \"Guardian phone (required for school students)\": \"\", \"Institution-approved identity reference\": \"FIXTURE-IDENTITY\", \"Program or qualification code\": \"BSBA\", \"Academic year code\": \"AY2026\", \"Admission term code\": \"FALL\", \"Previous qualification or school\": \"Demonstration College\", \"Required document Drive links (one per line)\": \"IDENTITY|https://drive.google.com/example\", \"Additional notes\": \"\"}",
+  "Processing Status": "pending",
+  "Processed At UTC": "",
+  "Correlation ID": "",
+  "Idempotency Key": "google-form:FORM_ID:phase4-fixture-student-1",
+  "Error Code": "",
+  "Error Message": "",
+  "Retry Count": 0,
+  "Last Attempt At UTC": "",
+  "n8n Execution ID": ""
+}

@@ -1,0 +1,16 @@
+﻿test_id,actor,action,expected,evidence
+AUTH-01,Unauthenticated browser,Read staff or academic data,Denied,anon has no table access and no administrative RPC execution.
+AUTH-02,Authenticated user without staff profile,Open portal,Denied,Portal reports that no active staff profile is linked.
+AUTH-03,Super administrator,View institutions and campuses,Allowed,All active institutions are visible.
+AUTH-04,Registrar administrator,Search students within assigned institution,Allowed,Institution scope enforced.
+AUTH-05,Registrar administrator,Search students in another institution,Denied,AUTH_SCOPE_DENIED or no visible row.
+AUTH-06,Campus administrator,Search assigned campus,Allowed,Campus assignment validated.
+AUTH-07,Campus administrator,Search unassigned campus,Denied,AUTH_SCOPE_DENIED.
+AUTH-08,Teacher assigned to section,Submit/finalize marks for assigned section,Allowed,Teacher assignment validated by RPC.
+AUTH-09,Teacher,Approve marks batch,Denied,Registrar/admin role required.
+AUTH-10,Suspended or expired role,Perform protected operation,Denied,"Only active, time-valid assignments count."
+AUTH-11,Authenticated staff,Call service-only RPC,Denied,Service role required.
+AUTH-12,Browser code,Use service-role key,Prohibited,Static check and operating policy reject it.
+AUTH-13,Authorized staff,Enrollment decision in permitted scope,Allowed,Decision and audit evidence recorded.
+AUTH-14,Authorized staff,Approve/reject correction,Allowed,Decision applied transactionally.
+AUTH-15,Repeated idempotent decision,Submit same idempotency key,Same result,No duplicate side effect.

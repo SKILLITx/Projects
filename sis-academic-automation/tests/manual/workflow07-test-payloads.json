@@ -1,0 +1,31 @@
+{
+  "positive_student_search": {
+    "operation": "student.admin.search",
+    "correlation_id": "GENERATE_AT_RUNTIME",
+    "institution_id": "SELECTED_BY_PORTAL",
+    "campus_id": "SELECTED_BY_PORTAL_OR_NULL",
+    "payload": {
+      "query": "DMU-0001",
+      "status": "active",
+      "limit": 20
+    }
+  },
+  "positive_dashboard": {
+    "operation": "dashboard.snapshot.get",
+    "correlation_id": "GENERATE_AT_RUNTIME",
+    "institution_id": "SELECTED_BY_PORTAL",
+    "campus_id": "SELECTED_BY_PORTAL_OR_NULL",
+    "payload": {
+      "term_id": null
+    }
+  },
+  "negative_cases": [
+    "missing bearer token",
+    "query shorter than two characters",
+    "limit greater than 50",
+    "invalid institution UUID",
+    "campus outside institution",
+    "term outside institution",
+    "unauthorized institution or campus"
+  ]
+}

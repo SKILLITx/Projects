@@ -1,0 +1,106 @@
+{
+  "project": "sis-academic-automation",
+  "phase": 0,
+  "status": "complete_pending_user_review",
+  "created_at_utc": "2026-07-16T16:50:11+00:00",
+  "contains_workflow_exports": false,
+  "contains_sql_migrations": false,
+  "contains_secrets": false,
+  "files": [
+    {
+      "path": "CHANGELOG.md",
+      "bytes": 701,
+      "sha256": "5e0a0a7b16aa5e1ad2c1fd9bdd9a1e2c3cfbc3536583b5e4646f5afe7644f94c"
+    },
+    {
+      "path": "PROJECT_STATE.md",
+      "bytes": 2730,
+      "sha256": "3d954d8fff31b1a54d751e0a3d42bf4b5345665f8e4cf8da8ea2df1408426286"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2622,
+      "sha256": "23c24a2901fa96e80444a1499912d015ec5d83adda359152ac92ff639c90a1b4"
+    },
+    {
+      "path": "docs/architecture/00-confirmed-requirements-and-assumptions.md",
+      "bytes": 5914,
+      "sha256": "f38466b45c23f27cdb6e565c2842b473cecf9070174c25970ea278abd365eb61"
+    },
+    {
+      "path": "docs/architecture/01-final-architecture.md",
+      "bytes": 5912,
+      "sha256": "4495f25fdabf400e0c4c4217b4c144d3af469092ed6283c55d02eef98d3a6ce9"
+    },
+    {
+      "path": "docs/architecture/02-workflow-boundaries.md",
+      "bytes": 7906,
+      "sha256": "72c7596b2a8927d32e8c445a2c795d62634e65483c6f554547e9069300a0d947"
+    },
+    {
+      "path": "docs/architecture/03-data-flow-diagrams.md",
+      "bytes": 4955,
+      "sha256": "afd86b927c485ac644d109ea178173d3f4660a86fc00c2020a34fb439ac65477"
+    },
+    {
+      "path": "docs/architecture/04-role-authorization-matrix.md",
+      "bytes": 3930,
+      "sha256": "56cad085ced36537909f21d58c18164be1d323c15f31602444c7f1ec76134243"
+    },
+    {
+      "path": "docs/architecture/05-database-entity-catalog.md",
+      "bytes": 7220,
+      "sha256": "a2ddc84dd5b426eaf15142425fe36301715bce46bd1c381e8faa7211e538ffc4"
+    },
+    {
+      "path": "docs/architecture/06-public-rpc-contract.md",
+      "bytes": 5765,
+      "sha256": "0d6ce31b8075159bfe5b324d3b6135669070b638fc50194c9f38c8a66888009c"
+    },
+    {
+      "path": "docs/architecture/07-google-workspace-structure.md",
+      "bytes": 4829,
+      "sha256": "b9436ba854f3afc5191b4a647a5440a61c0a8a5cca1d88d161312ab3cd0b818d"
+    },
+    {
+      "path": "docs/architecture/08-repository-plan.md",
+      "bytes": 2671,
+      "sha256": "f11e2a902b5dc3e9605fdb6279cca669317d4aa88948614fb1973cf5860232d3"
+    },
+    {
+      "path": "docs/architecture/09-risk-register.md",
+      "bytes": 4401,
+      "sha256": "0d48e430ea0f6dec9449191845b54d065665c86ce47a14f194747135882c8675"
+    },
+    {
+      "path": "docs/architecture/10-implementation-sequence.md",
+      "bytes": 3970,
+      "sha256": "c346b6b7e9855ffb4c5f942bed255a988b6ca2f629ba44a29386c3d933a854c0"
+    },
+    {
+      "path": "docs/architecture/11-phase-0-review-checklist.md",
+      "bytes": 2269,
+      "sha256": "4fd742d9e9236a18b3f8e562b309fd2ceda3d1f544829057b7f137b0b8eaaf31"
+    },
+    {
+      "path": "docs/architecture/entity-catalog.csv",
+      "bytes": 1851,
+      "sha256": "a5e5838c56da4ff4d14208b5b85f8c2ef12b606d33b0818ef11212d1af7d4484"
+    },
+    {
+      "path": "docs/architecture/risk-register.csv",
+      "bytes": 2129,
+      "sha256": "83b2c51a34212fa1c7c542d5175f844a8c7f0e7edce76c03197b795cabc2e291"
+    },
+    {
+      "path": "docs/architecture/rpc-catalog.csv",
+      "bytes": 1624,
+      "sha256": "ed040c711634c715f25ae829360baef6ecbccfa0fe487b11394ffe7e0f5a97cb"
+    },
+    {
+      "path": "docs/architecture/user-role-matrix.csv",
+      "bytes": 655,
+      "sha256": "e810bcafc5401fe163844517e069d938f6356b781ec9b05ad0a9765e1679804e"
+    }
+  ]
+}

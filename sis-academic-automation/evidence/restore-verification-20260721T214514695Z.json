@@ -1,0 +1,10 @@
+﻿{
+    "status":  "PASS",
+    "verified_at_utc":  "2026-07-21T21:45:46.4108492Z",
+    "backup_zip":  "C:\\Users\\DeLL\\OneDrive\\Documents\\SIS-Private-Backups\\sis-private-recovery-20260721T212552Z.zip",
+    "backup_sha256":  "CEE3A2C0AF6975EA576941464EEB81D40B46B79E3A13EACF249BF683E8188CBF",
+    "manifest_files":  422,
+    "restored_workflows":  13,
+    "workflow09_found":  true,
+    "secrets_printed":  false
+}

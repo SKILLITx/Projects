@@ -1,0 +1,115 @@
+{
+  "generated_at": "2026-07-21T00:14:30.508Z",
+  "mode": "negative",
+  "actor_email": "zaidrizwan.278@gmail.com",
+  "workflow_base_origin": "https://gemma-unfossilised-silverly.ngrok-free.dev",
+  "tests": [
+    {
+      "name": "missing Authorization header is sanitized",
+      "passed": true,
+      "http_status": 401,
+      "correlation_id": "99eee22d-8cfa-4162-bfff-a517602fdfc2",
+      "n8n_execution_id": "1190",
+      "result_count": null,
+      "error_code": "AUTH_HEADER_REQUIRED",
+      "note": null
+    },
+    {
+      "name": "invalid token is sanitized",
+      "passed": true,
+      "http_status": 401,
+      "correlation_id": "99eee22d-8cfa-4162-bfff-a517602fdfc2",
+      "n8n_execution_id": "1191",
+      "result_count": null,
+      "error_code": "AUTH_SESSION_INVALID",
+      "note": null
+    },
+    {
+      "name": "expired token is sanitized",
+      "passed": true,
+      "http_status": 401,
+      "correlation_id": "99eee22d-8cfa-4162-bfff-a517602fdfc2",
+      "n8n_execution_id": "1192",
+      "result_count": null,
+      "error_code": "AUTH_SESSION_INVALID",
+      "note": null
+    },
+    {
+      "name": "invalid institution UUID",
+      "passed": true,
+      "http_status": 400,
+      "correlation_id": "99eee22d-8cfa-4162-bfff-a517602fdfc2",
+      "n8n_execution_id": "1193",
+      "result_count": null,
+      "error_code": "VALIDATION_INSTITUTION_UUID_INVALID",
+      "note": null
+    },
+    {
+      "name": "invalid campus UUID",
+      "passed": true,
+      "http_status": 400,
+      "correlation_id": "99eee22d-8cfa-4162-bfff-a517602fdfc2",
+      "n8n_execution_id": "1194",
+      "result_count": null,
+      "error_code": "VALIDATION_CAMPUS_UUID_INVALID",
+      "note": null
+    },
+    {
+      "name": "empty search query",
+      "passed": true,
+      "http_status": 400,
+      "correlation_id": "2cac5dbd-2180-4f87-b9a4-605cadb0f910",
+      "n8n_execution_id": "1195",
+      "result_count": null,
+      "error_code": "VALIDATION_SEARCH_QUERY_REQUIRED",
+      "note": null
+    },
+    {
+      "name": "one-character name search",
+      "passed": true,
+      "http_status": 400,
+      "correlation_id": "438e6b76-f45f-48a5-b75e-b3ad7a891c3e",
+      "n8n_execution_id": "1196",
+      "result_count": null,
+      "error_code": "VALIDATION_NAME_QUERY_TOO_SHORT",
+      "note": null
+    },
+    {
+      "name": "unsupported search type",
+      "passed": true,
+      "http_status": 400,
+      "correlation_id": "171ea010-e025-4fb9-ae63-ea2e08404ee6",
+      "n8n_execution_id": "1197",
+      "result_count": null,
+      "error_code": "VALIDATION_SEARCH_TYPE_UNSUPPORTED",
+      "note": null
+    },
+    {
+      "name": "identity search never returns the full value",
+      "passed": true,
+      "http_status": 200,
+      "correlation_id": "9005d073-158a-4b3d-80ce-979d78d55d0c",
+      "n8n_execution_id": "1198",
+      "result_count": 1,
+      "error_code": null,
+      "note": null
+    },
+    {
+      "name": "zero matches return HTTP 200 and an empty array",
+      "passed": true,
+      "http_status": 200,
+      "correlation_id": "3cc56efc-6179-4e43-bd04-ea2cebbd7826",
+      "n8n_execution_id": "1199",
+      "result_count": 0,
+      "error_code": null,
+      "note": null
+    }
+  ],
+  "coverage_notes": [
+    "No authorized empty institution/campus fixture was available; zero-dashboard shape remains covered by database/tests/workflow07-admin-dashboard.sql.",
+    "Teacher-only denial is transactionally covered by database/tests/workflow07-admin-dashboard.sql; a second live teacher-only Auth account was not supplied to this script.",
+    "Out-of-scope role denial requires a deliberately limited live actor; server-side scope is also verified by the database test and verification SQL.",
+    "Temporary Supabase outage mapping is not induced against the live pilot. It requires a controlled fault-injection window.",
+    "Business tables are read-only in the RPC definitions; durable workflow-run logging is an intentional operational side effect."
+  ]
+}

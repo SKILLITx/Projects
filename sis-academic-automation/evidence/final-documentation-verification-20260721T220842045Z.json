@@ -1,0 +1,92 @@
+﻿{
+    "status":  "PASS",
+    "checked_at_utc":  "2026-07-21T22:08:42.0453687Z",
+    "passed":  21,
+    "failed":  0,
+    "checks":  [
+                   {
+                       "name":  "repository_exists",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "document_final_pilot_status",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "document_known_limitations",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "document_startup_and_recovery",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "document_operator_handover",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "document_production_migration_plan",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "document_testing_and_evidence",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "project_state_exists",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "changelog_exists",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "evidence_index_exists",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "unified_launcher_exists",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "package_json_exists",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "project_state_final_marker",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "workflow06_deferred",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "workflow10_deferred",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "changelog_final_marker",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "index_classification",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "index_no_secrets",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "completed_count",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "deferred_count",
+                       "passed":  true
+                   },
+                   {
+                       "name":  "package_unified_start",
+                       "passed":  true
+                   }
+               ]
+}

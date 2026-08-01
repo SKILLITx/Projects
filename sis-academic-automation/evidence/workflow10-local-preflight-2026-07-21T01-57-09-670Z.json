@@ -1,0 +1,742 @@
+﻿{
+    "status":  "FAIL",
+    "checked_at_utc":  "2026-07-21T01:57:09.6700916Z",
+    "repository":  "D:\\AI automation\\zaid278-workflows\\skill it\\Project 1\\V2\\sis-academic-automation",
+    "n8n_version":  "2.4.0",
+    "checks":  {
+                   "n8n_version_exact_2_4_0":  true,
+                   "node_catalogue_present":  true,
+                   "node_error_trigger_present":  true,
+                   "node_code_present":  true,
+                   "node_http_request_present":  true,
+                   "node_if_node_present":  true,
+                   "node_merge_present":  true,
+                   "node_switch_present":  true,
+                   "error_trigger_identity_present":  true,
+                   "workflow_json_parse":  true,
+                   "no_active_runtime_workflow10_duplicate":  false,
+                   "no_active_workflow10_duplicate":  true
+               },
+    "failed_checks":  [
+                          "no_active_runtime_workflow10_duplicate"
+                      ],
+    "node_implementations":  {
+                                 "error_trigger":  "D:\\AI automation\\zaid278-workflows\\skill it\\Project 1\\V2\\sis-academic-automation\\node_modules\\n8n-nodes-base\\dist\\nodes\\ErrorTrigger\\ErrorTrigger.node.js",
+                                 "code":  "D:\\AI automation\\zaid278-workflows\\skill it\\Project 1\\V2\\sis-academic-automation\\node_modules\\n8n-nodes-base\\dist\\nodes\\Code\\Code.node.js",
+                                 "http_request":  "D:\\AI automation\\zaid278-workflows\\skill it\\Project 1\\V2\\sis-academic-automation\\node_modules\\n8n-nodes-base\\dist\\nodes\\HttpRequest\\HttpRequest.node.js",
+                                 "if_node":  "D:\\AI automation\\zaid278-workflows\\skill it\\Project 1\\V2\\sis-academic-automation\\node_modules\\n8n-nodes-base\\dist\\nodes\\If\\If.node.js",
+                                 "merge":  "D:\\AI automation\\zaid278-workflows\\skill it\\Project 1\\V2\\sis-academic-automation\\node_modules\\n8n-nodes-base\\dist\\nodes\\Merge\\Merge.node.js",
+                                 "switch":  "D:\\AI automation\\zaid278-workflows\\skill it\\Project 1\\V2\\sis-academic-automation\\node_modules\\n8n-nodes-base\\dist\\nodes\\Switch\\Switch.node.js"
+                             },
+    "workflow_summaries":  [
+                               {
+                                   "file":  "01-student-intake.json",
+                                   "name":  "SIS 01 — Student Intake and Profile Management",
+                                   "active":  false,
+                                   "node_types":  [
+                                                      "n8n-nodes-base.code",
+                                                      "n8n-nodes-base.googleSheets",
+                                                      "n8n-nodes-base.googleSheetsTrigger",
+                                                      "n8n-nodes-base.httpRequest",
+                                                      "n8n-nodes-base.if"
+                                                  ]
+                               },
+                               {
+                                   "file":  "01-student-intake-stabilized.json",
+                                   "name":  "SIS 01 â€” Student Intake and Profile Management â€” Stabilized",
+                                   "active":  false,
+                                   "node_types":  [
+                                                      "n8n-nodes-base.code",
+                                                      "n8n-nodes-base.googleSheets",
+                                                      "n8n-nodes-base.googleSheetsTrigger",
+                                                      "n8n-nodes-base.httpRequest",
+                                                      "n8n-nodes-base.if",
+                                                      "n8n-nodes-base.noOp"
+                                                  ]
+                               },
+                               {
+                                   "file":  "02-enrollment-lifecycle.json",
+                                   "name":  "SIS 02 — Course and Subject Enrollment Lifecycle",
+                                   "active":  false,
+                                   "node_types":  [
+                                                      "n8n-nodes-base.code",
+                                                      "n8n-nodes-base.googleSheets",
+                                                      "n8n-nodes-base.googleSheetsTrigger",
+                                                      "n8n-nodes-base.httpRequest",
+                                                      "n8n-nodes-base.if"
+                                                  ]
+                               },
+                               {
+                                   "file":  "02-enrollment-lifecycle-stabilized.json",
+                                   "name":  "SIS 02 â€” Course and Subject Enrollment Lifecycle â€” Stabilized",
+                                   "active":  false,
+                                   "node_types":  [
+                                                      "n8n-nodes-base.code",
+                                                      "n8n-nodes-base.googleSheets",
+                                                      "n8n-nodes-base.googleSheetsTrigger",
+                                                      "n8n-nodes-base.httpRequest",
+                                                      "n8n-nodes-base.if",
+                                                      "n8n-nodes-base.noOp"
+                                                  ]
+                               },
+                               {
+                                   "file":  "03-marks-intake-complete-stabilized.json",
+                                   "name":  "SIS 03 Ã¢â‚¬â€ Marks Intake and Validation Ã¢â‚¬â€ Complete Stabilized",
+                                   "active":  false,
+                                   "node_types":  [
+                                                      "n8n-nodes-base.code",
+                                                      "n8n-nodes-base.extractFromFile",
+                                                      "n8n-nodes-base.googleDrive",
+                                                      "n8n-nodes-base.googleSheets",
+                                                      "n8n-nodes-base.googleSheetsTrigger",
+                                                      "n8n-nodes-base.httpRequest",
+                                                      "n8n-nodes-base.if",
+                                                      "n8n-nodes-base.noOp"
+                                                  ]
+                               },
+                               {
+                                   "file":  "03-marks-intake-stabilized.json",
+                                   "name":  "SIS 03 â€” Marks Intake and Validation â€” Stabilized",
+                                   "active":  false,
+                                   "node_types":  [
+                                                      "n8n-nodes-base.code",
+                                                      "n8n-nodes-base.googleSheets",
+                                                      "n8n-nodes-base.googleSheetsTrigger",
+                                                      "n8n-nodes-base.httpRequest",
+                                                      "n8n-nodes-base.if",
+                                                      "n8n-nodes-base.noOp"
+                                                  ]
+                               },
+                               {
+                                   "file":  "04-results-publication.json",
+                                   "name":  "SIS 04 â€” Results Approval and Publication â€” Complete",
+                                   "active":  false,
+                                   "node_types":  [
+                                                      "n8n-nodes-base.code",
+                                                      "n8n-nodes-base.googleSheets",
+                                                      "n8n-nodes-base.googleSheetsTrigger",
+                                                      "n8n-nodes-base.httpRequest",
+                                                      "n8n-nodes-base.if",
+                                                      "n8n-nodes-base.noOp",
+                                                      "n8n-nodes-base.webhook"
+                                                  ]
+                               },
+                               {
+                                   "file":  "05-transcript-delivery.json",
+                                   "name":  "SIS 05 â€” Transcript Request, Generation and Delivery â€” Complete",
+                                   "active":  false,
+                                   "node_types":  [
+                                                      "n8n-nodes-base.code",
+                                                      "n8n-nodes-base.crypto",
+                                                      "n8n-nodes-base.httpRequest",
+                                                      "n8n-nodes-base.if",
+                                                      "n8n-nodes-base.respondToWebhook",
+                                                      "n8n-nodes-base.set",
+                                                      "n8n-nodes-base.stickyNote",
+                                                      "n8n-nodes-base.webhook"
+                                                  ]
+                               },
+                               {
+                                   "file":  "05-transcript-delivery-drive-resolution-stabilized.json",
+                                   "name":  "SIS 05 â€” Transcript Request, Generation and Delivery â€” Drive Resolution Stabilized",
+                                   "active":  false,
+                                   "node_types":  [
+                                                      "n8n-nodes-base.code",
+                                                      "n8n-nodes-base.crypto",
+                                                      "n8n-nodes-base.httpRequest",
+                                                      "n8n-nodes-base.if",
+                                                      "n8n-nodes-base.respondToWebhook",
+                                                      "n8n-nodes-base.set",
+                                                      "n8n-nodes-base.stickyNote",
+                                                      "n8n-nodes-base.webhook"
+                                                  ]
+                               },
+                               {
+                                   "file":  "07-admin-dashboard.json",
+                                   "name":  "SIS 07 â€” Administrative Search and Basic Dashboard â€” Complete",
+                                   "active":  false,
+                                   "node_types":  [
+                                                      "n8n-nodes-base.code",
+                                                      "n8n-nodes-base.httpRequest",
+                                                      "n8n-nodes-base.if",
+                                                      "n8n-nodes-base.respondToWebhook",
+                                                      "n8n-nodes-base.webhook"
+                                                  ]
+                               },
+                               {
+                                   "file":  "08-notification-dispatcher.json",
+                                   "name":  "SIS 08 — Notification Dispatcher",
+                                   "active":  false,
+                                   "node_types":  [
+                                                      "n8n-nodes-base.code",
+                                                      "n8n-nodes-base.gmail",
+                                                      "n8n-nodes-base.httpRequest",
+                                                      "n8n-nodes-base.if",
+                                                      "n8n-nodes-base.scheduleTrigger"
+                                                  ]
+                               },
+                               {
+                                   "file":  "08-notification-dispatcher-stabilized.json",
+                                   "name":  "SIS 08 â€” Notification Dispatcher â€” Stabilized",
+                                   "active":  false,
+                                   "node_types":  [
+                                                      "n8n-nodes-base.code",
+                                                      "n8n-nodes-base.gmail",
+                                                      "n8n-nodes-base.httpRequest",
+                                                      "n8n-nodes-base.if",
+                                                      "n8n-nodes-base.scheduleTrigger"
+                                                  ]
+                               },
+                               {
+                                   "file":  "09-operations-monitoring.json",
+                                   "name":  "SIS 09 â€” Scheduled Operations and Monitoring â€” Complete",
+                                   "active":  false,
+                                   "node_types":  [
+                                                      "n8n-nodes-base.code",
+                                                      "n8n-nodes-base.httpRequest",
+                                                      "n8n-nodes-base.if",
+                                                      "n8n-nodes-base.scheduleTrigger"
+                                                  ]
+                               }
+                           ],
+    "runtime_workflow_catalogue":  {
+                                       "available":  true,
+                                       "database_location":  "C:\\Users\\DeLL\\.n8n\\database.sqlite",
+                                       "driver":  "sqlite3",
+                                       "workflows":  [
+                                                         {
+                                                             "id":  "Silo9zq7jg7Fm94zb5qjd",
+                                                             "name":  "AI Bug Report Triage System",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.code",
+                                                                                "n8n-nodes-base.formTrigger",
+                                                                                "n8n-nodes-base.gmail",
+                                                                                "n8n-nodes-base.httpRequest",
+                                                                                "n8n-nodes-base.mySql",
+                                                                                "n8n-nodes-base.set",
+                                                                                "n8n-nodes-base.switch"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "_xUBGphGKBoItf2I6aj5b",
+                                                             "name":  "AI Generated Videos",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "@n8n/n8n-nodes-langchain.agent",
+                                                                                "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                                                                "n8n-nodes-base.googleSheets",
+                                                                                "n8n-nodes-base.httpRequest",
+                                                                                "n8n-nodes-base.scheduleTrigger",
+                                                                                "n8n-nodes-base.wait",
+                                                                                "n8n-nodes-base.youTube"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "CpadI1yrJWB8LlZh",
+                                                             "name":  "AI Rag Chat",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "@n8n/n8n-nodes-langchain.agent",
+                                                                                "@n8n/n8n-nodes-langchain.chatTrigger",
+                                                                                "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+                                                                                "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                                                                "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                                                                                "@n8n/n8n-nodes-langchain.vectorStorePinecone"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "nVZHryZ2aiK_G3av59l0W",
+                                                             "name":  "Atom Camp Assignment 1",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.formTrigger",
+                                                                                "n8n-nodes-base.gmail",
+                                                                                "n8n-nodes-base.googleSheets",
+                                                                                "n8n-nodes-base.set"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "eDyGKlGAQ5LleE5berzQS",
+                                                             "name":  "AutoBiz",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "@n8n/n8n-nodes-langchain.agent",
+                                                                                "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                                                                "n8n-nodes-base.gmail",
+                                                                                "n8n-nodes-base.googleSheets",
+                                                                                "n8n-nodes-base.if",
+                                                                                "n8n-nodes-base.postgres",
+                                                                                "n8n-nodes-base.respondToWebhook",
+                                                                                "n8n-nodes-base.set",
+                                                                                "n8n-nodes-base.webhook"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "-t6ReTTPZWwFJm2hs-UUW",
+                                                             "name":  "AutoBiz - Universal Error Handler",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.code",
+                                                                                "n8n-nodes-base.errorTrigger",
+                                                                                "n8n-nodes-base.httpRequest"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "JNr88XMbdItHo4J-MGn1-",
+                                                             "name":  "Autobiz Error Handler",
+                                                             "active":  true,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.errorTrigger",
+                                                                                "n8n-nodes-base.gmail"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "wS1so7DyU1eapf7V",
+                                                             "name":  "Browser",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.airtop",
+                                                                                "n8n-nodes-base.executeWorkflowTrigger"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "eampRZ2SHJzdx5b-t6iN5",
+                                                             "name":  "Browser(2)",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.airtop",
+                                                                                "n8n-nodes-base.executeWorkflowTrigger"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "kWNK9p-H-RjxTfn-cOM2J",
+                                                             "name":  "CV Screener â€” Notion Talent Board",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.code",
+                                                                                "n8n-nodes-base.googleSheetsTrigger",
+                                                                                "n8n-nodes-base.httpRequest",
+                                                                                "n8n-nodes-base.if"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "2nDxvm_lHN9mdJxbcRQ9H",
+                                                             "name":  "Centralized SDR Google Form Automation - 2026 V3 Production",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.code",
+                                                                                "n8n-nodes-base.errorTrigger",
+                                                                                "n8n-nodes-base.gmail",
+                                                                                "n8n-nodes-base.googleCalendar",
+                                                                                "n8n-nodes-base.googleSheets",
+                                                                                "n8n-nodes-base.googleSheetsTrigger",
+                                                                                "n8n-nodes-base.httpRequest",
+                                                                                "n8n-nodes-base.if",
+                                                                                "n8n-nodes-base.scheduleTrigger",
+                                                                                "n8n-nodes-base.switch"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "3DHxX5yFpKpBI6wIUgROR",
+                                                             "name":  "Clinic Diagnostic Lab Patient Lifecycle Automation",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.code",
+                                                                                "n8n-nodes-base.gmail",
+                                                                                "n8n-nodes-base.googleCalendar",
+                                                                                "n8n-nodes-base.googleDrive",
+                                                                                "n8n-nodes-base.googleDriveTrigger",
+                                                                                "n8n-nodes-base.googleSheets",
+                                                                                "n8n-nodes-base.googleSheetsTrigger",
+                                                                                "n8n-nodes-base.respondToWebhook",
+                                                                                "n8n-nodes-base.scheduleTrigger",
+                                                                                "n8n-nodes-base.set",
+                                                                                "n8n-nodes-base.wait",
+                                                                                "n8n-nodes-base.webhook"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "OnfXZ83Zy6JqoALW",
+                                                             "name":  "Email Management",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                                                                "@n8n/n8n-nodes-langchain.openAi",
+                                                                                "@n8n/n8n-nodes-langchain.textClassifier",
+                                                                                "n8n-nodes-base.gmail",
+                                                                                "n8n-nodes-base.gmailTrigger",
+                                                                                "n8n-nodes-base.set"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "XgyVzdahmhOe4TfT",
+                                                             "name":  "Email Management",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                                                                "@n8n/n8n-nodes-langchain.openAi",
+                                                                                "@n8n/n8n-nodes-langchain.textClassifier",
+                                                                                "n8n-nodes-base.gmail",
+                                                                                "n8n-nodes-base.gmailTrigger"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "Nrfo436LB7IhHJoREpQyo",
+                                                             "name":  "Instagram Clothing Store Engagement Automation(META CANT DO)",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.airtable",
+                                                                                "n8n-nodes-base.emailSend",
+                                                                                "n8n-nodes-base.httpRequest",
+                                                                                "n8n-nodes-base.if",
+                                                                                "n8n-nodes-base.scheduleTrigger",
+                                                                                "n8n-nodes-base.set",
+                                                                                "n8n-nodes-base.stickyNote",
+                                                                                "n8n-nodes-base.switch",
+                                                                                "n8n-nodes-base.wait",
+                                                                                "n8n-nodes-base.webhook"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "7qotqW50OTTx5vTe",
+                                                             "name":  "Inventory Management",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "@n8n/n8n-nodes-langchain.agent",
+                                                                                "@n8n/n8n-nodes-langchain.chatTrigger",
+                                                                                "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                                                                "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                                                                                "n8n-nodes-base.googleSheetsTool"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "kpamltxAoCTCSw4a_AEdh",
+                                                             "name":  "Lead Gen Agency - SDR KPI Dashboard, Appointment Tracking and Daily Reporting",
+                                                             "active":  false,
+                                                             "node_types":  [
+
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "T8uICYC9wdW8BflH",
+                                                             "name":  "LinkedIn Post Generator",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "@n8n/n8n-nodes-langchain.agent",
+                                                                                "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                                                                "n8n-nodes-base.convertToFile",
+                                                                                "n8n-nodes-base.formTrigger",
+                                                                                "n8n-nodes-base.httpRequest",
+                                                                                "n8n-nodes-base.httpRequestTool",
+                                                                                "n8n-nodes-base.linkedIn"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "VN2IMMdffDDXj8Ox",
+                                                             "name":  "Mail Sender",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "@n8n/n8n-nodes-langchain.agent",
+                                                                                "@n8n/n8n-nodes-langchain.chatTrigger",
+                                                                                "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+                                                                                "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                                                                                "n8n-nodes-base.gmailTool"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "5WdxRhpmaxYJJlouOxNNY",
+                                                             "name":  "Multi-Role Hiring Automation â€” Application Processor",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "@n8n/n8n-nodes-langchain.agent",
+                                                                                "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                                                                "n8n-nodes-base.code",
+                                                                                "n8n-nodes-base.extractFromFile",
+                                                                                "n8n-nodes-base.filter",
+                                                                                "n8n-nodes-base.googleDrive",
+                                                                                "n8n-nodes-base.googleSheets",
+                                                                                "n8n-nodes-base.if",
+                                                                                "n8n-nodes-base.merge",
+                                                                                "n8n-nodes-base.noOp",
+                                                                                "n8n-nodes-base.scheduleTrigger",
+                                                                                "n8n-nodes-base.set",
+                                                                                "n8n-nodes-base.splitInBatches",
+                                                                                "n8n-nodes-base.switch",
+                                                                                "n8n-nodes-base.wait"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "C5e27qfdBbZdNNhh",
+                                                             "name":  "Multi-Role Hiring â€” Email Dispatcher",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.filter",
+                                                                                "n8n-nodes-base.gmail",
+                                                                                "n8n-nodes-base.googleCalendar",
+                                                                                "n8n-nodes-base.googleSheets",
+                                                                                "n8n-nodes-base.noOp",
+                                                                                "n8n-nodes-base.scheduleTrigger",
+                                                                                "n8n-nodes-base.set",
+                                                                                "n8n-nodes-base.splitInBatches",
+                                                                                "n8n-nodes-base.switch",
+                                                                                "n8n-nodes-base.wait"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "fqXHmG0oY0Pri3SQ",
+                                                             "name":  "My Sub-Workflow 2",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.executeWorkflowTrigger",
+                                                                                "n8n-nodes-base.noOp"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "CYhkdVPApSQmDzkDKDSde",
+                                                             "name":  "My workflow",
+                                                             "active":  false,
+                                                             "node_types":  [
+
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "K5laNkrFqXagyaoT",
+                                                             "name":  "RAG",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+                                                                                "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+                                                                                "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+                                                                                "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+                                                                                "n8n-nodes-base.manualTrigger",
+                                                                                "n8n-nodes-base.microsoftOneDrive"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "gAV6aPsyMmqSTwkv",
+                                                             "name":  "RAG",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+                                                                                "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+                                                                                "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+                                                                                "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+                                                                                "n8n-nodes-base.googleDrive",
+                                                                                "n8n-nodes-base.manualTrigger"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "GUkRJf4S88pUYQTWCah9d",
+                                                             "name":  "Restaurant Assistant",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "@n8n/n8n-nodes-langchain.agent",
+                                                                                "@n8n/n8n-nodes-langchain.chainLlm",
+                                                                                "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+                                                                                "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+                                                                                "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                                                                "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+                                                                                "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+                                                                                "n8n-nodes-base.gmail",
+                                                                                "n8n-nodes-base.googleDrive",
+                                                                                "n8n-nodes-base.httpRequest",
+                                                                                "n8n-nodes-base.if",
+                                                                                "n8n-nodes-base.manualTrigger",
+                                                                                "n8n-nodes-base.respondToWebhook",
+                                                                                "n8n-nodes-base.webhook"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "j-Ccdq9mYPhDn3NNWqspd",
+                                                             "name":  "Searcher",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "@n8n/n8n-nodes-langchain.agent",
+                                                                                "@n8n/n8n-nodes-langchain.chatTrigger",
+                                                                                "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                                                                "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                                                                                "@n8n/n8n-nodes-langchain.toolThink",
+                                                                                "@n8n/n8n-nodes-langchain.toolWorkflow",
+                                                                                "n8n-nodes-base.airtopTool"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "zYxnVts3n83469lIHwXVs",
+                                                             "name":  "Voice Agent",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "@n8n/n8n-nodes-langchain.agent",
+                                                                                "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                                                                "n8n-nodes-base.gmailTool",
+                                                                                "n8n-nodes-base.googleSheetsTool",
+                                                                                "n8n-nodes-base.respondToWebhook",
+                                                                                "n8n-nodes-base.webhook"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "gUxbteCMpp2W6Q1fBZXpm",
+                                                             "name":  "W1",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.gmail",
+                                                                                "n8n-nodes-base.scheduleTrigger"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "pecg7ME4Cu5eaxbOvwSpi",
+                                                             "name":  "W2",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.gmail",
+                                                                                "n8n-nodes-base.googleSheets",
+                                                                                "n8n-nodes-base.webhook"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "G9fc_6qevaHXjj8Rw0DVc",
+                                                             "name":  "W4",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.googleSheets",
+                                                                                "n8n-nodes-base.httpRequest",
+                                                                                "n8n-nodes-base.scheduleTrigger",
+                                                                                "n8n-nodes-base.set"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "AXYYCTKfGEsvys5RFaPqz",
+                                                             "name":  "W5 - Inactive User Re-engagement",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.gmail",
+                                                                                "n8n-nodes-base.if",
+                                                                                "n8n-nodes-base.mySql",
+                                                                                "n8n-nodes-base.scheduleTrigger"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "E88djQAmiwqN2JfQOVW-7",
+                                                             "name":  "W6 - Database Sync (Weather API)",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.httpRequest",
+                                                                                "n8n-nodes-base.if",
+                                                                                "n8n-nodes-base.merge",
+                                                                                "n8n-nodes-base.mySql",
+                                                                                "n8n-nodes-base.scheduleTrigger",
+                                                                                "n8n-nodes-base.set"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "ZA90pDOCAGfDdXOV3a7ME",
+                                                             "name":  "W7-Price Updatess",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.code",
+                                                                                "n8n-nodes-base.gmail",
+                                                                                "n8n-nodes-base.httpRequest",
+                                                                                "n8n-nodes-base.if",
+                                                                                "n8n-nodes-base.merge",
+                                                                                "n8n-nodes-base.mySql",
+                                                                                "n8n-nodes-base.noOp",
+                                                                                "n8n-nodes-base.scheduleTrigger",
+                                                                                "n8n-nodes-base.splitInBatches"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "qX1AyjgrAfqyIEvbWDnp3",
+                                                             "name":  "WF10 â€” Automated Outbound Call + Voicemail Drop",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.code",
+                                                                                "n8n-nodes-base.googleSheets",
+                                                                                "n8n-nodes-base.httpRequest",
+                                                                                "n8n-nodes-base.if",
+                                                                                "n8n-nodes-base.respondToWebhook",
+                                                                                "n8n-nodes-base.webhook"
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "FaZNcHtJ_kId5BuTzeR13",
+                                                             "name":  "w1",
+                                                             "active":  false,
+                                                             "node_types":  [
+
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "TDnxLxovStGCK-ugERjWJ",
+                                                             "name":  "w3",
+                                                             "active":  false,
+                                                             "node_types":  [
+
+                                                                            ]
+                                                         },
+                                                         {
+                                                             "id":  "u07nUgGBV9bYRdf16E6Yf",
+                                                             "name":  "whatsapp bot",
+                                                             "active":  false,
+                                                             "node_types":  [
+                                                                                "n8n-nodes-base.httpRequest",
+                                                                                "n8n-nodes-base.if",
+                                                                                "n8n-nodes-base.mySql",
+                                                                                "n8n-nodes-base.respondToWebhook",
+                                                                                "n8n-nodes-base.webhook"
+                                                                            ]
+                                                         }
+                                                     ],
+                                       "active_workflows":  [
+                                                                {
+                                                                    "id":  "JNr88XMbdItHo4J-MGn1-",
+                                                                    "name":  "Autobiz Error Handler"
+                                                                }
+                                                            ],
+                                       "error_handlers":  [
+                                                              {
+                                                                  "id":  "-t6ReTTPZWwFJm2hs-UUW",
+                                                                  "name":  "AutoBiz - Universal Error Handler",
+                                                                  "active":  false
+                                                              },
+                                                              {
+                                                                  "id":  "JNr88XMbdItHo4J-MGn1-",
+                                                                  "name":  "Autobiz Error Handler",
+                                                                  "active":  true
+                                                              },
+                                                              {
+                                                                  "id":  "2nDxvm_lHN9mdJxbcRQ9H",
+                                                                  "name":  "Centralized SDR Google Form Automation - 2026 V3 Production",
+                                                                  "active":  false
+                                                              }
+                                                          ],
+                                       "unsupported_crypto_references":  [
+
+                                                                         ],
+                                       "warning":  null
+                                   },
+    "existing_error_handlers":  [
+
+                                ],
+    "unsupported_crypto_references":  [
+                                          {
+                                              "file":  "05-transcript-delivery.json",
+                                              "workflow":  "SIS 05 â€” Transcript Request, Generation and Delivery â€” Complete",
+                                              "active":  false,
+                                              "node":  "Compute Transcript PDF SHA256",
+                                              "type":  "n8n-nodes-base.crypto",
+                                              "connected":  true
+                                          },
+                                          {
+                                              "file":  "05-transcript-delivery-drive-resolution-stabilized.json",
+                                              "workflow":  "SIS 05 â€” Transcript Request, Generation and Delivery â€” Drive Resolution Stabilized",
+                                              "active":  false,
+                                              "node":  "Compute Transcript PDF SHA256",
+                                              "type":  "n8n-nodes-base.crypto",
+                                              "connected":  true
+                                          }
+                                      ],
+    "warnings":  [
+                     "The live n8n SQLite catalogue contains an active Error Trigger/Workflow 10-like workflow.",
+                     "Legacy Crypto-node references found: 2. Review active/connected classification before final integration; do not copy them into Workflow 10."
+                 ]
+}

@@ -1,0 +1,1234 @@
+{
+    "name":  "SIS 03 â€” Marks Intake and Validation â€” Complete Stabilized",
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "pollTimes":  {
+                                                           "item":  [
+                                                                        {
+                                                                            "mode":  "everyMinute"
+                                                                        }
+                                                                    ]
+                                                       },
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "={{$env.SIS_TEACHER_MARKS_RESPONSE_SHEET_ID}}",
+                                                            "mode":  "id"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  "={{$env.SIS_TEACHER_MARKS_QUEUE_TAB_ID}}",
+                                                           "mode":  "id"
+                                                       },
+                                         "event":  "rowAdded",
+                                         "options":  {
+                                                         "dataLocationOnSheet":  {
+                                                                                     "values":  {
+                                                                                                    "rangeDefinition":  "specifyRangeA1",
+                                                                                                    "range":  "A1:P"
+                                                                                                }
+                                                                                 },
+                                                         "valueRender":  "UNFORMATTED_VALUE",
+                                                         "dateTimeRenderOption":  "FORMATTED_STRING"
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheetsTrigger",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -920,
+                                       0
+                                   ],
+                      "id":  "133b90c3-9144-49d4-9c3a-37896ee8e4f7",
+                      "name":  "Manual Marks Queue Trigger",
+                      "notesInFlow":  true,
+                      "notes":  "Reads only newly appended rows from the Teacher Marks Submission spreadsheet Automation Queue, columns A:P."
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "runOnceForEachItem",
+                                         "language":  "javaScript",
+                                         "jsCode":  "const row = $json;\n\nconst text = (value) =\u003e {\n  if (value == null) return \u0027\u0027;\n  if (Array.isArray(value)) {\n    return value\n      .map((item) =\u003e String(item ?? \u0027\u0027).trim())\n      .filter(Boolean)\n      .join(\u0027 \u0027);\n  }\n  return String(value).trim();\n};\n\nconst upper = (value) =\u003e text(value).toUpperCase();\nconst lower = (value) =\u003e text(value).toLowerCase();\n\nconst normalizeTitle = (value) =\u003e\n  text(value)\n    .normalize(\u0027NFKD\u0027)\n    .toLowerCase()\n    .replace(/[â€”â€“_-]+/g, \u0027 \u0027)\n    .replace(/[^a-z0-9\\s]/g, \u0027 \u0027)\n    .replace(/\\s+/g, \u0027 \u0027)\n    .trim();\n\nconst uuid = () =\u003e\n  \u0027xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx\u0027.replace(/[xy]/g, (character) =\u003e {\n    const random = Math.floor(Math.random() * 16);\n    return (\n      character === \u0027x\u0027\n        ? random\n        : ((random \u0026 3) | 8)\n    ).toString(16);\n  });\n\nconst status = lower(row[\u0027Processing Status\u0027]);\nconst operation = text(row[\u0027Operation\u0027]);\nconst formResponseId = text(row[\u0027Form Response ID\u0027]);\nconst retryCountValue = Number(row[\u0027Retry Count\u0027] || 0);\n\nconst queue = {\n  formResponseId,\n  retryCount: Number.isFinite(retryCountValue) ? retryCountValue : 0,\n  incomingStatus: status,\n  operation,\n};\n\nconst processable =\n  status === \u0027pending\u0027 \u0026\u0026\n  operation === \u0027marks.batch.submit\u0027;\n\nif (!processable) {\n  return {\n    json: {\n      processable: false,\n      queue,\n      skipReason:\n        status !== \u0027pending\u0027\n          ? \u0027QUEUE_ROW_NOT_PENDING\u0027\n          : \u0027QUEUE_OPERATION_MISMATCH\u0027,\n    },\n  };\n}\n\nif (!formResponseId) {\n  throw new Error(\u0027VALIDATION_FORM_RESPONSE_ID_REQUIRED\u0027);\n}\n\nlet raw = row[\u0027Raw Response JSON\u0027];\n\nif (typeof raw === \u0027string\u0027) {\n  try {\n    raw = JSON.parse(raw);\n  } catch {\n    throw new Error(\u0027VALIDATION_RAW_RESPONSE_JSON\u0027);\n  }\n}\n\nif (!raw || typeof raw !== \u0027object\u0027 || Array.isArray(raw)) {\n  throw new Error(\u0027VALIDATION_RAW_RESPONSE_OBJECT\u0027);\n}\n\nconst rawEntries = Object.entries(raw);\n\nconst findFormValue = ({\n  aliases = [],\n  requiredWords = [],\n  preferredWords = [],\n  valueValidator = null,\n}) =\u003e {\n  const normalizedAliases = aliases.map(normalizeTitle);\n\n  for (const [key, value] of rawEntries) {\n    if (normalizedAliases.includes(normalizeTitle(key))) {\n      return text(value);\n    }\n  }\n\n  for (const [key, value] of rawEntries) {\n    const normalizedKey = normalizeTitle(key);\n    const hasRequiredWords = requiredWords.every((word) =\u003e\n      normalizedKey.includes(normalizeTitle(word))\n    );\n    const hasPreferredWord =\n      preferredWords.length === 0 ||\n      preferredWords.some((word) =\u003e\n        normalizedKey.includes(normalizeTitle(word))\n      );\n    const validValue =\n      typeof valueValidator !== \u0027function\u0027 ||\n      valueValidator(value);\n\n    if (hasRequiredWords \u0026\u0026 hasPreferredWord \u0026\u0026 validValue) {\n      return text(value);\n    }\n  }\n\n  return \u0027\u0027;\n};\n\nconst declarationText = findFormValue({\n  aliases: [\n    \u0027I confirm that I am assigned to this class and that these marks are accurate.\u0027,\n    \u0027Teacher confirmation\u0027,\n    \u0027Confirmation\u0027,\n  ],\n  requiredWords: [\u0027confirm\u0027],\n  preferredWords: [\u0027assigned\u0027, \u0027class\u0027, \u0027marks\u0027, \u0027accurate\u0027],\n});\n\nif (!lower(declarationText).includes(\u0027confirm\u0027)) {\n  throw new Error(\u0027VALIDATION_TEACHER_DECLARATION_REQUIRED\u0027);\n}\n\nconst marksText = findFormValue({\n  aliases: [\n    \u0027Marks â€” one line per student: student_number,marks,absent,remarks\u0027,\n    \u0027Marks - one line per student: student_number,marks,absent,remarks\u0027,\n    \u0027Marks Ã¢â‚¬â€ one line per student: student_number,marks,absent,remarks\u0027,\n    \u0027Enter marks\u0027,\n    \u0027Student marks\u0027,\n  ],\n  requiredWords: [\u0027marks\u0027],\n  preferredWords: [\u0027student\u0027, \u0027remarks\u0027, \u0027absent\u0027],\n  valueValidator: (value) =\u003e {\n    const candidate = text(value);\n    return (\n      candidate.includes(\u0027,\u0027) \u0026\u0026\n      (candidate.includes(\u0027\\n\u0027) || /^[A-Za-z0-9-]+\\s*,/.test(candidate))\n    );\n  },\n});\n\nconst lines = marksText\n  .split(/\\r?\\n/)\n  .map((line) =\u003e line.trim())\n  .filter(Boolean);\n\nif (lines.length === 0) {\n  throw new Error(\u0027VALIDATION_MARKS_LINES_REQUIRED\u0027);\n}\n\nconst absentTokens = new Set([\u0027true\u0027, \u0027yes\u0027, \u0027y\u0027, \u0027absent\u0027, \u0027a\u0027]);\nconst missingTokens = new Set([\u0027missing\u0027, \u0027m\u0027]);\nconst presentTokens = new Set([\u0027\u0027, \u0027false\u0027, \u0027no\u0027, \u0027n\u0027, \u0027present\u0027, \u0027p\u0027]);\n\nconst marks = lines.map((line, index) =\u003e {\n  const lineNumber = index + 1;\n  const parts = line.split(\u0027,\u0027);\n\n  if (parts.length \u003c 3) {\n    throw new Error(`VALIDATION_MARKS_LINE_${lineNumber}_FORMAT`);\n  }\n\n  const studentNumber = upper(parts.shift());\n  const marksValue = text(parts.shift());\n  const stateToken = lower(parts.shift());\n  const remarks = text(parts.join(\u0027,\u0027));\n\n  if (!studentNumber) {\n    throw new Error(`VALIDATION_MARKS_LINE_${lineNumber}_STUDENT`);\n  }\n\n  let marksObtained = null;\n  let isAbsent = false;\n  let isMissing = false;\n\n  if (absentTokens.has(stateToken)) {\n    if (marksValue !== \u0027\u0027) {\n      throw new Error(`VALIDATION_MARKS_LINE_${lineNumber}_ABSENT_VALUE`);\n    }\n    isAbsent = true;\n  } else if (missingTokens.has(stateToken)) {\n    if (marksValue !== \u0027\u0027) {\n      throw new Error(`VALIDATION_MARKS_LINE_${lineNumber}_MISSING_VALUE`);\n    }\n    isMissing = true;\n  } else if (presentTokens.has(stateToken)) {\n    if (marksValue === \u0027\u0027) {\n      throw new Error(`VALIDATION_MARKS_LINE_${lineNumber}_MARKS_REQUIRED`);\n    }\n\n    const parsedMarks = Number(marksValue);\n    if (!Number.isFinite(parsedMarks) || parsedMarks \u003c 0) {\n      throw new Error(`VALIDATION_MARKS_LINE_${lineNumber}_MARKS_INVALID`);\n    }\n    marksObtained = parsedMarks;\n  } else {\n    throw new Error(`VALIDATION_MARKS_LINE_${lineNumber}_STATE`);\n  }\n\n  return {\n    student_number: studentNumber,\n    marks_obtained: marksObtained,\n    is_absent: isAbsent,\n    is_missing: isMissing,\n    remarks: remarks || null,\n  };\n});\n\nconst studentNumbers = marks.map((mark) =\u003e mark.student_number);\nif (new Set(studentNumbers).size !== studentNumbers.length) {\n  throw new Error(\u0027VALIDATION_DUPLICATE_STUDENT_NUMBER\u0027);\n}\n\nconst getByAliases = (aliases, requiredWords = [], preferredWords = []) =\u003e\n  findFormValue({ aliases, requiredWords, preferredWords });\n\nconst submissionStateRaw = lower(\n  getByAliases(\n    [\u0027Submission state\u0027, \u0027Submission status\u0027, \u0027Draft or finalize\u0027],\n    [\u0027submission\u0027],\n    [\u0027state\u0027, \u0027status\u0027, \u0027draft\u0027, \u0027finalize\u0027]\n  )\n);\n\nconst submissionState =\n  submissionStateRaw.includes(\u0027finalize\u0027)\n    ? \u0027finalize\u0027\n    : \u0027draft\u0027;\n\nconst correlationId = uuid();\nconst idempotencyKey =\n  text(row[\u0027Idempotency Key\u0027]) ||\n  `google-form:${text(row[\u0027Source Form ID\u0027])}:${formResponseId}`;\nconst teacherEmail = lower(row[\u0027Respondent Email\u0027]);\n\nif (!teacherEmail) {\n  throw new Error(\u0027AUTH_CAPTURED_TEACHER_EMAIL_REQUIRED\u0027);\n}\n\nconst request = {\n  operation: \u0027marks.batch.submit\u0027,\n  correlation_id: correlationId,\n  idempotency_key: idempotencyKey,\n  requester: {\n    email: teacherEmail,\n    type: \u0027authorized_teacher_google_form\u0027,\n  },\n  submitted_at:\n    text(row[\u0027Submitted At UTC\u0027]) ||\n    new Date().toISOString(),\n  source: {\n    channel: \u0027google_forms\u0027,\n    source_submission_id: formResponseId,\n    source_form_id: text(row[\u0027Source Form ID\u0027]),\n    source_spreadsheet_id: text(row[\u0027Source Spreadsheet ID\u0027]),\n  },\n  payload: {\n    institution_code: upper(\n      getByAliases([\u0027Institution code\u0027], [\u0027institution\u0027, \u0027code\u0027])\n    ),\n    campus_code: upper(\n      getByAliases([\u0027Campus code\u0027], [\u0027campus\u0027, \u0027code\u0027])\n    ),\n    term_code: upper(\n      getByAliases(\n        [\u0027Term or semester code\u0027, \u0027Term code\u0027, \u0027Semester code\u0027],\n        [\u0027code\u0027],\n        [\u0027term\u0027, \u0027semester\u0027]\n      )\n    ),\n    course_offering_code: upper(\n      getByAliases(\n        [\u0027Course offering code\u0027, \u0027Offering code\u0027],\n        [\u0027offering\u0027, \u0027code\u0027]\n      )\n    ),\n    section_code: upper(\n      getByAliases([\u0027Section code\u0027], [\u0027section\u0027, \u0027code\u0027])\n    ),\n    assessment_code: upper(\n      getByAliases([\u0027Assessment code\u0027], [\u0027assessment\u0027, \u0027code\u0027])\n    ),\n    submission_state: submissionState,\n    teacher_email: teacherEmail,\n    teacher_notes: getByAliases(\n      [\u0027Teacher notes\u0027, \u0027Submission notes\u0027, \u0027Notes\u0027],\n      [\u0027notes\u0027]\n    ),\n    marks,\n  },\n};\n\nfor (const [key, value] of Object.entries({\n  institution_code: request.payload.institution_code,\n  campus_code: request.payload.campus_code,\n  term_code: request.payload.term_code,\n  course_offering_code: request.payload.course_offering_code,\n  section_code: request.payload.section_code,\n  assessment_code: request.payload.assessment_code,\n})) {\n  if (!value) {\n    throw new Error(`VALIDATION_${key.toUpperCase()}_REQUIRED`);\n  }\n}\n\nreturn {\n  json: {\n    processable: true,\n    queue,\n    request,\n    markCount: marks.length,\n  },\n};"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -680,
+                                       0
+                                   ],
+                      "id":  "b0dfe76d-552b-4d7f-bf23-f40041b5d60f",
+                      "name":  "Normalize Manual Marks Queue Row",
+                      "notesInFlow":  true,
+                      "notes":  "Validates the queue state, captured teacher email, declaration and one-line-per-student marks format. Produces one stable service RPC request."
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "boolean":  [
+                                                                            {
+                                                                                "value1":  "={{$json.processable}}",
+                                                                                "operation":  "equal",
+                                                                                "value2":  true
+                                                                            }
+                                                                        ]
+                                                        }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -440,
+                                       0
+                                   ],
+                      "id":  "7792525b-57de-4726-883c-66dd749ea23f",
+                      "name":  "Is Manual Queue Row Processable?",
+                      "notesInFlow":  true,
+                      "notes":  "Processes only exact pending marks.batch.submit queue rows. All other rows terminate without side effects."
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "={{$env.SUPABASE_URL + \u0027/rest/v1/rpc/rpc_log_workflow_run\u0027}}",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "supabaseApi",
+                                         "sendHeaders":  true,
+                                         "specifyHeaders":  "keypair",
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Prefer",
+                                                                                         "value":  "return=representation"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "contentType":  "json",
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ { \u0027p_request\u0027: { \u0027operation\u0027:\u0027workflow.run.log\u0027, \u0027correlation_id\u0027: $(\u0027Normalize Manual Marks Queue Row\u0027).item.json.request.correlation_id, \u0027idempotency_key\u0027: $(\u0027Normalize Manual Marks Queue Row\u0027).item.json.request.idempotency_key + \u0027:workflow-start\u0027, \u0027source\u0027:{\u0027channel\u0027:\u0027n8n\u0027}, \u0027payload\u0027:{ \u0027workflow_code\u0027:\u002703-marks-intake\u0027, \u0027n8n_execution_id\u0027:$execution.id, \u0027operation\u0027:\u0027marks.batch.submit\u0027, \u0027run_status\u0027:\u0027started\u0027, \u0027input_summary\u0027:{\u0027form_response_id\u0027:$(\u0027Normalize Manual Marks Queue Row\u0027).item.json.queue.formResponseId,\u0027mark_count\u0027:$(\u0027Normalize Manual Marks Queue Row\u0027).item.json.markCount} } } } }}",
+                                         "options":  {
+                                                         "response":  {
+                                                                          "response":  {
+                                                                                           "fullResponse":  true,
+                                                                                           "neverError":  true,
+                                                                                           "responseFormat":  "json"
+                                                                                       }
+                                                                      },
+                                                         "timeout":  15000
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.3,
+                      "position":  [
+                                       -200,
+                                       -80
+                                   ],
+                      "id":  "47eafb18-66d9-4913-998f-61ce57f8ad6e",
+                      "name":  "Log Manual Workflow Start",
+                      "notesInFlow":  true,
+                      "notes":  "Best-effort durable start evidence. Logging failure cannot block marks submission.",
+                      "continueOnFail":  true,
+                      "retryOnFail":  true,
+                      "maxTries":  3,
+                      "waitBetweenTries":  2000
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "={{$env.SUPABASE_URL + \u0027/rest/v1/rpc/rpc_submit_marks_from_form\u0027}}",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "supabaseApi",
+                                         "sendHeaders":  true,
+                                         "specifyHeaders":  "keypair",
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Prefer",
+                                                                                         "value":  "return=representation"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "contentType":  "json",
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ { \u0027p_request\u0027: $(\u0027Normalize Manual Marks Queue Row\u0027).item.json.request } }}",
+                                         "options":  {
+                                                         "response":  {
+                                                                          "response":  {
+                                                                                           "fullResponse":  true,
+                                                                                           "neverError":  true,
+                                                                                           "responseFormat":  "json"
+                                                                                       }
+                                                                      },
+                                                         "timeout":  15000
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.3,
+                      "position":  [
+                                       40,
+                                       -80
+                                   ],
+                      "id":  "ab8d19f4-1b56-445f-9c32-494bd45132bc",
+                      "name":  "Submit Manual Marks RPC",
+                      "notesInFlow":  true,
+                      "notes":  "Calls the service-role-only code-resolving marks wrapper. The RPC verifies teacher assignment, class membership, ranges and finalization rules.",
+                      "continueOnFail":  true,
+                      "retryOnFail":  true,
+                      "maxTries":  3,
+                      "waitBetweenTries":  2000
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "runOnceForEachItem",
+                                         "language":  "javaScript",
+                                         "jsCode":  "const source = $(\u0027Normalize Manual Marks Queue Row\u0027).item.json;\nconst raw = $json ?? {};\n\nlet body = Object.prototype.hasOwnProperty.call(raw, \u0027body\u0027)\n  ? raw.body\n  : raw;\n\nif (typeof body === \u0027string\u0027) {\n  try {\n    body = JSON.parse(body);\n  } catch {\n    body = { message: body };\n  }\n}\n\nif (\n  Array.isArray(body) \u0026\u0026\n  body.length === 1 \u0026\u0026\n  body[0] \u0026\u0026\n  typeof body[0] === \u0027object\u0027\n) {\n  body = body[0];\n}\n\nconst statusValue = raw.statusCode ?? raw.status ?? null;\nconst statusCode =\n  statusValue == null\n    ? (raw.error ? 0 : 200)\n    : Number(statusValue);\n\nconst transportError =\n  typeof raw.error === \u0027string\u0027\n    ? raw.error\n    : (raw.error?.message || raw.message || \u0027\u0027);\n\nconst bodyError =\n  body \u0026\u0026 typeof body === \u0027object\u0027\n    ? (\n        body.error \u0026\u0026 typeof body.error === \u0027object\u0027\n          ? body.error\n          : body\n      )\n    : {};\n\nconst rpcSuccess =\n  statusCode \u003e= 200 \u0026\u0026\n  statusCode \u003c 300 \u0026\u0026\n  body \u0026\u0026\n  typeof body === \u0027object\u0027 \u0026\u0026\n  body.success === true;\n\nconst errorCode = rpcSuccess\n  ? \u0027\u0027\n  : String(\n      bodyError.code ||\n      bodyError.error_code ||\n      (statusCode \u003e 0 ? `HTTP_${statusCode}` : \u0027NETWORK_FAILURE\u0027)\n    ).slice(0, 100);\n\nconst errorMessage = rpcSuccess\n  ? \u0027\u0027\n  : String(\n      bodyError.message ||\n      bodyError.error_message ||\n      transportError ||\n      \u0027The marks operation could not be completed.\u0027\n    ).slice(0, 300);\n\nconst now = new Date().toISOString();\n\nreturn {\n  json: {\n    \u0027Form Response ID\u0027: source.queue.formResponseId,\n    \u0027Processing Status\u0027: rpcSuccess ? \u0027completed\u0027 : \u0027failed\u0027,\n    \u0027Processed At UTC\u0027: now,\n    \u0027Correlation ID\u0027:\n      body?.correlation_id || source.request.correlation_id,\n    \u0027Error Code\u0027: errorCode,\n    \u0027Error Message\u0027: errorMessage,\n    \u0027Retry Count\u0027:\n      source.queue.retryCount + (rpcSuccess ? 0 : 1),\n    \u0027Last Attempt At UTC\u0027: now,\n    \u0027n8n Execution ID\u0027: $execution.id,\n    marksBatchId: body?.data?.marks_batch_id || \u0027\u0027,\n    batchStatus: body?.data?.status || \u0027\u0027,\n    validationSummary: body?.data?.validation_summary || {},\n    rpcResult: body,\n    httpStatusCode: statusCode,\n    success: rpcSuccess,\n  },\n};"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       280,
+                                       -80
+                                   ],
+                      "id":  "9b2344ce-7f24-427c-b3d3-02e9cf7be6b5",
+                      "name":  "Build Manual Queue Outcome",
+                      "notesInFlow":  true,
+                      "notes":  "Converts the transport and RPC result into sanitized queue status fields without exposing stack traces or credentials."
+                  },
+                  {
+                      "parameters":  {
+                                         "authentication":  "oAuth2",
+                                         "resource":  "sheet",
+                                         "operation":  "update",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "={{$env.SIS_TEACHER_MARKS_RESPONSE_SHEET_ID}}",
+                                                            "mode":  "id"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  "={{$env.SIS_TEACHER_MARKS_QUEUE_TAB_ID}}",
+                                                           "mode":  "id"
+                                                       },
+                                         "dataMode":  "defineBelow",
+                                         "columnToMatchOn":  "Form Response ID",
+                                         "valueToMatchOn":  "={{$json[\"Form Response ID\"]}}",
+                                         "fieldsUi":  {
+                                                          "values":  [
+                                                                         {
+                                                                             "column":  "Processing Status",
+                                                                             "fieldValue":  "={{$json[\"Processing Status\"]}}"
+                                                                         },
+                                                                         {
+                                                                             "column":  "Processed At UTC",
+                                                                             "fieldValue":  "={{$json[\"Processed At UTC\"]}}"
+                                                                         },
+                                                                         {
+                                                                             "column":  "Correlation ID",
+                                                                             "fieldValue":  "={{$json[\"Correlation ID\"]}}"
+                                                                         },
+                                                                         {
+                                                                             "column":  "Error Code",
+                                                                             "fieldValue":  "={{$json[\"Error Code\"]}}"
+                                                                         },
+                                                                         {
+                                                                             "column":  "Error Message",
+                                                                             "fieldValue":  "={{$json[\"Error Message\"]}}"
+                                                                         },
+                                                                         {
+                                                                             "column":  "Retry Count",
+                                                                             "fieldValue":  "={{$json[\"Retry Count\"]}}"
+                                                                         },
+                                                                         {
+                                                                             "column":  "Last Attempt At UTC",
+                                                                             "fieldValue":  "={{$json[\"Last Attempt At UTC\"]}}"
+                                                                         },
+                                                                         {
+                                                                             "column":  "n8n Execution ID",
+                                                                             "fieldValue":  "={{$json[\"n8n Execution ID\"]}}"
+                                                                         }
+                                                                     ]
+                                                      },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  3,
+                      "position":  [
+                                       520,
+                                       20
+                                   ],
+                      "id":  "62d3bc23-6560-490e-8376-c9de4b4544a8",
+                      "name":  "Update Manual Automation Queue",
+                      "notesInFlow":  true,
+                      "notes":  "Updates exactly one marks queue row by immutable Form Response ID.",
+                      "retryOnFail":  true,
+                      "maxTries":  3,
+                      "waitBetweenTries":  2000
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "={{$env.SUPABASE_URL + \u0027/rest/v1/rpc/rpc_log_workflow_run\u0027}}",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "supabaseApi",
+                                         "sendHeaders":  true,
+                                         "specifyHeaders":  "keypair",
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Prefer",
+                                                                                         "value":  "return=representation"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "contentType":  "json",
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ { \u0027p_request\u0027: { \u0027operation\u0027:\u0027workflow.run.log\u0027, \u0027correlation_id\u0027: $(\u0027Normalize Manual Marks Queue Row\u0027).item.json.request.correlation_id, \u0027idempotency_key\u0027: $(\u0027Normalize Manual Marks Queue Row\u0027).item.json.request.idempotency_key + \u0027:workflow-completion\u0027, \u0027source\u0027:{\u0027channel\u0027:\u0027n8n\u0027}, \u0027payload\u0027:{ \u0027workflow_code\u0027:\u002703-marks-intake\u0027, \u0027n8n_execution_id\u0027:$execution.id, \u0027operation\u0027:\u0027marks.batch.submit\u0027, \u0027run_status\u0027: $(\u0027Build Manual Queue Outcome\u0027).item.json.success ? \u0027completed\u0027 : \u0027failed\u0027, \u0027output_summary\u0027:{\u0027queue_status\u0027:$(\u0027Build Manual Queue Outcome\u0027).item.json[\u0027Processing Status\u0027],\u0027marks_batch_id\u0027:$(\u0027Build Manual Queue Outcome\u0027).item.json.marksBatchId,\u0027batch_status\u0027:$(\u0027Build Manual Queue Outcome\u0027).item.json.batchStatus}, \u0027error_code\u0027:$(\u0027Build Manual Queue Outcome\u0027).item.json[\u0027Error Code\u0027], \u0027error_message\u0027:$(\u0027Build Manual Queue Outcome\u0027).item.json[\u0027Error Message\u0027] } } } }}",
+                                         "options":  {
+                                                         "response":  {
+                                                                          "response":  {
+                                                                                           "fullResponse":  true,
+                                                                                           "neverError":  true,
+                                                                                           "responseFormat":  "json"
+                                                                                       }
+                                                                      },
+                                                         "timeout":  15000
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.3,
+                      "position":  [
+                                       760,
+                                       20
+                                   ],
+                      "id":  "4524ad89-6c23-4672-a022-eb909e160e46",
+                      "name":  "Log Manual Workflow Completion",
+                      "notesInFlow":  true,
+                      "notes":  "Runs only after the queue outcome is durably written. Logging remains best effort.",
+                      "continueOnFail":  true,
+                      "retryOnFail":  true,
+                      "maxTries":  3,
+                      "waitBetweenTries":  2000
+                  },
+                  {
+                      "parameters":  {
+
+                                     },
+                      "type":  "n8n-nodes-base.noOp",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -200,
+                                       112
+                                   ],
+                      "id":  "150824dc-d676-4512-83bd-51ed822c3e71",
+                      "name":  "Skip Manual Non-Pending Queue Row",
+                      "notesInFlow":  true,
+                      "notes":  "Expected terminal for completed, failed, stale or operation-mismatched queue rows."
+                  },
+                  {
+                      "parameters":  {
+                                         "pollTimes":  {
+                                                           "item":  [
+                                                                        {
+                                                                            "mode":  "everyMinute"
+                                                                        }
+                                                                    ]
+                                                       },
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "={{$env.SIS_MARKS_FILE_RESPONSE_SHEET_ID}}",
+                                                            "mode":  "id"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  "={{$env.SIS_MARKS_FILE_QUEUE_TAB_ID}}",
+                                                           "mode":  "id"
+                                                       },
+                                         "event":  "rowAdded",
+                                         "options":  {
+                                                         "dataLocationOnSheet":  {
+                                                                                     "values":  {
+                                                                                                    "rangeDefinition":  "specifyRangeA1",
+                                                                                                    "range":  "A1:P"
+                                                                                                }
+                                                                                 },
+                                                         "valueRender":  "UNFORMATTED_VALUE",
+                                                         "dateTimeRenderOption":  "FORMATTED_STRING"
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheetsTrigger",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -920,
+                                       520
+                                   ],
+                      "id":  "6c888e4a-d082-4551-ab6e-7829230741b3",
+                      "name":  "Marks File Queue Trigger",
+                      "notesInFlow":  true,
+                      "notes":  "Reads only new Automation Queue rows from the Marks CSV or Excel Upload response spreadsheet, columns A:P."
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "runOnceForEachItem",
+                                         "language":  "javaScript",
+                                         "jsCode":  "const row = $json;\nconst text = (value) =\u003e value == null ? \u0027\u0027 : String(value).trim();\nconst lower = (value) =\u003e text(value).toLowerCase();\nconst upper = (value) =\u003e text(value).toUpperCase();\n\nconst normalizeTitle = (value) =\u003e\n  text(value)\n    .normalize(\u0027NFKD\u0027)\n    .toLowerCase()\n    .replace(/[â€”â€“_-]+/g, \u0027 \u0027)\n    .replace(/[^a-z0-9\\s]/g, \u0027 \u0027)\n    .replace(/\\s+/g, \u0027 \u0027)\n    .trim();\n\nconst uuid = () =\u003e\n  \u0027xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx\u0027.replace(/[xy]/g, (character) =\u003e {\n    const random = Math.floor(Math.random() * 16);\n    return (\n      character === \u0027x\u0027\n        ? random\n        : ((random \u0026 3) | 8)\n    ).toString(16);\n  });\n\nconst status = lower(row[\u0027Processing Status\u0027]);\nconst operation = text(row[\u0027Operation\u0027]);\nconst formResponseId = text(row[\u0027Form Response ID\u0027]);\nconst retryCountValue = Number(row[\u0027Retry Count\u0027] || 0);\n\nconst queue = {\n  formResponseId,\n  retryCount: Number.isFinite(retryCountValue) ? retryCountValue : 0,\n  incomingStatus: status,\n  operation,\n};\n\nconst processable =\n  status === \u0027pending\u0027 \u0026\u0026\n  operation === \u0027marks.file.submit\u0027;\n\nif (!processable) {\n  return {\n    json: {\n      processable: false,\n      queue,\n      skipReason:\n        status !== \u0027pending\u0027\n          ? \u0027QUEUE_ROW_NOT_PENDING\u0027\n          : \u0027QUEUE_OPERATION_MISMATCH\u0027,\n    },\n  };\n}\n\nif (!formResponseId) {\n  throw new Error(\u0027VALIDATION_FORM_RESPONSE_ID_REQUIRED\u0027);\n}\n\nlet raw = row[\u0027Raw Response JSON\u0027];\nif (typeof raw === \u0027string\u0027) {\n  try {\n    raw = JSON.parse(raw);\n  } catch {\n    throw new Error(\u0027VALIDATION_RAW_RESPONSE_JSON\u0027);\n  }\n}\n\nif (!raw || typeof raw !== \u0027object\u0027 || Array.isArray(raw)) {\n  throw new Error(\u0027VALIDATION_RAW_RESPONSE_OBJECT\u0027);\n}\n\nconst entries = Object.entries(raw);\nconst find = (aliases, requiredWords = []) =\u003e {\n  const normalizedAliases = aliases.map(normalizeTitle);\n\n  for (const [key, value] of entries) {\n    if (normalizedAliases.includes(normalizeTitle(key))) {\n      return text(value);\n    }\n  }\n\n  for (const [key, value] of entries) {\n    const normalizedKey = normalizeTitle(key);\n    if (\n      requiredWords.every((word) =\u003e\n        normalizedKey.includes(normalizeTitle(word))\n      )\n    ) {\n      return text(value);\n    }\n  }\n\n  return \u0027\u0027;\n};\n\nconst declaration = find(\n  [\n    \u0027I confirm that I am authorized to submit this class file.\u0027,\n    \u0027Authorization confirmation\u0027,\n  ],\n  [\u0027confirm\u0027, \u0027authorized\u0027]\n);\n\nif (!lower(declaration).includes(\u0027confirm\u0027)) {\n  throw new Error(\u0027VALIDATION_FILE_DECLARATION_REQUIRED\u0027);\n}\n\nconst driveUrl = find(\n  [\u0027Uploaded CSV or Excel Google Drive URL\u0027, \u0027Google Drive URL\u0027, \u0027Drive URL\u0027],\n  [\u0027drive\u0027, \u0027url\u0027]\n);\n\nconst originalFileName = find(\n  [\u0027Original file name\u0027, \u0027File name\u0027],\n  [\u0027file\u0027, \u0027name\u0027]\n);\n\nconst extractDriveFileId = (value) =\u003e {\n  const candidate = text(value);\n\n  const patterns = [\n    /\\/d\\/([A-Za-z0-9_-]{10,})/i,\n    /[?\u0026]id=([A-Za-z0-9_-]{10,})/i,\n    /^([A-Za-z0-9_-]{10,})$/,\n  ];\n\n  for (const pattern of patterns) {\n    const match = candidate.match(pattern);\n    if (match) return match[1];\n  }\n\n  return \u0027\u0027;\n};\n\nconst fileId = extractDriveFileId(driveUrl);\nif (!fileId) {\n  throw new Error(\u0027VALIDATION_GOOGLE_DRIVE_FILE_ID\u0027);\n}\n\nconst extensionMatch = lower(originalFileName).match(/\\.([a-z0-9]+)$/);\nconst fileExtension = extensionMatch ? extensionMatch[1] : \u0027\u0027;\n\nif (![\u0027csv\u0027, \u0027xlsx\u0027, \u0027xls\u0027].includes(fileExtension)) {\n  throw new Error(\u0027VALIDATION_MARKS_FILE_TYPE\u0027);\n}\n\nconst teacherEmail = lower(row[\u0027Respondent Email\u0027]);\nif (!teacherEmail) {\n  throw new Error(\u0027AUTH_CAPTURED_TEACHER_EMAIL_REQUIRED\u0027);\n}\n\nconst submissionStateRaw = lower(\n  find([\u0027Submission state\u0027, \u0027Submission status\u0027], [\u0027submission\u0027])\n);\nconst submissionState =\n  submissionStateRaw.includes(\u0027finalize\u0027)\n    ? \u0027finalize\u0027\n    : \u0027draft\u0027;\n\nconst correlationId = uuid();\nconst idempotencyKey =\n  text(row[\u0027Idempotency Key\u0027]) ||\n  `google-form:${text(row[\u0027Source Form ID\u0027])}:${formResponseId}`;\n\nconst formContext = {\n  institutionCode: upper(find([\u0027Institution code\u0027], [\u0027institution\u0027, \u0027code\u0027])),\n  campusCode: upper(find([\u0027Campus code\u0027], [\u0027campus\u0027, \u0027code\u0027])),\n  termCode: upper(\n    find([\u0027Term or semester code\u0027, \u0027Term code\u0027, \u0027Semester code\u0027], [\u0027code\u0027])\n  ),\n  courseOfferingCode: upper(\n    find([\u0027Course offering code\u0027, \u0027Offering code\u0027], [\u0027offering\u0027, \u0027code\u0027])\n  ),\n  sectionCode: upper(find([\u0027Section code\u0027], [\u0027section\u0027, \u0027code\u0027])),\n  assessmentCode: upper(find([\u0027Assessment code\u0027], [\u0027assessment\u0027, \u0027code\u0027])),\n  submissionState,\n  teacherEmail,\n  teacherNotes: find([\u0027File notes\u0027, \u0027Teacher notes\u0027, \u0027Notes\u0027], [\u0027notes\u0027]),\n};\n\nfor (const [key, value] of Object.entries(formContext)) {\n  if (\n    [\n      \u0027institutionCode\u0027,\n      \u0027campusCode\u0027,\n      \u0027termCode\u0027,\n      \u0027courseOfferingCode\u0027,\n      \u0027sectionCode\u0027,\n      \u0027assessmentCode\u0027,\n      \u0027teacherEmail\u0027,\n    ].includes(key) \u0026\u0026\n    !value\n  ) {\n    throw new Error(`VALIDATION_${key.replace(/([a-z])([A-Z])/g, \u0027$1_$2\u0027).toUpperCase()}_REQUIRED`);\n  }\n}\n\nreturn {\n  json: {\n    processable: true,\n    queue,\n    correlationId,\n    idempotencyKey,\n    submittedAt:\n      text(row[\u0027Submitted At UTC\u0027]) ||\n      new Date().toISOString(),\n    sourceFormId: text(row[\u0027Source Form ID\u0027]),\n    sourceSpreadsheetId: text(row[\u0027Source Spreadsheet ID\u0027]),\n    driveUrl,\n    fileId,\n    originalFileName,\n    fileExtension,\n    formContext,\n  },\n};"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -680,
+                                       520
+                                   ],
+                      "id":  "0e31b3f7-d191-46be-badb-f86f0c81d8e8",
+                      "name":  "Normalize Marks File Queue Row",
+                      "notesInFlow":  true,
+                      "notes":  "Validates strict pending state, captured teacher email, form context, Drive URL, declared file name and CSV/XLS/XLSX type."
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "boolean":  [
+                                                                            {
+                                                                                "value1":  "={{$json.processable}}",
+                                                                                "operation":  "equal",
+                                                                                "value2":  true
+                                                                            }
+                                                                        ]
+                                                        }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -440,
+                                       520
+                                   ],
+                      "id":  "a5c52f83-9c0b-49c1-be1d-6e09d277319e",
+                      "name":  "Is File Queue Row Processable?",
+                      "notesInFlow":  true,
+                      "notes":  "Processes only exact pending marks.file.submit rows."
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "={{$env.SUPABASE_URL + \u0027/rest/v1/rpc/rpc_log_workflow_run\u0027}}",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "supabaseApi",
+                                         "sendHeaders":  true,
+                                         "specifyHeaders":  "keypair",
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Prefer",
+                                                                                         "value":  "return=representation"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "contentType":  "json",
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ { \u0027p_request\u0027: { \u0027operation\u0027:\u0027workflow.run.log\u0027, \u0027correlation_id\u0027: $(\u0027Normalize Marks File Queue Row\u0027).item.json.correlationId, \u0027idempotency_key\u0027: $(\u0027Normalize Marks File Queue Row\u0027).item.json.idempotencyKey + \u0027:workflow-start\u0027, \u0027source\u0027:{\u0027channel\u0027:\u0027n8n\u0027}, \u0027payload\u0027:{\u0027workflow_code\u0027:\u002703-marks-intake\u0027,\u0027n8n_execution_id\u0027:$execution.id,\u0027operation\u0027:\u0027marks.file.submit\u0027,\u0027run_status\u0027:\u0027started\u0027,\u0027input_summary\u0027:{\u0027form_response_id\u0027:$(\u0027Normalize Marks File Queue Row\u0027).item.json.queue.formResponseId,\u0027file_name\u0027:$(\u0027Normalize Marks File Queue Row\u0027).item.json.originalFileName}}} } }}",
+                                         "options":  {
+                                                         "response":  {
+                                                                          "response":  {
+                                                                                           "fullResponse":  true,
+                                                                                           "neverError":  true,
+                                                                                           "responseFormat":  "json"
+                                                                                       }
+                                                                      },
+                                                         "timeout":  15000
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.3,
+                      "position":  [
+                                       -200,
+                                       440
+                                   ],
+                      "id":  "baa91278-fb4c-44f3-8c14-62eee7f61735",
+                      "name":  "Log File Workflow Start",
+                      "notesInFlow":  true,
+                      "notes":  "Best-effort start evidence for the file-upload branch.",
+                      "retryOnFail":  true,
+                      "maxTries":  3,
+                      "waitBetweenTries":  2000,
+                      "continueOnFail":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "authentication":  "oAuth2",
+                                         "resource":  "file",
+                                         "operation":  "download",
+                                         "fileId":  {
+                                                        "__rl":  true,
+                                                        "value":  "={{$(\u0027Normalize Marks File Queue Row\u0027).item.json.fileId}}",
+                                                        "mode":  "id"
+                                                    },
+                                         "options":  {
+                                                         "binaryPropertyName":  "data",
+                                                         "fileName":  "={{$(\u0027Normalize Marks File Queue Row\u0027).item.json.originalFileName}}"
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3,
+                      "position":  [
+                                       40,
+                                       440
+                                   ],
+                      "id":  "abf8801c-d093-46d9-8d41-e8219790188a",
+                      "name":  "Download Marks File",
+                      "notesInFlow":  true,
+                      "notes":  "Downloads the teacher-provided Drive file into binary field data. Provider errors continue to the queue failure classifier.",
+                      "continueOnFail":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "runOnceForEachItem",
+                                         "language":  "javaScript",
+                                         "jsCode":  "const source = $(\u0027Normalize Marks File Queue Row\u0027).item.json;\nconst binary = $binary?.data;\nconst now = new Date().toISOString();\n\nif (!binary) {\n  const errorText = String(\n    $json?.error?.message ||\n    $json?.error ||\n    $json?.message ||\n    \u0027Google Drive did not return a binary file.\u0027\n  );\n\n  return {\n    json: {\n      ...source,\n      downloadReady: false,\n      \u0027Form Response ID\u0027: source.queue.formResponseId,\n      \u0027Processing Status\u0027: \u0027failed\u0027,\n      \u0027Processed At UTC\u0027: now,\n      \u0027Correlation ID\u0027: source.correlationId,\n      \u0027Error Code\u0027: \u0027FILE_DOWNLOAD_FAILED\u0027,\n      \u0027Error Message\u0027: errorText.slice(0, 300),\n      \u0027Retry Count\u0027: source.queue.retryCount + 1,\n      \u0027Last Attempt At UTC\u0027: now,\n      \u0027n8n Execution ID\u0027: $execution.id,\n      success: false,\n    },\n  };\n}\n\nconst actualExtension = String(binary.fileExtension || \u0027\u0027)\n  .toLowerCase()\n  .replace(/^\\./, \u0027\u0027);\n\nif (\n  actualExtension \u0026\u0026\n  ![\u0027csv\u0027, \u0027xlsx\u0027, \u0027xls\u0027].includes(actualExtension)\n) {\n  return {\n    json: {\n      ...source,\n      downloadReady: false,\n      \u0027Form Response ID\u0027: source.queue.formResponseId,\n      \u0027Processing Status\u0027: \u0027failed\u0027,\n      \u0027Processed At UTC\u0027: now,\n      \u0027Correlation ID\u0027: source.correlationId,\n      \u0027Error Code\u0027: \u0027FILE_TYPE_UNSUPPORTED\u0027,\n      \u0027Error Message\u0027:\n        `Downloaded file type \"${actualExtension}\" is not CSV, XLSX or XLS.`,\n      \u0027Retry Count\u0027: source.queue.retryCount + 1,\n      \u0027Last Attempt At UTC\u0027: now,\n      \u0027n8n Execution ID\u0027: $execution.id,\n      success: false,\n    },\n  };\n}\n\nif (\n  actualExtension \u0026\u0026\n  actualExtension !== source.fileExtension\n) {\n  return {\n    json: {\n      ...source,\n      downloadReady: false,\n      \u0027Form Response ID\u0027: source.queue.formResponseId,\n      \u0027Processing Status\u0027: \u0027failed\u0027,\n      \u0027Processed At UTC\u0027: now,\n      \u0027Correlation ID\u0027: source.correlationId,\n      \u0027Error Code\u0027: \u0027FILE_EXTENSION_MISMATCH\u0027,\n      \u0027Error Message\u0027:\n        `Declared extension \"${source.fileExtension}\" does not match downloaded extension \"${actualExtension}\".`,\n      \u0027Retry Count\u0027: source.queue.retryCount + 1,\n      \u0027Last Attempt At UTC\u0027: now,\n      \u0027n8n Execution ID\u0027: $execution.id,\n      success: false,\n    },\n  };\n}\n\nreturn {\n  json: {\n    ...source,\n    downloadReady: true,\n    downloadedMimeType: binary.mimeType || \u0027\u0027,\n    downloadedFileName: binary.fileName || source.originalFileName,\n  },\n  binary: $binary,\n};"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       280,
+                                       440
+                                   ],
+                      "id":  "6526f58e-5448-43a2-89f2-edab158918de",
+                      "name":  "Validate Downloaded Marks File",
+                      "notesInFlow":  true,
+                      "notes":  "Confirms binary download and actual supported file extension. Builds a sanitized queue failure when download validation fails."
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "boolean":  [
+                                                                            {
+                                                                                "value1":  "={{$json.downloadReady}}",
+                                                                                "operation":  "equal",
+                                                                                "value2":  true
+                                                                            }
+                                                                        ]
+                                                        }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  1,
+                      "position":  [
+                                       520,
+                                       440
+                                   ],
+                      "id":  "45a7d41a-04cd-4c1b-a76f-07cb36e7d265",
+                      "name":  "Is Download Ready?",
+                      "notesInFlow":  true,
+                      "notes":  "Routes valid binary files to native extraction."
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "string":  [
+                                                                           {
+                                                                               "value1":  "={{$json.fileExtension}}",
+                                                                               "operation":  "equal",
+                                                                               "value2":  "csv"
+                                                                           }
+                                                                       ]
+                                                        }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  1,
+                      "position":  [
+                                       760,
+                                       360
+                                   ],
+                      "id":  "1e4803db-9bbf-4590-be78-ad6643fd2797",
+                      "name":  "Is CSV File?",
+                      "notesInFlow":  true,
+                      "notes":  "Routes CSV separately from Excel formats."
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "csv",
+                                         "binaryPropertyName":  "data",
+                                         "options":  {
+                                                         "delimiter":  ",",
+                                                         "encoding":  "utf-8",
+                                                         "enableBOM":  true,
+                                                         "headerRow":  true,
+                                                         "includeEmptyCells":  true,
+                                                         "maxRowCount":  1000,
+                                                         "fromLine":  0,
+                                                         "skipRecordsWithErrors":  {
+                                                                                       "value":  {
+                                                                                                     "enabled":  false,
+                                                                                                     "maxSkippedRecords":  -1
+                                                                                                 }
+                                                                                   }
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.extractFromFile",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       1000,
+                                       280
+                                   ],
+                      "id":  "9b17a7fb-e5e0-4251-84b3-c2e7e1958de1",
+                      "name":  "Extract CSV Marks",
+                      "notesInFlow":  true,
+                      "notes":  "Uses the native Extract From File node with the first row as headers. Parsing errors continue for queue classification.",
+                      "continueOnFail":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "string":  [
+                                                                           {
+                                                                               "value1":  "={{$json.fileExtension}}",
+                                                                               "operation":  "equal",
+                                                                               "value2":  "xlsx"
+                                                                           }
+                                                                       ]
+                                                        }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  1,
+                      "position":  [
+                                       1000,
+                                       440
+                                   ],
+                      "id":  "db942d80-7df0-4de4-8e9e-e6c858a3b71e",
+                      "name":  "Is XLSX File?",
+                      "notesInFlow":  true,
+                      "notes":  "Routes XLSX separately from legacy XLS."
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "xlsx",
+                                         "binaryPropertyName":  "data",
+                                         "options":  {
+                                                         "headerRow":  true,
+                                                         "includeEmptyCells":  true,
+                                                         "rawData":  false,
+                                                         "readAsString":  false,
+                                                         "sheetName":  "Marks",
+                                                         "range":  ""
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.extractFromFile",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       1240,
+                                       400
+                                   ],
+                      "id":  "fd57c63e-c224-4f9b-9df9-5dcbff900e43",
+                      "name":  "Extract XLSX Marks",
+                      "notesInFlow":  true,
+                      "notes":  "Uses the native Extract From File node and reads the Marks sheet with a header row.",
+                      "continueOnFail":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "xls",
+                                         "binaryPropertyName":  "data",
+                                         "options":  {
+                                                         "headerRow":  true,
+                                                         "includeEmptyCells":  true,
+                                                         "rawData":  false,
+                                                         "readAsString":  false,
+                                                         "sheetName":  "Marks",
+                                                         "range":  ""
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.extractFromFile",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       1240,
+                                       560
+                                   ],
+                      "id":  "5233aa3e-4155-4650-b1c4-9b9036009a3c",
+                      "name":  "Extract XLS Marks",
+                      "notesInFlow":  true,
+                      "notes":  "Supports legacy Excel XLS files using the same Marks-sheet contract.",
+                      "continueOnFail":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "runOnceForAllItems",
+                                         "language":  "javaScript",
+                                         "jsCode":  "const source = $(\u0027Normalize Marks File Queue Row\u0027).first().json;\nconst inputItems = $input.all();\nconst now = new Date().toISOString();\n\nconst failure = (errorCode, errorMessage, incrementRetry = false) =\u003e [\n  {\n    json: {\n      ...source,\n      requestReady: false,\n      \u0027Form Response ID\u0027: source.queue.formResponseId,\n      \u0027Processing Status\u0027: \u0027failed\u0027,\n      \u0027Processed At UTC\u0027: now,\n      \u0027Correlation ID\u0027: source.correlationId,\n      \u0027Error Code\u0027: String(errorCode || \u0027FILE_VALIDATION_FAILED\u0027)\n        .trim()\n        .toUpperCase()\n        .replace(/[^A-Z0-9_]+/g, \u0027_\u0027)\n        .slice(0, 100),\n      \u0027Error Message\u0027: String(\n        errorMessage || \u0027The uploaded marks file did not pass validation.\u0027\n      ).slice(0, 300),\n      \u0027Retry Count\u0027:\n        source.queue.retryCount + (incrementRetry ? 1 : 0),\n      \u0027Last Attempt At UTC\u0027: now,\n      \u0027n8n Execution ID\u0027: $execution.id,\n      success: false,\n    },\n  },\n];\n\nif (inputItems.length === 0) {\n  return failure(\n    \u0027FILE_EMPTY\u0027,\n    \u0027The uploaded marks file contains no data rows.\u0027\n  );\n}\n\nconst extractionError = inputItems.find(\n  (item) =\u003e\n    item.json?.error ||\n    item.json?.errorMessage ||\n    Number(item.json?.statusCode || item.json?.status || 0) \u003e= 400\n);\n\nif (extractionError) {\n  const extractionMessage =\n    extractionError.json?.error?.message ||\n    extractionError.json?.errorMessage ||\n    extractionError.json?.error ||\n    extractionError.json?.message ||\n    \u0027The uploaded marks file could not be parsed.\u0027;\n\n  return failure(\n    \u0027FILE_PARSE_FAILED\u0027,\n    extractionMessage,\n    false\n  );\n}\n\nconst normalizeHeader = (value) =\u003e\n  String(value ?? \u0027\u0027)\n    .trim()\n    .toLowerCase()\n    .replace(/[^a-z0-9]+/g, \u0027_\u0027)\n    .replace(/^_+|_+$/g, \u0027\u0027);\n\nconst truthy = new Set([\n  \u0027true\u0027,\n  \u0027yes\u0027,\n  \u0027y\u0027,\n  \u00271\u0027,\n  \u0027absent\u0027,\n  \u0027missing\u0027,\n]);\n\nconst falsy = new Set([\n  \u0027\u0027,\n  \u0027false\u0027,\n  \u0027no\u0027,\n  \u0027n\u0027,\n  \u00270\u0027,\n  \u0027present\u0027,\n]);\n\nconst getColumn = (row, aliases) =\u003e {\n  const mapped = {};\n\n  for (const [key, value] of Object.entries(row || {})) {\n    mapped[normalizeHeader(key)] = value;\n  }\n\n  for (const alias of aliases) {\n    const normalizedAlias = normalizeHeader(alias);\n\n    if (\n      Object.prototype.hasOwnProperty.call(\n        mapped,\n        normalizedAlias\n      )\n    ) {\n      return mapped[normalizedAlias];\n    }\n  }\n\n  return undefined;\n};\n\ntry {\n  const marks = inputItems.map((item, index) =\u003e {\n    const row = item.json || {};\n    const line = index + 2;\n\n    const studentNumber = String(\n      getColumn(row, [\n        \u0027student_number\u0027,\n        \u0027student number\u0027,\n        \u0027student_id\u0027,\n        \u0027student id\u0027,\n      ]) ?? \u0027\u0027\n    )\n      .trim()\n      .toUpperCase();\n\n    if (!studentNumber) {\n      throw new Error(\n        `FILE_ROW_${line}_STUDENT_NUMBER_REQUIRED`\n      );\n    }\n\n    const absentValue = String(\n      getColumn(row, [\u0027absent\u0027, \u0027is_absent\u0027]) ?? \u0027\u0027\n    )\n      .trim()\n      .toLowerCase();\n\n    const missingValue = String(\n      getColumn(row, [\u0027missing\u0027, \u0027is_missing\u0027]) ?? \u0027\u0027\n    )\n      .trim()\n      .toLowerCase();\n\n    if (\n      !truthy.has(absentValue) \u0026\u0026\n      !falsy.has(absentValue)\n    ) {\n      throw new Error(\n        `FILE_ROW_${line}_ABSENT_INVALID`\n      );\n    }\n\n    if (\n      !truthy.has(missingValue) \u0026\u0026\n      !falsy.has(missingValue)\n    ) {\n      throw new Error(\n        `FILE_ROW_${line}_MISSING_INVALID`\n      );\n    }\n\n    const isAbsent = truthy.has(absentValue);\n    const isMissing = truthy.has(missingValue);\n\n    if (isAbsent \u0026\u0026 isMissing) {\n      throw new Error(\n        `FILE_ROW_${line}_ABSENT_AND_MISSING`\n      );\n    }\n\n    const marksRaw = getColumn(row, [\n      \u0027marks\u0027,\n      \u0027marks_obtained\u0027,\n      \u0027obtained_marks\u0027,\n      \u0027score\u0027,\n    ]);\n\n    let marksObtained = null;\n\n    if (!isAbsent \u0026\u0026 !isMissing) {\n      const marksText = String(marksRaw ?? \u0027\u0027).trim();\n\n      if (marksText === \u0027\u0027) {\n        throw new Error(\n          `FILE_ROW_${line}_MARKS_REQUIRED`\n        );\n      }\n\n      const parsedMarks = Number(marksText);\n\n      if (\n        !Number.isFinite(parsedMarks) ||\n        parsedMarks \u003c 0\n      ) {\n        throw new Error(\n          `FILE_ROW_${line}_MARKS_INVALID`\n        );\n      }\n\n      marksObtained = parsedMarks;\n    } else if (String(marksRaw ?? \u0027\u0027).trim() !== \u0027\u0027) {\n      throw new Error(\n        `FILE_ROW_${line}_NON_PRESENT_MARKS_VALUE`\n      );\n    }\n\n    return {\n      student_number: studentNumber,\n      marks_obtained: marksObtained,\n      is_absent: isAbsent,\n      is_missing: isMissing,\n      remarks:\n        String(\n          getColumn(row, [\n            \u0027remarks\u0027,\n            \u0027comment\u0027,\n            \u0027comments\u0027,\n            \u0027notes\u0027,\n          ]) ?? \u0027\u0027\n        ).trim() || null,\n    };\n  });\n\n  const studentNumbers = marks.map(\n    (mark) =\u003e mark.student_number\n  );\n\n  const duplicateStudentNumbers = [\n    ...new Set(\n      studentNumbers.filter(\n        (studentNumber, index) =\u003e\n          studentNumbers.indexOf(studentNumber) !== index\n      )\n    ),\n  ];\n\n  if (duplicateStudentNumbers.length \u003e 0) {\n    return failure(\n      \u0027VALIDATION_DUPLICATE_STUDENT_NUMBER\u0027,\n      `Duplicate student number detected: ${duplicateStudentNumbers.join(\u0027, \u0027)}.`\n    );\n  }\n\n  const context = source.formContext;\n\n  return [\n    {\n      json: {\n        ...source,\n        requestReady: true,\n        markCount: marks.length,\n        request: {\n          operation: \u0027marks.batch.submit\u0027,\n          correlation_id: source.correlationId,\n          idempotency_key: source.idempotencyKey,\n          requester: {\n            email: context.teacherEmail,\n            type:\n              \u0027authorized_teacher_google_form_file_upload\u0027,\n          },\n          submitted_at: source.submittedAt,\n          source: {\n            channel: \u0027google_forms_drive_upload\u0027,\n            source_submission_id:\n              source.queue.formResponseId,\n            source_form_id: source.sourceFormId,\n            source_spreadsheet_id:\n              source.sourceSpreadsheetId,\n            source_file_id: source.fileId,\n            source_file_name: source.originalFileName,\n          },\n          payload: {\n            institution_code:\n              context.institutionCode,\n            campus_code: context.campusCode,\n            term_code: context.termCode,\n            course_offering_code:\n              context.courseOfferingCode,\n            section_code: context.sectionCode,\n            assessment_code:\n              context.assessmentCode,\n            submission_state:\n              context.submissionState,\n            teacher_email: context.teacherEmail,\n            teacher_notes: context.teacherNotes,\n            marks,\n          },\n        },\n      },\n    },\n  ];\n} catch (error) {\n  const code =\n    error instanceof Error \u0026\u0026 error.message\n      ? error.message\n      : \u0027FILE_VALIDATION_FAILED\u0027;\n\n  return failure(\n    code,\n    code.startsWith(\u0027FILE_ROW_\u0027)\n      ? `The uploaded marks file contains an invalid value (${code}).`\n      : \u0027The uploaded marks file did not pass validation.\u0027\n  );\n}"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       1480,
+                                       400
+                                   ],
+                      "id":  "8d2bb58c-0c60-4ebb-9dee-e21a8626719f",
+                      "name":  "Build File Marks Request",
+                      "notesInFlow":  true,
+                      "notes":  "Aggregates extracted rows and converts duplicate or malformed file data into durable failed queue outcomes instead of terminating the execution."
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "boolean":  [
+                                                                            {
+                                                                                "value1":  "={{$json.requestReady}}",
+                                                                                "operation":  "equal",
+                                                                                "value2":  true
+                                                                            }
+                                                                        ]
+                                                        }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  1,
+                      "position":  [
+                                       1720,
+                                       400
+                                   ],
+                      "id":  "4d4a040e-7960-4214-8437-a9cb469ec4aa",
+                      "name":  "Is File Request Ready?",
+                      "notesInFlow":  true,
+                      "notes":  "Prevents malformed files from reaching the marks RPC."
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "={{$env.SUPABASE_URL + \u0027/rest/v1/rpc/rpc_submit_marks_from_form\u0027}}",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "supabaseApi",
+                                         "sendHeaders":  true,
+                                         "specifyHeaders":  "keypair",
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Prefer",
+                                                                                         "value":  "return=representation"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "contentType":  "json",
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ { \u0027p_request\u0027: $(\u0027Build File Marks Request\u0027).item.json.request } }}",
+                                         "options":  {
+                                                         "response":  {
+                                                                          "response":  {
+                                                                                           "fullResponse":  true,
+                                                                                           "neverError":  true,
+                                                                                           "responseFormat":  "json"
+                                                                                       }
+                                                                      },
+                                                         "timeout":  15000
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.3,
+                      "position":  [
+                                       1960,
+                                       320
+                                   ],
+                      "id":  "0666a6bc-eda4-447e-86cc-f78a9bfa7b8b",
+                      "name":  "Submit File Marks RPC",
+                      "notesInFlow":  true,
+                      "notes":  "Submits the normalized file batch through the same service-role-only marks wrapper used by manual entry.",
+                      "retryOnFail":  true,
+                      "maxTries":  3,
+                      "waitBetweenTries":  2000,
+                      "continueOnFail":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "runOnceForEachItem",
+                                         "language":  "javaScript",
+                                         "jsCode":  "const source = $(\u0027Build File Marks Request\u0027).item.json;\nconst raw = $json ?? {};\n\nlet body = Object.prototype.hasOwnProperty.call(raw, \u0027body\u0027)\n  ? raw.body\n  : raw;\n\nif (typeof body === \u0027string\u0027) {\n  try {\n    body = JSON.parse(body);\n  } catch {\n    body = { message: body };\n  }\n}\n\nif (\n  Array.isArray(body) \u0026\u0026\n  body.length === 1 \u0026\u0026\n  body[0] \u0026\u0026\n  typeof body[0] === \u0027object\u0027\n) {\n  body = body[0];\n}\n\nconst statusValue = raw.statusCode ?? raw.status ?? null;\nconst statusCode =\n  statusValue == null\n    ? (raw.error ? 0 : 200)\n    : Number(statusValue);\n\nconst transportError =\n  typeof raw.error === \u0027string\u0027\n    ? raw.error\n    : (raw.error?.message || raw.message || \u0027\u0027);\n\nconst bodyError =\n  body \u0026\u0026 typeof body === \u0027object\u0027\n    ? (\n        body.error \u0026\u0026 typeof body.error === \u0027object\u0027\n          ? body.error\n          : body\n      )\n    : {};\n\nconst rpcSuccess =\n  statusCode \u003e= 200 \u0026\u0026\n  statusCode \u003c 300 \u0026\u0026\n  body \u0026\u0026\n  typeof body === \u0027object\u0027 \u0026\u0026\n  body.success === true;\n\nconst now = new Date().toISOString();\n\nreturn {\n  json: {\n    ...source,\n    \u0027Form Response ID\u0027: source.queue.formResponseId,\n    \u0027Processing Status\u0027: rpcSuccess ? \u0027completed\u0027 : \u0027failed\u0027,\n    \u0027Processed At UTC\u0027: now,\n    \u0027Correlation ID\u0027:\n      body?.correlation_id || source.correlationId,\n    \u0027Error Code\u0027: rpcSuccess\n      ? \u0027\u0027\n      : String(\n          bodyError.code ||\n          bodyError.error_code ||\n          (statusCode \u003e 0 ? `HTTP_${statusCode}` : \u0027NETWORK_FAILURE\u0027)\n        ).slice(0, 100),\n    \u0027Error Message\u0027: rpcSuccess\n      ? \u0027\u0027\n      : String(\n          bodyError.message ||\n          bodyError.error_message ||\n          transportError ||\n          \u0027The uploaded marks file could not be submitted.\u0027\n        ).slice(0, 300),\n    \u0027Retry Count\u0027:\n      source.queue.retryCount + (rpcSuccess ? 0 : 1),\n    \u0027Last Attempt At UTC\u0027: now,\n    \u0027n8n Execution ID\u0027: $execution.id,\n    marksBatchId: body?.data?.marks_batch_id || \u0027\u0027,\n    batchStatus: body?.data?.status || \u0027\u0027,\n    validationSummary: body?.data?.validation_summary || {},\n    rpcResult: body,\n    success: rpcSuccess,\n  },\n};"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       2200,
+                                       320
+                                   ],
+                      "id":  "6b899252-d0e4-4831-9630-0dc1a58f611a",
+                      "name":  "Build File Queue Outcome",
+                      "notesInFlow":  true,
+                      "notes":  "Converts transport and RPC output into sanitized queue fields."
+                  },
+                  {
+                      "parameters":  {
+                                         "authentication":  "oAuth2",
+                                         "resource":  "sheet",
+                                         "operation":  "update",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "={{$env.SIS_MARKS_FILE_RESPONSE_SHEET_ID}}",
+                                                            "mode":  "id"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  "={{$env.SIS_MARKS_FILE_QUEUE_TAB_ID}}",
+                                                           "mode":  "id"
+                                                       },
+                                         "dataMode":  "defineBelow",
+                                         "columnToMatchOn":  "Form Response ID",
+                                         "valueToMatchOn":  "={{$json[\"Form Response ID\"]}}",
+                                         "fieldsUi":  {
+                                                          "values":  [
+                                                                         {
+                                                                             "column":  "Processing Status",
+                                                                             "fieldValue":  "={{$json[\"Processing Status\"]}}"
+                                                                         },
+                                                                         {
+                                                                             "column":  "Processed At UTC",
+                                                                             "fieldValue":  "={{$json[\"Processed At UTC\"]}}"
+                                                                         },
+                                                                         {
+                                                                             "column":  "Correlation ID",
+                                                                             "fieldValue":  "={{$json[\"Correlation ID\"]}}"
+                                                                         },
+                                                                         {
+                                                                             "column":  "Error Code",
+                                                                             "fieldValue":  "={{$json[\"Error Code\"]}}"
+                                                                         },
+                                                                         {
+                                                                             "column":  "Error Message",
+                                                                             "fieldValue":  "={{$json[\"Error Message\"]}}"
+                                                                         },
+                                                                         {
+                                                                             "column":  "Retry Count",
+                                                                             "fieldValue":  "={{$json[\"Retry Count\"]}}"
+                                                                         },
+                                                                         {
+                                                                             "column":  "Last Attempt At UTC",
+                                                                             "fieldValue":  "={{$json[\"Last Attempt At UTC\"]}}"
+                                                                         },
+                                                                         {
+                                                                             "column":  "n8n Execution ID",
+                                                                             "fieldValue":  "={{$json[\"n8n Execution ID\"]}}"
+                                                                         }
+                                                                     ]
+                                                      },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  3,
+                      "position":  [
+                                       2440,
+                                       440
+                                   ],
+                      "id":  "a37ba428-3fe4-4ff2-b5fa-a6775a4a7faf",
+                      "name":  "Update File Automation Queue",
+                      "notesInFlow":  true,
+                      "notes":  "Updates exactly one upload queue row by immutable Form Response ID.",
+                      "retryOnFail":  true,
+                      "maxTries":  3,
+                      "waitBetweenTries":  2000
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "={{$env.SUPABASE_URL + \u0027/rest/v1/rpc/rpc_log_workflow_run\u0027}}",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "supabaseApi",
+                                         "sendHeaders":  true,
+                                         "specifyHeaders":  "keypair",
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Prefer",
+                                                                                         "value":  "return=representation"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "contentType":  "json",
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ { \u0027p_request\u0027: { \u0027operation\u0027:\u0027workflow.run.log\u0027, \u0027correlation_id\u0027: $(\u0027Normalize Marks File Queue Row\u0027).item.json.correlationId, \u0027idempotency_key\u0027: $(\u0027Normalize Marks File Queue Row\u0027).item.json.idempotencyKey + \u0027:workflow-completion\u0027, \u0027source\u0027:{\u0027channel\u0027:\u0027n8n\u0027}, \u0027payload\u0027:{\u0027workflow_code\u0027:\u002703-marks-intake\u0027,\u0027n8n_execution_id\u0027:$execution.id,\u0027operation\u0027:\u0027marks.file.submit\u0027,\u0027run_status\u0027: $json[\u0027Processing Status\u0027] === \u0027completed\u0027 ? \u0027completed\u0027 : \u0027failed\u0027,\u0027output_summary\u0027:{\u0027queue_status\u0027:$json[\u0027Processing Status\u0027],\u0027marks_batch_id\u0027:$json.marksBatchId || \u0027\u0027,\u0027batch_status\u0027:$json.batchStatus || \u0027\u0027,\u0027source_file_id\u0027:$(\u0027Normalize Marks File Queue Row\u0027).item.json.fileId},\u0027error_code\u0027:$json[\u0027Error Code\u0027] || \u0027\u0027,\u0027error_message\u0027:$json[\u0027Error Message\u0027] || \u0027\u0027}} } }}",
+                                         "options":  {
+                                                         "response":  {
+                                                                          "response":  {
+                                                                                           "fullResponse":  true,
+                                                                                           "neverError":  true,
+                                                                                           "responseFormat":  "json"
+                                                                                       }
+                                                                      },
+                                                         "timeout":  15000
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.3,
+                      "position":  [
+                                       2680,
+                                       440
+                                   ],
+                      "id":  "0afb278b-74ca-440b-9a38-1a1d8256a5a4",
+                      "name":  "Log File Workflow Completion",
+                      "notesInFlow":  true,
+                      "notes":  "Best-effort completion evidence after the upload queue is updated.",
+                      "retryOnFail":  true,
+                      "maxTries":  3,
+                      "waitBetweenTries":  2000,
+                      "continueOnFail":  true
+                  },
+                  {
+                      "parameters":  {
+
+                                     },
+                      "type":  "n8n-nodes-base.noOp",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -200,
+                                       680
+                                   ],
+                      "id":  "04a3825f-71e0-4a3d-9d05-ab5857875b57",
+                      "name":  "Skip File Non-Pending Queue Row",
+                      "notesInFlow":  true,
+                      "notes":  "Expected terminal for completed, failed, stale or operation-mismatched upload queue rows."
+                  }
+              ],
+    "pinData":  {
+
+                },
+    "connections":  {
+                        "Manual Marks Queue Trigger":  {
+                                                           "main":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "Normalize Manual Marks Queue Row",
+                                                                                "type":  "main",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                       },
+                        "Normalize Manual Marks Queue Row":  {
+                                                                 "main":  [
+                                                                              [
+                                                                                  {
+                                                                                      "node":  "Is Manual Queue Row Processable?",
+                                                                                      "type":  "main",
+                                                                                      "index":  0
+                                                                                  }
+                                                                              ]
+                                                                          ]
+                                                             },
+                        "Is Manual Queue Row Processable?":  {
+                                                                 "main":  [
+                                                                              [
+                                                                                  {
+                                                                                      "node":  "Log Manual Workflow Start",
+                                                                                      "type":  "main",
+                                                                                      "index":  0
+                                                                                  }
+                                                                              ],
+                                                                              [
+                                                                                  {
+                                                                                      "node":  "Skip Manual Non-Pending Queue Row",
+                                                                                      "type":  "main",
+                                                                                      "index":  0
+                                                                                  }
+                                                                              ]
+                                                                          ]
+                                                             },
+                        "Log Manual Workflow Start":  {
+                                                          "main":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "Submit Manual Marks RPC",
+                                                                               "type":  "main",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                                      },
+                        "Submit Manual Marks RPC":  {
+                                                        "main":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "Build Manual Queue Outcome",
+                                                                             "type":  "main",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                    },
+                        "Build Manual Queue Outcome":  {
+                                                           "main":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "Update Manual Automation Queue",
+                                                                                "type":  "main",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                       },
+                        "Update Manual Automation Queue":  {
+                                                               "main":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "Log Manual Workflow Completion",
+                                                                                    "type":  "main",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                                           },
+                        "Marks File Queue Trigger":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "Normalize Marks File Queue Row",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "Normalize Marks File Queue Row":  {
+                                                               "main":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "Is File Queue Row Processable?",
+                                                                                    "type":  "main",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                                           },
+                        "Is File Queue Row Processable?":  {
+                                                               "main":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "Log File Workflow Start",
+                                                                                    "type":  "main",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ],
+                                                                            [
+                                                                                {
+                                                                                    "node":  "Skip File Non-Pending Queue Row",
+                                                                                    "type":  "main",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                                           },
+                        "Log File Workflow Start":  {
+                                                        "main":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "Download Marks File",
+                                                                             "type":  "main",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                    },
+                        "Download Marks File":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Validate Downloaded Marks File",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Validate Downloaded Marks File":  {
+                                                               "main":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "Is Download Ready?",
+                                                                                    "type":  "main",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                                           },
+                        "Is Download Ready?":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Is CSV File?",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ],
+                                                                [
+                                                                    {
+                                                                        "node":  "Update File Automation Queue",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Is CSV File?":  {
+                                             "main":  [
+                                                          [
+                                                              {
+                                                                  "node":  "Extract CSV Marks",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ],
+                                                          [
+                                                              {
+                                                                  "node":  "Is XLSX File?",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ]
+                                                      ]
+                                         },
+                        "Is XLSX File?":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "Extract XLSX Marks",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ],
+                                                           [
+                                                               {
+                                                                   "node":  "Extract XLS Marks",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "Extract CSV Marks":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "Build File Marks Request",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "Extract XLSX Marks":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Build File Marks Request",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Extract XLS Marks":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "Build File Marks Request",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "Build File Marks Request":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "Is File Request Ready?",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "Is File Request Ready?":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "Submit File Marks RPC",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ],
+                                                                    [
+                                                                        {
+                                                                            "node":  "Update File Automation Queue",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "Submit File Marks RPC":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "Build File Queue Outcome",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "Build File Queue Outcome":  {
+                                                         "main":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "Update File Automation Queue",
+                                                                              "type":  "main",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                     },
+                        "Update File Automation Queue":  {
+                                                             "main":  [
+                                                                          [
+                                                                              {
+                                                                                  "node":  "Log File Workflow Completion",
+                                                                                  "type":  "main",
+                                                                                  "index":  0
+                                                                              }
+                                                                          ]
+                                                                      ]
+                                                         }
+                    },
+    "active":  false,
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "saveDataSuccessExecution":  "all",
+                     "saveDataErrorExecution":  "all",
+                     "saveManualExecutions":  true,
+                     "timezone":  "Asia/Karachi"
+                 },
+    "tags":  [
+
+             ]
+}

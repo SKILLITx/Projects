@@ -1,0 +1,13 @@
+Phase 1 static-validator regression evidence
+
+Result 1: Exclusion behaviour passed.
+- A private-key marker placed under node_modules did not fail validation.
+- A service-role-like assignment placed under .runtime did not fail validation.
+
+Result 2: Detection behaviour passed.
+- A service-role-like assignment placed in tests/static/secret-regression-fixture.txt caused validation to fail.
+- The reported path matched the repository-authored fixture.
+- The fixture was removed after the test.
+
+Final clean validation result:
+Phase 1 static validation passed.

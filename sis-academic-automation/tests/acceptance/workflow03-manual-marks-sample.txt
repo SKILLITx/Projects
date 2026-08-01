@@ -1,0 +1,8 @@
+DMU-0001,18,false,Good
+DMU-0002,17.5,false,Good
+DMU-0003,16,false,Satisfactory
+DMU-0004,19,false,Very good
+DMU-0005,15.5,false,Satisfactory
+DMU-0006,14,false,Needs improvement
+DMU-0007,20,false,Excellent
+DMU-0008,18.5,false,Very good

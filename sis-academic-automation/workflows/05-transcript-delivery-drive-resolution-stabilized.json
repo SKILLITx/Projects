@@ -1,0 +1,1799 @@
+{
+  "name": "SIS 05 — Transcript Request, Generation and Delivery — Drive Resolution Stabilized",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "Workflow 05 — Transcript Request, Generation and Delivery\n\nCreates an authorized, idempotent transcript request; retrieves one complete academic data model; renders a Google Docs transcript; exports and stores a PDF in Google Drive; records the document; and queues approved-recipient delivery through Workflow 08.\n\nCredentials:\n• Google Drive account\n• SIS Supabase Service Role\n\nEnvironment:\n• SIS_SUPABASE_URL or SUPABASE_URL\n• SIS_SUPABASE_ANON_KEY or SUPABASE_ANON_KEY\n• SIS_TRANSCRIPT_DRIVE_FOLDER_ID (optional; blank uses My Drive root)\n• WEBHOOK_URL (optional verification link)\n\nNo Gmail is sent directly here. The durable outbox event is dispatched by the active Workflow 08.",
+        "height": 520,
+        "width": 760
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1600,
+        -720
+      ],
+      "id": "0062c46b-d48e-4a78-b90b-0ad303a9da6b",
+      "name": "Workflow 05 Documentation",
+      "notesInFlow": true,
+      "notes": "Purpose: Documents the complete Workflow 05 contract.\nInput: none\nOutput: operator guidance\nError behaviour: none"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "staff/rpc_create_transcript_request",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1600,
+        0
+      ],
+      "id": "55ef512b-5a48-4b25-8994-d0272dd7496f",
+      "name": "Transcript Request Webhook",
+      "notesInFlow": true,
+      "notes": "Purpose: Receives an authenticated staff or student transcript request from the staff portal.\nInput: Bearer token plus student_id, institution_id, campus_id, recipient_email, purpose and idempotency_key.\nOutput: Raw webhook request.\nError behaviour: Unsupported methods are rejected by n8n; payload and authentication are validated downstream.",
+      "webhookId": "sis-05-transcript-request"
+    },
+    {
+      "parameters": {
+        "jsCode": "function uuidv4() {\n  if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') return globalThis.crypto.randomUUID();\n  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {\n    const r = Math.random() * 16 | 0;\n    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);\n  });\n}\nconst input = $json || {};\nconst body = input.body && typeof input.body === 'object' ? input.body : input;\nconst headers = input.headers || {};\nconst header = (name) => {\n  const v = headers[name] ?? headers[name.toLowerCase()] ?? headers[name.toUpperCase()];\n  return v == null ? '' : String(v).trim();\n};\nconst authHeader = header('authorization');\nconst accessToken = /^Bearer\\s+(.+)$/i.test(authHeader) ? authHeader.replace(/^Bearer\\s+/i, '').trim() : '';\nconst correlationId = String(body.correlation_id || header('x-correlation-id') || uuidv4()).trim();\nconst idempotencyKey = String(body.idempotency_key || `portal:transcript.request:${uuidv4()}`).trim();\nconst institutionId = String(body.institution_id || body.institutionId || '').trim();\nconst campusId = String(body.campus_id || body.campusId || '').trim();\nconst studentId = String(body.student_id || body.studentId || '').trim();\nconst recipientEmail = String(body.recipient_email || body.recipientEmail || '').trim().toLowerCase();\nconst purpose = String(body.purpose || 'Official academic transcript request').trim();\nconst uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\nconst valid = Boolean(\n  accessToken &&\n  uuidRe.test(correlationId) &&\n  uuidRe.test(institutionId) &&\n  uuidRe.test(campusId) &&\n  uuidRe.test(studentId) &&\n  idempotencyKey &&\n  recipientEmail.includes('@')\n);\nreturn [{\n  json: {\n    valid,\n    access_token: accessToken,\n    correlation_id: correlationId,\n    idempotency_key: idempotencyKey,\n    institution_id: institutionId,\n    campus_id: campusId,\n    student_id: studentId,\n    recipient_email: recipientEmail,\n    purpose,\n    submitted_at: new Date().toISOString(),\n    validation_error: valid ? null : {\n      code: 'VALIDATION_REQUEST_ENVELOPE_REQUIRED',\n      message: 'A valid login, academic scope, student, recipient email and idempotency key are required.'\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1360,
+        0
+      ],
+      "id": "85afaab8-01a2-4b43-97cc-d05970a04e88",
+      "name": "Normalize Transcript Request",
+      "notesInFlow": true,
+      "notes": "Purpose: Normalizes the request and generates correlation/idempotency values without exposing secrets.\nInput: Raw webhook body and headers.\nOutput: Validated request context.\nError behaviour: Permanent validation failures route to a sanitized HTTP 400 response."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "be058869-d4db-4875-9e40-44cd86dd6618",
+              "leftValue": "={{$json.valid}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1120,
+        0
+      ],
+      "id": "b1d33a8d-b8c6-4ce9-b681-94abf4b0f959",
+      "name": "Request Envelope Valid?",
+      "notesInFlow": true,
+      "notes": "Purpose: Routes valid request envelopes.\nInput: Normalized request.\nOutput: Valid or invalid branch.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success:false, operation:'transcript.request.create', correlation_id:$json.correlation_id, idempotency_key:$json.idempotency_key, error:{ code:$json.validation_error.code, message:$json.validation_error.message, retryable:false } } }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -880,
+        240
+      ],
+      "id": "aac02519-78db-4f5d-8b7a-4c45b36ce1c6",
+      "name": "Respond Invalid Request",
+      "notesInFlow": true,
+      "notes": "Purpose: Returns the standard sanitized validation failure.\nInput: Invalid normalized request.\nOutput: HTTP 400 JSON.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{($env.SIS_SUPABASE_URL || $env.SUPABASE_URL) + '/auth/v1/user'}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{$env.SIS_SUPABASE_ANON_KEY || $env.SUPABASE_ANON_KEY}}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{'Bearer ' + $('Normalize Transcript Request').item.json.access_token}}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -880,
+        -40
+      ],
+      "id": "5718f4eb-3333-45f7-90f4-d38faba70494",
+      "name": "Validate Supabase User",
+      "notesInFlow": true,
+      "notes": "Purpose: Validates the caller's Supabase Auth access token.\nInput: Bearer token from the normalized request.\nOutput: Supabase user response.\nError behaviour: Temporary transport failures retry twice; invalid tokens are not retried as business operations.",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500,
+      "continueOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const request = $('Normalize Transcript Request').item.json;\nconst raw = $json || {};\nconst statusCode = Number(raw.statusCode || raw.status || 0);\nconst body = raw.body !== undefined ? raw.body : raw;\nconst userId = body && typeof body === 'object' ? (body.id || body.user?.id || null) : null;\nconst authenticated = Boolean(userId && (!statusCode || statusCode < 400));\nreturn [{json:{...request, authenticated, auth_user_id:userId, auth_response_status:statusCode || (authenticated ? 200 : 401)}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        -40
+      ],
+      "id": "f8e69e72-4331-410d-bac0-c7598fe7cae5",
+      "name": "Classify Supabase User",
+      "notesInFlow": true,
+      "notes": "Purpose: Classifies token validation without returning provider details.\nInput: Supabase Auth response.\nOutput: Authenticated request context.\nError behaviour: Invalid tokens route to HTTP 401."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6efa606d-01b6-4c2f-9a58-0838381cc17e",
+              "leftValue": "={{$json.authenticated}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -400,
+        -40
+      ],
+      "id": "0f0be3dd-33ba-408c-abed-fbb8d3882926",
+      "name": "User Authenticated?",
+      "notesInFlow": true,
+      "notes": "Purpose: Routes authenticated users.\nInput: Classified auth context.\nOutput: Authenticated or unauthorized branch.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success:false, operation:'transcript.request.create', correlation_id:$json.correlation_id, idempotency_key:$json.idempotency_key, error:{ code:'AUTH_LOGIN_REQUIRED', message:'A valid staff or student login is required.', retryable:false } } }}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -160,
+        240
+      ],
+      "id": "3722d3d4-cfd8-406e-8b03-cb0895177f52",
+      "name": "Respond Unauthorized",
+      "notesInFlow": true,
+      "notes": "Purpose: Returns a sanitized authentication failure.\nInput: Unauthenticated request.\nOutput: HTTP 401 JSON.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{($env.SIS_SUPABASE_URL || $env.SUPABASE_URL) + '/rest/v1/rpc/rpc_create_transcript_request'}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{$env.SIS_SUPABASE_ANON_KEY || $env.SUPABASE_ANON_KEY}}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{'Bearer ' + $json.access_token}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { p_request: { operation:'transcript.request.create', correlation_id:$json.correlation_id, idempotency_key:$json.idempotency_key, institution_id:$json.institution_id, campus_id:$json.campus_id, requester:{ type:'authenticated_user', auth_user_id:$json.auth_user_id }, submitted_at:$json.submitted_at, source:{ channel:'staff_portal', source_submission_id:$json.idempotency_key }, payload:{ student_id:$json.student_id, recipient_email:$json.recipient_email, purpose:$json.purpose } } } }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -160,
+        -80
+      ],
+      "id": "e55e866a-99a9-4abe-95b4-e50fd3dd1094",
+      "name": "Create Transcript Request RPC",
+      "notesInFlow": true,
+      "notes": "Purpose: Creates or reuses the authorized transcript request through the caller JWT.\nInput: Authenticated request context.\nOutput: Stable RPC response.\nError behaviour: Transport failures retry twice; permanent database/business failures are classified downstream.",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500,
+      "continueOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const context = $('Classify Supabase User').item.json;\nconst raw = $json || {};\nconst statusCode = Number(raw.statusCode || raw.status || 0);\nconst body = raw.body !== undefined ? raw.body : raw;\nconst rpc = Array.isArray(body) ? (body[0] || {}) : (body || {});\nconst transportFailed = Boolean(raw.error || raw.errorMessage || (statusCode >= 400 && !rpc.success));\nconst success = rpc.success === true && !transportFailed;\nconst error = rpc.error || {};\nlet responseCode = 422;\nif (transportFailed && statusCode >= 500) responseCode = 502;\nelse if (String(error.code || '').startsWith('AUTH_')) responseCode = 403;\nelse if (String(error.code || '').includes('NOT_FOUND')) responseCode = 404;\nelse if (String(error.code || '').includes('IDEMPOTENCY')) responseCode = 409;\nreturn [{json:{\n  ...context,\n  request_rpc_success: success,\n  request_rpc: rpc,\n  request_data: rpc.data || {},\n  response_code: success ? 200 : responseCode,\n  public_error: success ? null : {\n    code: error.code || (transportFailed ? 'TRANSCRIPT_REQUEST_SERVICE_UNAVAILABLE' : 'TRANSCRIPT_REQUEST_FAILED'),\n    message: error.message || 'The transcript request could not be completed.',\n    retryable: Boolean(error.retryable || (transportFailed && statusCode >= 500))\n  }\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        -80
+      ],
+      "id": "9744aabc-3731-40bf-b4e4-136710c645d4",
+      "name": "Classify Transcript Request",
+      "notesInFlow": true,
+      "notes": "Purpose: Classifies the request RPC and preserves its stable data.\nInput: RPC transport/body.\nOutput: Request data or sanitized error.\nError behaviour: No retry; RPC and HTTP nodes own retries."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "093c8291-1847-4504-913d-259559567fe0",
+              "leftValue": "={{$json.request_rpc_success}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        320,
+        -80
+      ],
+      "id": "4a2e19af-fae5-4274-a67a-45dc968ba666",
+      "name": "Transcript Request Created?",
+      "notesInFlow": true,
+      "notes": "Purpose: Routes successful request creation.\nInput: Classified RPC.\nOutput: Success or business-failure branch.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success:false, operation:'transcript.request.create', correlation_id:$json.correlation_id, idempotency_key:$json.idempotency_key, error:$json.public_error } }}",
+        "options": {
+          "responseCode": "={{$json.response_code}}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        240
+      ],
+      "id": "200b7161-f01c-4994-844e-8ccebe5d011a",
+      "name": "Respond Transcript Business Failure",
+      "notesInFlow": true,
+      "notes": "Purpose: Returns the stable business failure.\nInput: Failed request/model context.\nOutput: Sanitized JSON response.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "787b03f7-1bd8-4563-8cd5-f69e6e979cca",
+              "leftValue": "={{$json.request_data.document_reusable === true}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        560,
+        -120
+      ],
+      "id": "a60857ce-05e9-414a-893d-34047d1fc52b",
+      "name": "Reusable Document Exists?",
+      "notesInFlow": true,
+      "notes": "Purpose: Avoids regenerating an existing PDF for an idempotent request.\nInput: Successful request data.\nOutput: Reuse or generation branch.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "jsCode": "const x=$json;\nconst d=x.request_data.existing_document || {};\nconst delivery=x.request_data.existing_delivery || {};\nreturn [{json:{\n success:true,\n operation:'transcript.request.create',\n correlation_id:x.correlation_id,\n idempotency_key:x.idempotency_key,\n data:{\n   transcript_request_id:x.request_data.transcript_request_id,\n   reference_number:x.request_data.reference_number,\n   verification_code:x.request_data.verification_code || null,\n   status:x.request_data.status,\n   transcript_document_id:d.transcript_document_id || d.id || null,\n   google_doc_id:d.google_doc_id || null,\n   pdf_drive_file_id:d.pdf_drive_file_id || null,\n   pdf_file_url:d.pdf_file_url || null,\n   delivery_status:delivery.delivery_status || null,\n   document_reused:true\n },\n warnings:[]\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -280
+      ],
+      "id": "3ccce69c-c371-4089-ac60-60de3b0c6b36",
+      "name": "Build Reused Document Response",
+      "notesInFlow": true,
+      "notes": "Purpose: Builds the idempotent existing-document response.\nInput: Existing request/document metadata.\nOutput: Standard success object.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        3280,
+        -240
+      ],
+      "id": "ad818ad6-0c59-45eb-972b-8012afb6c7f1",
+      "name": "Respond Transcript Success",
+      "notesInFlow": true,
+      "notes": "Purpose: Returns the complete transcript outcome.\nInput: Generated or reused standard success object.\nOutput: HTTP 200 JSON.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{($env.SIS_SUPABASE_URL || $env.SUPABASE_URL) + '/rest/v1/rpc/rpc_get_transcript_model'}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{$env.SIS_SUPABASE_ANON_KEY || $env.SUPABASE_ANON_KEY}}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{'Bearer ' + $json.access_token}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { p_request:{ operation:'transcript.model.get', correlation_id:$json.correlation_id, institution_id:$json.institution_id, campus_id:$json.campus_id, requester:{type:'authenticated_user',auth_user_id:$json.auth_user_id}, source:{channel:'staff_portal'}, payload:{transcript_request_id:$json.request_data.transcript_request_id} } } }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        800,
+        -80
+      ],
+      "id": "3674a383-3dd8-4e9b-a819-353f895991ee",
+      "name": "Get Transcript Model RPC",
+      "notesInFlow": true,
+      "notes": "Purpose: Retrieves the complete transcript data model under the caller JWT.\nInput: Authorized transcript request ID.\nOutput: Stable transcript model RPC response.\nError behaviour: Temporary transport failures retry twice.",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500,
+      "continueOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const context=$('Classify Transcript Request').item.json;\nconst raw=$json||{};\nconst statusCode=Number(raw.statusCode||raw.status||0);\nconst body=raw.body!==undefined?raw.body:raw;\nconst rpc=Array.isArray(body)?(body[0]||{}):(body||{});\nconst success=rpc.success===true && !(raw.error||raw.errorMessage||(statusCode>=400&&!rpc.success));\nconst error=rpc.error||{};\nreturn [{json:{\n ...context,\n model_rpc_success:success,\n transcript_model:rpc.data||{},\n public_error:success?null:{\n   code:error.code||'TRANSCRIPT_MODEL_FAILED',\n   message:error.message||'The transcript academic record could not be loaded.',\n   retryable:Boolean(error.retryable||statusCode>=500)\n },\n response_code: success?200:(String(error.code||'').startsWith('AUTH_')?403:(String(error.code||'').includes('NOT_FOUND')?404:422))\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -80
+      ],
+      "id": "c768de32-f0b6-45a0-893d-3e4c6838a1eb",
+      "name": "Classify Transcript Model",
+      "notesInFlow": true,
+      "notes": "Purpose: Classifies the transcript data model response.\nInput: Model RPC response.\nOutput: Complete model or sanitized failure.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "482141ac-ab3f-42f7-b801-59b03edcf16b",
+              "leftValue": "={{$json.model_rpc_success}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1280,
+        -80
+      ],
+      "id": "aef04742-1099-48da-aa20-3434faea8592",
+      "name": "Transcript Model Ready?",
+      "notesInFlow": true,
+      "notes": "Purpose: Routes complete transcript models.\nInput: Classified model.\nOutput: Rendering or failure branch.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8daa15a7-1fd4-4d85-a201-e349a35fbb51",
+              "name": "drive_folder_id",
+              "value": "={{$env.SIS_TRANSCRIPT_DRIVE_FOLDER_ID || $env.GOOGLE_DRIVE_TRANSCRIPTS_FOLDER_ID || ''}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1520,
+        -80
+      ],
+      "id": "962f60c2-668d-4fa7-b8b6-d5c8f2c2acf1",
+      "name": "Set Transcript Runtime Configuration",
+      "notesInFlow": true,
+      "notes": "Purpose: Injects non-secret Drive and verification configuration.\nInput: Complete transcript model.\nOutput: Model plus folder and verification base URL.\nError behaviour: Blank folder safely uses My Drive root."
+    },
+    {
+      "parameters": {
+        "jsCode": "const x=$json;\nconst m=x.transcript_model||{};\nconst esc=(v)=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[c]));\nconst terms=Array.isArray(m.terms)?m.terms:[];\nconst courseRows=terms.map(term=>{\n  const courses=Array.isArray(term.courses)?term.courses:[];\n  const rows=courses.map(c=>`<tr><td>${esc(c.course_code)}</td><td>${esc(c.course_title)}</td><td class=\"num\">${esc(c.credit_hours)}</td><td class=\"num\">${esc(c.total_score)}</td><td class=\"center\">${esc(c.letter_grade)}</td><td class=\"num\">${esc(c.grade_point)}</td><td>${esc(c.outcome_code)}</td></tr>`).join('');\n  const sr=term.semester_result||{};\n  return `<div class=\"term\"><h3>${esc(term.term_name)} (${esc(term.term_code)}) — ${esc(term.academic_year)}</h3><table><thead><tr><th>Course</th><th>Title</th><th>Credits</th><th>Score</th><th>Grade</th><th>GP</th><th>Outcome</th></tr></thead><tbody>${rows||'<tr><td colspan=\"7\">No published courses</td></tr>'}</tbody></table><div class=\"term-summary\"><span>Attempted credits: <b>${esc(sr.attempted_credits)}</b></span><span>Earned credits: <b>${esc(sr.earned_credits)}</b></span><span>GPA: <b>${esc(sr.gpa)}</b></span><span>Standing: <b>${esc(sr.standing_code)}</b></span></div></div>`;\n}).join('');\nconst cumulative=m.cumulative||{};\nconst institution=m.institution||{};\nconst campus=m.campus||{};\nconst student=m.student||{};\nconst program=m.program||{};\nconst logo=institution.logo_url?`<img class=\"logo\" src=\"${esc(institution.logo_url)}\" alt=\"Institution logo\">`:`<div class=\"logo-fallback\">${esc((institution.code||'SIS').slice(0,6))}</div>`;\nconst html=`<!doctype html><html><head><meta charset=\"utf-8\"><style>\n@page{size:A4;margin:18mm}body{font-family:Arial,sans-serif;color:#172033;font-size:10.5pt;line-height:1.35}header{display:flex;align-items:center;border-bottom:3px solid #243b64;padding-bottom:12px;margin-bottom:16px}.logo{width:72px;height:72px;object-fit:contain;margin-right:16px}.logo-fallback{width:72px;height:72px;border:2px solid #243b64;display:flex;align-items:center;justify-content:center;font-weight:700;margin-right:16px}.title h1{font-size:20pt;margin:0;color:#172b4d}.title p{margin:3px 0}.badge{margin-left:auto;text-align:right}.badge strong{display:block;font-size:12pt}.section{border:1px solid #c8d1df;padding:10px;margin:10px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px}.label{color:#5b6678}.term{page-break-inside:avoid;margin-top:16px}.term h3{background:#e9eef6;padding:7px;margin:0}table{border-collapse:collapse;width:100%;font-size:9.3pt}th,td{border:1px solid #aeb9c8;padding:5px}th{background:#243b64;color:#fff}.num{text-align:right}.center{text-align:center}.term-summary,.summary{display:flex;gap:18px;flex-wrap:wrap;background:#f3f6fa;padding:7px}.footer{margin-top:18px;border-top:1px solid #aeb9c8;padding-top:10px;font-size:8.5pt;color:#4b5565}.watermark{font-weight:700;color:#9a3412}.verify{word-break:break-all}\n</style></head><body>\n<header>${logo}<div class=\"title\"><h1>${esc(institution.name)}</h1><p>${esc(campus.name)}${campus.city?', '+esc(campus.city):''}</p><p>ACADEMIC TRANSCRIPT</p></div><div class=\"badge\"><strong>${esc(m.reference_number)}</strong><span>Issue date: ${esc(m.issue_date)}</span></div></header>\n<div class=\"section grid\"><div><span class=\"label\">Student name:</span> <b>${esc(student.full_name)}</b></div><div><span class=\"label\">Student number:</span> <b>${esc(student.student_number)}</b></div><div><span class=\"label\">Program:</span> ${esc(program.name)} (${esc(program.code)})</div><div><span class=\"label\">Level:</span> ${esc(program.level_name)}</div><div><span class=\"label\">Student status:</span> ${esc(student.status)}</div><div><span class=\"label\">Academic model:</span> ${esc(program.academic_model)}</div></div>\n${courseRows||'<div class=\"section\">No published academic record is available.</div>'}\n<div class=\"summary\"><span>Total attempted credits: <b>${esc(cumulative.attempted_credits)}</b></span><span>Total earned credits: <b>${esc(cumulative.earned_credits)}</b></span><span>CGPA: <b>${esc(cumulative.cgpa)}</b></span><span>Academic standing: <b>${esc(cumulative.standing_code)}</b></span></div>\n<div class=\"section\"><b>Verification code:</b> ${esc(m.verification_code)}</div>\n<div class=\"footer\"><div class=\"watermark\">CONTROLLED PILOT / DEMONSTRATION DOCUMENT</div><p>${esc(m.disclaimer||'')}</p><p>This transcript was generated from published academic records. Alteration invalidates the document.</p></div>\n</body></html>`;\nconst safeRef=String(m.reference_number||'transcript').replace(/[^A-Za-z0-9_-]+/g,'-');\nconst docName=`${safeRef} - ${student.student_number||'student'} - Transcript`;\nconst pdfName=`${safeRef}-${student.student_number||'student'}.pdf`;\nconst boundary='sis-05-transcript-boundary';\nconst metadata={name:docName,mimeType:'application/vnd.google-apps.document'};\nif(x.drive_folder_id) metadata.parents=[x.drive_folder_id];\nconst multipart=`--${boundary}\\r\\nContent-Type: application/json; charset=UTF-8\\r\\n\\r\\n${JSON.stringify(metadata)}\\r\\n--${boundary}\\r\\nContent-Type: text/html; charset=UTF-8\\r\\n\\r\\n${html}\\r\\n--${boundary}--`;\nreturn [{json:{...x, transcript_html:html, google_doc_multipart_body:multipart, multipart_boundary:boundary, google_doc_file_name:docName, pdf_file_name:pdfName}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        -80
+      ],
+      "id": "9d6e8559-1a34-4342-99c4-58d1a32620c9",
+      "name": "Populate Transcript Google Docs Template",
+      "notesInFlow": true,
+      "notes": "Purpose: Renders the configured transcript model into the professional Google Docs HTML template.\nInput: Complete academic model and runtime configuration.\nOutput: HTML, multipart body and artifact names.\nError behaviour: Deterministic rendering; Google API failures route downstream."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,mimeType,webViewLink",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "multipart/related; boundary=sis-05-transcript-boundary",
+        "body": "={{$json.google_doc_multipart_body}}",
+        "options": {
+          "timeout": 60000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2000,
+        -80
+      ],
+      "id": "adea93b5-7682-41ae-bdaa-6d6683a29b3b",
+      "name": "Create Transcript Google Doc",
+      "notesInFlow": true,
+      "notes": "Purpose: Creates a populated Google Docs transcript in the configured Drive folder.\nInput: Rendered multipart HTML document.\nOutput: Google Doc metadata.\nError behaviour: Retries temporary Google failures three times; permanent errors route to failure recording.",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "name": "Google Drive account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "continueOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx=$('Populate Transcript Google Docs Template').item.json;\nconst raw=$json||{};\nconst status=Number(raw.statusCode||raw.status||0);\nlet body=raw.body!==undefined?raw.body:raw;\nif(typeof body==='string'){try{body=JSON.parse(body);}catch{}}\nif(body&&typeof body.data==='object'){body=body.data}\nconst files=Array.isArray(body?.files)?body.files:[];\nconst file=files[0]||null;\nconst failed=Boolean(raw.error||raw.errorMessage||status>=400||!file?.id);\nreturn [{json:{...ctx,google_doc_created:!failed,google_doc_id:file?.id||null,google_doc_url:file?.webViewLink||null,external_error:failed?{code:'GOOGLE_DOC_RESOLUTION_FAILED',message:'The transcript Google Doc was created but its Drive file ID could not be resolved.',retryable:status===429||status>=500,stage:'google_doc_resolve'}:null}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2480,
+        -80
+      ],
+      "id": "65d5ffed-fc8c-4e72-adc7-43866a126596",
+      "name": "Classify Google Doc Creation",
+      "notesInFlow": true,
+      "notes": "Purpose: Classifies Google Doc creation.\nInput: Drive API response.\nOutput: Google Doc ID or sanitized external failure.\nError behaviour: No retry; HTTP node owns retries."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "223e5e83-d2da-4bbd-bd17-947be6b99989",
+              "leftValue": "={{$json.google_doc_created}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2720,
+        -80
+      ],
+      "id": "f22aa7c0-9422-4669-ab29-90392f3ee511",
+      "name": "Google Doc Created?",
+      "notesInFlow": true,
+      "notes": "Purpose: Routes successful Google Doc creation.\nInput: Classified Doc response.\nOutput: PDF export or failure branch.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{'https://www.googleapis.com/drive/v3/files/' + encodeURIComponent($json.google_doc_id) + '/export?mimeType=' + encodeURIComponent('application/pdf')}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/pdf"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000,
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "pdf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2960,
+        -80
+      ],
+      "id": "2b7d01c6-f714-4c41-8f41-2f5d938046a0",
+      "name": "Export Transcript PDF",
+      "notesInFlow": true,
+      "notes": "Purpose: Exports the populated Google Doc as PDF bytes.\nInput: Google Doc ID.\nOutput: Binary property pdf.\nError behaviour: Retries temporary Google failures three times.",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "name": "Google Drive account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "continueOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx=$('Classify Google Doc Creation').item.json;\nconst item=$input.first();\nconst hasPdf=Boolean(item.binary&&item.binary.pdf&&Number(item.binary.pdf.fileSize||0)!==0);\nreturn [{json:{...ctx,pdf_exported:hasPdf,external_error:hasPdf?null:{code:'GOOGLE_PDF_EXPORT_FAILED',message:'The transcript PDF could not be exported.',retryable:true,stage:'pdf_export'}},binary:item.binary||{}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3200,
+        -80
+      ],
+      "id": "6cf0dc6e-b8d2-425a-a337-baaa7d4b5f2c",
+      "name": "Validate Exported PDF",
+      "notesInFlow": true,
+      "notes": "Purpose: Verifies that Google returned a PDF binary.\nInput: Export response and prior context.\nOutput: PDF context plus binary.\nError behaviour: Missing binary routes to failure recording."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "df08fbe6-5c73-4024-aed4-ba81a3b6190d",
+              "leftValue": "={{$json.pdf_exported}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3440,
+        -80
+      ],
+      "id": "46362aea-4180-4608-b320-7c9773fb87fa",
+      "name": "PDF Exported?",
+      "notesInFlow": true,
+      "notes": "Purpose: Routes valid PDF binaries.\nInput: Validated PDF.\nOutput: Hash/upload or failure branch.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "action": "hash",
+        "type": "SHA256",
+        "binaryData": true,
+        "binaryPropertyName": "pdf",
+        "dataPropertyName": "checksum_sha256",
+        "encoding": "hex"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [
+        3680,
+        -80
+      ],
+      "id": "24396a69-02dc-4762-9438-1e8780f74c6b",
+      "name": "Compute Transcript PDF SHA256",
+      "notesInFlow": true,
+      "notes": "Purpose: Computes the PDF SHA-256 checksum.\nInput: Binary property pdf.\nOutput: checksum_sha256 plus PDF binary.\nError behaviour: Hashing failure stops before document registration."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/upload/drive/v3/files?uploadType=media&fields=id,name,mimeType,webViewLink,webContentLink",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/pdf"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "pdf",
+        "options": {
+          "timeout": 60000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3920,
+        80
+      ],
+      "id": "7149ab36-d2cd-4eae-9478-ed3b79ac5432",
+      "name": "Upload Transcript PDF",
+      "notesInFlow": true,
+      "notes": "Purpose: Uploads the exported PDF bytes to Google Drive.\nInput: PDF binary and checksum context.\nOutput: Uploaded Drive PDF metadata.\nError behaviour: Retries temporary Google failures three times.",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "name": "Google Drive account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "continueOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx=$('Compute Transcript PDF SHA256').item.json;\nconst raw=$json||{};\nconst status=Number(raw.statusCode||raw.status||0);\nlet body=raw.body!==undefined?raw.body:raw;\nif(typeof body==='string'){try{body=JSON.parse(body);}catch{}}\nif(body&&typeof body.data==='object'){body=body.data}\nconst files=Array.isArray(body?.files)?body.files:[];\nconst file=files[0]||null;\nconst failed=Boolean(raw.error||raw.errorMessage||status>=400||!file?.id);\nreturn [{json:{...ctx,pdf_uploaded:!failed,pdf_drive_file_id:file?.id||null,pdf_initial_url:file?.webViewLink||file?.webContentLink||null,external_error:failed?{code:'GOOGLE_PDF_RESOLUTION_FAILED',message:'The transcript PDF was uploaded but its Drive file ID could not be resolved.',retryable:status===429||status>=500,stage:'pdf_resolve'}:null}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4160,
+        -80
+      ],
+      "id": "89604cc5-084a-4dd3-a54a-c2469258aaa7",
+      "name": "Classify PDF Upload",
+      "notesInFlow": true,
+      "notes": "Purpose: Classifies Drive PDF upload.\nInput: Drive upload response.\nOutput: PDF file ID or sanitized failure.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3b2a140f-a14d-4ce5-b4d0-12ac66b38582",
+              "leftValue": "={{$json.pdf_uploaded}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4400,
+        -80
+      ],
+      "id": "d438b597-a1bd-4881-b10e-d4dd753eff25",
+      "name": "PDF Uploaded?",
+      "notesInFlow": true,
+      "notes": "Purpose: Routes stored PDF artifacts.\nInput: Classified PDF upload.\nOutput: Metadata update or failure branch.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{'https://www.googleapis.com/drive/v3/files/' + encodeURIComponent($json.pdf_drive_file_id) + '?fields=id,name,mimeType,webViewLink,webContentLink' + ($json.drive_folder_id ? '&addParents=' + encodeURIComponent($json.drive_folder_id) : '')}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { name:$json.pdf_file_name } }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4640,
+        -80
+      ],
+      "id": "8fed1231-18f4-409f-8b77-7177a5073522",
+      "name": "Finalize Transcript PDF Metadata",
+      "notesInFlow": true,
+      "notes": "Purpose: Names the PDF and places it in the configured Drive folder.\nInput: Uploaded PDF ID, filename and optional parent.\nOutput: Final Drive metadata and links.\nError behaviour: Retries temporary Google failures three times.",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "name": "Google Drive account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2500,
+      "continueOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx=$('Classify PDF Upload').item.json;\nconst raw=$json||{};\nconst status=Number(raw.statusCode||raw.status||0);\nlet body=raw.body!==undefined?raw.body:raw;\nif(typeof body==='string'){try{body=JSON.parse(body);}catch{}}\nif(body&&typeof body.data==='object'){body=body.data}\nconst failed=Boolean(raw.error||raw.errorMessage||status>=400);\nconst url=body?.webViewLink||body?.webContentLink||ctx.pdf_initial_url||(ctx.pdf_drive_file_id?`https://drive.google.com/file/d/${ctx.pdf_drive_file_id}/view`:null);\nreturn [{json:{...ctx,artifact_ready:!failed,pdf_file_url:url,pdf_drive_file_id:body?.id||ctx.pdf_drive_file_id,external_error:failed?{code:'GOOGLE_PDF_METADATA_FAILED',message:'The transcript PDF was uploaded but its Drive metadata could not be finalized.',retryable:status===429||status>=500,stage:'pdf_metadata'}:null}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4880,
+        -80
+      ],
+      "id": "9ece9836-7489-47ff-b285-42ca837d137f",
+      "name": "Build Transcript Artifact",
+      "notesInFlow": true,
+      "notes": "Purpose: Builds the final document-registration payload.\nInput: Final Drive metadata.\nOutput: Google Doc ID, PDF ID, URL and checksum.\nError behaviour: Metadata failure routes to request failure recording."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "97eeb2a8-a700-4366-aaf8-4594e51deeb6",
+              "leftValue": "={{$json.artifact_ready}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        5120,
+        -80
+      ],
+      "id": "7aa115a3-3968-487a-8619-8dfb030b002d",
+      "name": "Transcript Artifact Ready?",
+      "notesInFlow": true,
+      "notes": "Purpose: Routes complete document artifacts.\nInput: Artifact context.\nOutput: Database registration or failure branch.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{($env.SIS_SUPABASE_URL || $env.SUPABASE_URL) + '/rest/v1/rpc/rpc_record_transcript_document'}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { p_request:{ operation:'transcript.document.record', correlation_id:$json.correlation_id, institution_id:$json.institution_id, campus_id:$json.campus_id, requester:{type:'system'}, submitted_at:new Date().toISOString(), source:{channel:'workflow05'}, payload:{ transcript_request_id:$json.request_data.transcript_request_id, google_doc_id:$json.google_doc_id, pdf_drive_file_id:$json.pdf_drive_file_id, pdf_file_url:$json.pdf_file_url, checksum_sha256:$json.checksum_sha256, file_name:$json.pdf_file_name } } } }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        5360,
+        -80
+      ],
+      "id": "1d5da8af-49d4-4c74-bf8b-2d76473cf11a",
+      "name": "Record Transcript Document RPC",
+      "notesInFlow": true,
+      "notes": "Purpose: Records the Google Doc/PDF once and creates the transcript-ready outbox job.\nInput: Complete artifact metadata.\nOutput: Transcript document, delivery and outbox IDs.\nError behaviour: Temporary transport failures retry twice; idempotency is enforced in PostgreSQL.",
+      "credentials": {
+        "supabaseApi": {
+          "name": "SIS Supabase Service Role"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500,
+      "continueOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx=$('Build Transcript Artifact').item.json;\nconst raw=$json||{};\nconst status=Number(raw.statusCode||raw.status||0);\nlet body=raw.body!==undefined?raw.body:raw;\nif(typeof body==='string'){try{body=JSON.parse(body);}catch{}}\nif(body&&typeof body.data==='object'&&body.success===undefined){body=body.data}\nconst rpc=Array.isArray(body)?(body[0]||{}):(body||{});\nconst success=rpc.success===true&&!(raw.error||raw.errorMessage||(status>=400&&!rpc.success));\nconst error=rpc.error||{};\nreturn [{json:{...ctx,document_recorded:success,record_rpc:rpc,record_data:rpc.data||{},external_error:success?null:{code:error.code||'TRANSCRIPT_DOCUMENT_RECORD_FAILED',message:error.message||'The transcript document could not be registered.',retryable:Boolean(error.retryable||status>=500),stage:'document_record'}}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5600,
+        -80
+      ],
+      "id": "5a99c005-6b6d-47b6-87c5-c4699a2a8543",
+      "name": "Classify Document Registration",
+      "notesInFlow": true,
+      "notes": "Purpose: Classifies idempotent transcript document registration.\nInput: Record RPC response.\nOutput: Registered IDs or sanitized failure.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1de443f0-6948-4d12-9c5d-7bec9f18421a",
+              "leftValue": "={{$json.document_recorded}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        5600,
+        -80
+      ],
+      "id": "207f0f21-25be-4859-bb0b-eb50e5b834f2",
+      "name": "Transcript Document Recorded?",
+      "notesInFlow": true,
+      "notes": "Purpose: Routes registered transcript artifacts.\nInput: Classified registration.\nOutput: Success or failure-recording branch.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "jsCode": "const x=$json;\nconst d=x.record_data||{};\nreturn [{json:{\n  success:true,\n  operation:'transcript.delivery.complete',\n  correlation_id:x.correlation_id,\n  idempotency_key:x.idempotency_key,\n  data:{\n    transcript_request_id:d.transcript_request_id||x.request_data.transcript_request_id,\n    reference_number:x.transcript_model.reference_number||x.request_data.reference_number,\n    verification_code:x.transcript_model.verification_code||x.request_data.verification_code||null,\n    transcript_document_id:d.transcript_document_id||null,\n    google_doc_id:x.google_doc_id,\n    google_doc_url:x.google_doc_url||null,\n    pdf_drive_file_id:x.pdf_drive_file_id,\n    pdf_file_url:x.pdf_file_url,\n    checksum_sha256:x.checksum_sha256,\n    delivery_record_id:d.delivery_record_id||null,\n    outbox_id:d.outbox_id||null,\n    status:d.status||'ready',\n    delivery_status:'queued',\n    document_reused:Boolean(d.already_recorded)\n  },\n  warnings:[]\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5840,
+        -160
+      ],
+      "id": "33410bf4-a0d4-4958-ab5e-e46e374c5731",
+      "name": "Build Transcript Completion Response",
+      "notesInFlow": true,
+      "notes": "Purpose: Builds the standard successful Workflow 05 response.\nInput: Registered transcript artifact.\nOutput: Request/reference/Drive/delivery metadata.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "jsCode": "const x=$json||{};\nconst req=(x.request_data&&x.request_data.transcript_request_id)?x.request_data.transcript_request_id:null;\nconst err=x.external_error||x.public_error||{code:'TRANSCRIPT_EXTERNAL_FAILURE',message:'The transcript could not be completed.',retryable:false,stage:'unknown'};\nreturn [{json:{...x, transcript_request_id:req, failure_error:err, response_code:err.retryable?502:422}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5120,
+        360
+      ],
+      "id": "667b3d6f-6a27-4711-a09b-70e6ada9ffe7",
+      "name": "Prepare Transcript Failure",
+      "notesInFlow": true,
+      "notes": "Purpose: Normalizes external/document failure context for durable recording.\nInput: Any failed Google or document-registration branch.\nOutput: Sanitized failure and request ID.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{($env.SIS_SUPABASE_URL || $env.SUPABASE_URL) + '/rest/v1/rpc/rpc_mark_transcript_request_failed'}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { p_request:{ operation:'transcript.request.fail', correlation_id:$json.correlation_id, institution_id:$json.institution_id, campus_id:$json.campus_id, requester:{type:'system'}, submitted_at:new Date().toISOString(), source:{channel:'workflow05'}, payload:{ transcript_request_id:$json.transcript_request_id, error_code:$json.failure_error.code, error_message:$json.failure_error.message, stage:$json.failure_error.stage } } } }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        5360,
+        360
+      ],
+      "id": "b73c0d31-47bd-4b50-b644-43310a00febe",
+      "name": "Record Transcript Failure RPC",
+      "notesInFlow": true,
+      "notes": "Purpose: Best-effort records the failed transcript request and audit evidence.\nInput: Normalized failure with request ID.\nOutput: Failure-recording RPC response.\nError behaviour: Recording failure never replaces the primary sanitized error.",
+      "credentials": {
+        "supabaseApi": {
+          "name": "SIS Supabase Service Role"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500,
+      "continueOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const x=$('Prepare Transcript Failure').item.json;\nreturn [{json:{\n success:false,\n operation:'transcript.delivery.complete',\n correlation_id:x.correlation_id,\n idempotency_key:x.idempotency_key,\n error:{\n   code:x.failure_error.code||'TRANSCRIPT_EXTERNAL_FAILURE',\n   message:x.failure_error.message||'The transcript could not be completed.',\n   retryable:Boolean(x.failure_error.retryable)\n }\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5600,
+        360
+      ],
+      "id": "0045eb7a-93f6-4ada-bc88-d3784105fd8f",
+      "name": "Build Transcript Failure Response",
+      "notesInFlow": true,
+      "notes": "Purpose: Builds the standard sanitized Workflow 05 failure response.\nInput: Primary failure plus best-effort recording result.\nOutput: Standard error JSON.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}",
+        "options": {
+          "responseCode": 502
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        5840,
+        360
+      ],
+      "id": "f6c03d70-48dd-42f5-b91e-1d17697774c6",
+      "name": "Respond Transcript External Failure",
+      "notesInFlow": true,
+      "notes": "Purpose: Returns a retry-aware external-service failure.\nInput: Standard failure response.\nOutput: HTTP 502 JSON.\nError behaviour: No retry."
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ (() => { const c=$('Populate Transcript Google Docs Template').item.json; const esc=String(c.google_doc_file_name||'').replace(/'/g,\"\\\\'\"); const since=new Date(new Date(c.submitted_at).getTime()-300000).toISOString(); const q=`name = '${esc}' and mimeType = 'application/vnd.google-apps.document' and trashed = false and createdTime >= '${since}'`; return 'https://www.googleapis.com/drive/v3/files?spaces=drive&pageSize=10&orderBy=createdTime%20desc&fields=' + encodeURIComponent('files(id,name,mimeType,webViewLink,createdTime)') + '&q=' + encodeURIComponent(q); })() }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2240,
+        -80
+      ],
+      "id": "814df582-bb91-4972-8b38-b8fc16b96562",
+      "name": "Resolve Created Google Doc",
+      "notesInFlow": true,
+      "notes": "Resolves the Google Doc by exact deterministic filename and current request time when the upload endpoint returns an empty n8n item.",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "name": "Google Drive account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "continueOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ (() => { const c=$('Compute Transcript PDF SHA256').item.json; const since=new Date(new Date(c.submitted_at).getTime()-300000).toISOString(); const q=`mimeType = 'application/pdf' and trashed = false and createdTime >= '${since}'`; return 'https://www.googleapis.com/drive/v3/files?spaces=drive&pageSize=10&orderBy=createdTime%20desc&fields=' + encodeURIComponent('files(id,name,mimeType,webViewLink,webContentLink,createdTime)') + '&q=' + encodeURIComponent(q); })() }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3920,
+        -80
+      ],
+      "id": "2c0051f7-7c1c-4293-a1f5-4902747de49c",
+      "name": "Resolve Uploaded Transcript PDF",
+      "notesInFlow": true,
+      "notes": "Resolves the newest PDF created by the current request when the Drive media upload endpoint returns an empty n8n item. Controlled-pilot fallback.",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "name": "Google Drive account"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "continueOnFail": true,
+      "alwaysOutputData": true
+    }
+  ],
+  "connections": {
+    "Transcript Request Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Transcript Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Transcript Request": {
+      "main": [
+        [
+          {
+            "node": "Request Envelope Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Envelope Valid?": {
+      "main": [
+        [
+          {
+            "node": "Validate Supabase User",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Invalid Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Supabase User": {
+      "main": [
+        [
+          {
+            "node": "Classify Supabase User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Supabase User": {
+      "main": [
+        [
+          {
+            "node": "User Authenticated?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Authenticated?": {
+      "main": [
+        [
+          {
+            "node": "Create Transcript Request RPC",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Unauthorized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Transcript Request RPC": {
+      "main": [
+        [
+          {
+            "node": "Classify Transcript Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Transcript Request": {
+      "main": [
+        [
+          {
+            "node": "Transcript Request Created?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcript Request Created?": {
+      "main": [
+        [
+          {
+            "node": "Reusable Document Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Transcript Business Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reusable Document Exists?": {
+      "main": [
+        [
+          {
+            "node": "Build Reused Document Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Transcript Model RPC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Reused Document Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Transcript Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Transcript Model RPC": {
+      "main": [
+        [
+          {
+            "node": "Classify Transcript Model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Transcript Model": {
+      "main": [
+        [
+          {
+            "node": "Transcript Model Ready?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcript Model Ready?": {
+      "main": [
+        [
+          {
+            "node": "Set Transcript Runtime Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Transcript Business Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Transcript Runtime Configuration": {
+      "main": [
+        [
+          {
+            "node": "Populate Transcript Google Docs Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Populate Transcript Google Docs Template": {
+      "main": [
+        [
+          {
+            "node": "Create Transcript Google Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Transcript Google Doc": {
+      "main": [
+        [
+          {
+            "node": "Resolve Created Google Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Google Doc Creation": {
+      "main": [
+        [
+          {
+            "node": "Google Doc Created?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Doc Created?": {
+      "main": [
+        [
+          {
+            "node": "Export Transcript PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Transcript Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Export Transcript PDF": {
+      "main": [
+        [
+          {
+            "node": "Validate Exported PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Exported PDF": {
+      "main": [
+        [
+          {
+            "node": "PDF Exported?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF Exported?": {
+      "main": [
+        [
+          {
+            "node": "Compute Transcript PDF SHA256",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Transcript Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Transcript PDF SHA256": {
+      "main": [
+        [
+          {
+            "node": "Upload Transcript PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Transcript PDF": {
+      "main": [
+        [
+          {
+            "node": "Resolve Uploaded Transcript PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify PDF Upload": {
+      "main": [
+        [
+          {
+            "node": "PDF Uploaded?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF Uploaded?": {
+      "main": [
+        [
+          {
+            "node": "Finalize Transcript PDF Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Transcript Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finalize Transcript PDF Metadata": {
+      "main": [
+        [
+          {
+            "node": "Build Transcript Artifact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Transcript Artifact": {
+      "main": [
+        [
+          {
+            "node": "Transcript Artifact Ready?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcript Artifact Ready?": {
+      "main": [
+        [
+          {
+            "node": "Record Transcript Document RPC",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Transcript Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Transcript Document RPC": {
+      "main": [
+        [
+          {
+            "node": "Classify Document Registration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Document Registration": {
+      "main": [
+        [
+          {
+            "node": "Transcript Document Recorded?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcript Document Recorded?": {
+      "main": [
+        [
+          {
+            "node": "Build Transcript Completion Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Transcript Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Transcript Completion Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Transcript Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Transcript Failure": {
+      "main": [
+        [
+          {
+            "node": "Record Transcript Failure RPC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Transcript Failure RPC": {
+      "main": [
+        [
+          {
+            "node": "Build Transcript Failure Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Transcript Failure Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Transcript External Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve Created Google Doc": {
+      "main": [
+        [
+          {
+            "node": "Classify Google Doc Creation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve Uploaded Transcript PDF": {
+      "main": [
+        [
+          {
+            "node": "Classify PDF Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "versionId": "ef15770a-f689-48ae-851d-403637badbe3",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}
