@@ -1,0 +1,66 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  Line-ending normalisation
+#  ─────────────────────────────────────────────────────────────────────────
+#  Without this file, a Windows checkout writes CRLF into the working tree
+#  while git stores LF, so every previously-committed file reports as fully
+#  modified — 23 insertions and 23 deletions on a 23-line file. That makes
+#  diffs unreadable and merges between collaborators needlessly painful.
+#
+#  `text=auto eol=lf` tells git to store LF in the repository and check out
+#  LF everywhere. Editors on Windows (VS Code, PyCharm, modern Notepad) all
+#  handle LF correctly.
+# ═══════════════════════════════════════════════════════════════════════════
+
+* text=auto eol=lf
+
+# ── Explicit text types ───────────────────────────────────────────────────
+*.py      text eol=lf
+*.pyi     text eol=lf
+*.js      text eol=lf
+*.jsx     text eol=lf
+*.ts      text eol=lf
+*.tsx     text eol=lf
+*.css     text eol=lf
+*.html    text eol=lf
+*.json    text eol=lf
+*.md      text eol=lf
+*.txt     text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.toml    text eol=lf
+*.ini     text eol=lf
+*.cfg     text eol=lf
+*.tex     text eol=lf
+*.svg     text eol=lf
+.env.example text eol=lf
+.gitignore   text eol=lf
+
+# ── Windows-only scripts keep CRLF, or cmd.exe misparses them ────────────
+*.bat     text eol=crlf
+*.cmd     text eol=crlf
+*.ps1     text eol=crlf
+
+# ── Shell scripts must keep LF, or bash reports "bad interpreter" ────────
+*.sh      text eol=lf
+
+# ── Binary: never diff, never convert ────────────────────────────────────
+*.pdf     binary
+*.docx    binary
+*.xlsx    binary
+*.pptx    binary
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.ico     binary
+*.woff    binary
+*.woff2   binary
+*.ttf     binary
+*.otf     binary
+*.zip     binary
+*.gz      binary
+*.sqlite3 binary
+*.db      binary
+
+# ── Generated: collapse in pull-request diffs ────────────────────────────
+package-lock.json  linguist-generated=true -diff

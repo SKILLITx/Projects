@@ -1,0 +1,214 @@
+\documentclass[12pt, a4paper]{article}
+
+\usepackage[top=2.5cm, bottom=2.5cm, left=3cm, right=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{parskip}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{amssymb}
+
+\definecolor{primary}{RGB}{15, 45, 82}
+\definecolor{accent}{RGB}{0, 112, 164}
+\definecolor{gold}{RGB}{180, 140, 60}
+\definecolor{darkgray}{RGB}{75, 75, 75}
+\definecolor{lightgray}{RGB}{245, 245, 245}
+
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries\color{primary}}{\thesection}{0.6em}{}
+[\vspace{-4pt}\color{primary}\rule{\linewidth}{0.6pt}]
+\titleformat{\subsection}{\normalsize\bfseries\color{accent}}{\thesubsection}{0.6em}{}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{darkgray} Legal RAG System \textendash{} Client Proposal}
+\fancyhead[R]{\small\color{darkgray} Confidential}
+\fancyfoot[C]{\small\color{darkgray}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\newtcolorbox{highlight}[1]{
+  colback=accent!7, colframe=accent, boxrule=0.5pt,
+  fonttitle=\bfseries\small\color{white}, title=#1,
+  arc=4pt, left=7pt, right=7pt
+}
+\newtcolorbox{goldbox}[1]{
+  colback=gold!8, colframe=gold, boxrule=0.5pt,
+  fonttitle=\bfseries\small\color{white}, title=#1,
+  arc=4pt, left=7pt, right=7pt
+}
+
+\hypersetup{colorlinks=true, linkcolor=accent, urlcolor=accent}
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+\vspace*{1.5cm}
+{\color{primary}\rule{\textwidth}{2.5pt}}
+\vspace{0.6cm}
+
+{\Huge\bfseries\color{primary} Legal RAG System}\\[0.4cm]
+{\LARGE\color{accent} Service Proposal}\\[0.3cm]
+{\large AI-Powered Due Diligence for Pakistani Law Firms}
+
+{\color{primary}\rule{\textwidth}{0.5pt}}
+\vspace{1.5cm}
+
+\begin{tabular}{@{}ll@{}}
+  \textbf{Prepared for}  & [Firm Name] \\[0.2cm]
+  \textbf{Prepared by}   & Pair B --- AI/ML Internship, skillSYNC \\[0.2cm]
+  \textbf{Date}          & \today \\[0.2cm]
+  \textbf{Valid until}   & 30 days from date of issue \\[0.2cm]
+  \textbf{Confidential}  & For addressee only \\
+\end{tabular}
+
+\vfill
+{\color{primary}\rule{\textwidth}{2.5pt}}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Executive Summary}
+
+\begin{highlight}{The Offer in One Sentence}
+We will deploy an AI-powered due diligence system at your firm that compresses
+5--7 day property review turnaround to \textbf{same-day delivery} at a cost of
+\textbf{PKR 35,000 per month} --- replacing over PKR 500,000 per month in
+senior associate time.
+\end{highlight}
+
+Your firm currently spends significant senior associate time on first-pass document
+review --- work that is slow, inconsistent, and below the capability level of your
+qualified lawyers. Our system automates this first pass entirely, producing a
+structured review memorandum with clause-by-clause findings, red flag alerts, and
+statutory citations in under 5 minutes.
+
+\section{What We Are Proposing}
+
+\subsection{The System}
+
+The Legal RAG System is a Retrieval-Augmented Generation document review platform
+built specifically for Pakistani legal due diligence. It is not an off-the-shelf
+international product --- it is configured for Pakistani law, Pakistani document
+formats, and Pakistani regulatory requirements.
+
+\begin{itemize}
+  \item Accepts your PDF document bundle (property deeds, NOCs, CNICs, tax receipts)
+  \item Runs 15+ due diligence questions automatically
+  \item Cross-references every finding against Pakistani statutes and the Constitution
+  \item Generates a branded review memorandum with your firm's letterhead
+  \item Allows your lawyer to ask additional questions in natural language
+\end{itemize}
+
+\subsection{What Makes It Specific to Pakistan}
+
+\begin{itemize}
+  \item \textbf{Pakistani statutory corpus:} Constitution of Pakistan 1973,
+    Transfer of Property Act 1882, Registration Act 1908, Stamp Act 1899,
+    Companies Act 2017, Muslim Family Laws Ordinance 1961, Benami Transactions
+    (Prohibition) Act 2017, Anti-Money Laundering Act 2010
+  \item \textbf{Urdu document support:} Handles mixed Urdu-English documents,
+    Fard-e-Malkiat, Intiqal, and Khasra references natively
+  \item \textbf{City-specific NOC requirements:} Separate profiles for CDA
+    (Islamabad), RDA (Rawalpindi), LDA (Lahore), SBCA (Karachi)
+  \item \textbf{FBR compliance:} Automatic Section 236C/236K withholding tax
+    checks for transactions above PKR 5 million
+  \item \textbf{Inheritance detection:} Automatically triggers succession
+    compliance checklist when inherited property is detected
+\end{itemize}
+
+\section{Pricing}
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{lXXX}
+\toprule
+\textbf{Feature}
+  & \textbf{Starter}
+  & \textbf{Professional}
+  & \textbf{Enterprise} \\
+\midrule
+Monthly price (PKR)  & 15,000   & 35,000    & 70,000    \\
+Monthly reviews      & 25       & 100       & Unlimited \\
+Transaction types    & Property & All 3     & All 3     \\
+Custom checklist     & ---      & \checkmark & \checkmark \\
+Firm letterhead      & ---      & \checkmark & \checkmark \\
+API access           & ---      & ---       & \checkmark \\
+SLA guarantee        & ---      & ---       & \checkmark \\
+\bottomrule
+\end{tabularx}
+\caption{SaaS Pricing Tiers}
+\end{table}
+
+\begin{goldbox}{Return on Investment --- Professional Tier}
+At PKR 35,000 per month, a firm processing 50 reviews per month replaces
+approximately PKR 500,000 per month in senior associate time.
+\textbf{This is a 14$\times$ return in month one.} Even at 10 reviews per month,
+the subscription pays for itself within the first week via time savings alone.
+\end{goldbox}
+
+\section{Onboarding Timeline}
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{lXl}
+\toprule
+\textbf{Day} & \textbf{Activity} & \textbf{Owner} \\
+\midrule
+Day 1 & Subscription confirmed, access credentials provided & Us \\
+Day 2 & System installed on firm's machine or server & Us \\
+Day 2 & Firm letterhead and checklist configured & Joint \\
+Day 3 & 30-minute staff training session & Us \\
+Day 3 & First live review conducted with firm staff & Joint \\
+Day 5 & Feedback collected and refinements applied & Us \\
+Day 7 & System fully operational & Firm \\
+\bottomrule
+\end{tabularx}
+\caption{Onboarding Schedule (7 Days)}
+\end{table}
+
+\section{What Is Included}
+
+\begin{itemize}
+  \item Full system installation and configuration
+  \item Firm letterhead integration on all memo outputs
+  \item Custom checklist configuration for your transaction types
+  \item 30-minute staff training
+  \item 30 days of support via WhatsApp
+  \item Monthly system updates
+\end{itemize}
+
+\section{Next Steps}
+
+To proceed, please confirm the following by reply email or WhatsApp:
+
+\begin{enumerate}
+  \item Preferred pricing tier (Starter / Professional / Enterprise)
+  \item Primary transaction type (Property / Loan / Acquisition)
+  \item Onboarding start date
+  \item Name of the contact person for technical setup
+\end{enumerate}
+
+\vspace{1cm}
+\begin{center}
+  {\color{primary}\rule{0.5\textwidth}{0.5pt}}\\[0.3cm]
+  {\small\color{darkgray}
+  Legal RAG System \textperiodcentered{}
+  Pair B \textperiodcentered{}
+  AI/ML Internship Program \textperiodcentered{}
+  skillSYNC}\\[0.15cm]
+  {\small\color{darkgray} Confidential \textperiodcentered{}
+  Valid 30 days from date of issue}
+\end{center}
+
+\end{document}

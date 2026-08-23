@@ -1,0 +1,17 @@
+Layer 1 — User Interface: React + Vite frontend. The lawyer uploads a PDF bundle (multi-file, drag-and-drop), selects transaction type (property/loan/acquisition), and clicks "Run Review." A live progress bar shows pipeline status. On completion, a download button delivers the Word and PDF memo.
+
+Layer 2 — Backend Orchestration: FastAPI (Python 3.11+). Receives the uploaded files, manages session state, orchestrates all downstream calls, and serves the final output file. Runs on port 8000 with CORS enabled for the React dev server.
+
+Layer 3 — Document Processing: pdfplumber for text-based PDFs. If text extraction returns empty or sparse content (scanned documents), falls back automatically to pdf2image + pytesseract OCR. Output: clean UTF-8 text per page with page-number metadata preserved.
+
+Layer 4 — Chunking: LlamaIndex SentenceSplitter with chunk_size=512, chunk_overlap=50. Metadata per chunk includes source filename, page number, and chunk index. This overlap ensures clause boundaries don't get split across chunks.
+
+Layer 5 — Embedding: HuggingFace sentence-transformers/all-MiniLM-L6-v2 running locally (no API cost, no rate limits). 384-dimensional dense vectors. Fast enough for real-time indexing of 50-page bundles.
+
+Layer 6 — Vector Store: ChromaDB with a persistent local client. One collection per upload session (named with a UUID). Collections are cleaned up after 24 hours.
+
+Layer 7 — Query Engine: LlamaIndex VectorIndexRetriever with similarity_top_k=5. For each of the 15 checklist questions, the engine runs a semantic search against the indexed collection and retrieves the 5 most relevant chunks.
+
+Layer 8 — Generation: The retrieved chunks + question + system prompt are sent to Claude Sonnet 4.6 API (or Groq Llama 3.3 70B during development). The system prompt instructs the LLM to respond in a structured JSON format: {finding, clause_reference, page_number, risk_level, recommendation}. Red flag detection runs on the same pass — any finding with risk_level: "HIGH" is flagged.
+
+Layer 9 — Output: python-docx assembles the Word memo. ReportLab generates a PDF version. The firm's letterhead (logo, address, contact) is injected at the top. The memo structure: cover page → transaction summary → clause-by-clause findings (tabular) → red flags section → missing documents checklist → recommendations.

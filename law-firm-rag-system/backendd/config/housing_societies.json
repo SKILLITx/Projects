@@ -1,0 +1,18 @@
+{
+  "DHA Islamabad": {
+    "transfer_docs": ["DHA Transfer Letter", "DHA NOC", "DHA Affidavit"],
+    "special_requirements": "DHA membership transfer must precede registry"
+  },
+  "DHA Lahore": {
+    "transfer_docs": ["DHA Transfer Letter", "DHA Dues Clearance", "DHA NOC"],
+    "special_requirements": "Outstanding dues clearance mandatory before transfer"
+  },
+  "Bahria Town Rawalpindi": {
+    "transfer_docs": ["Bahria Allocation Letter", "Bahria Transfer Certificate", "Dues Clearance"],
+    "special_requirements": "Dues clearance certificate mandatory"
+  },
+  "Bahria Town Lahore": {
+    "transfer_docs": ["Bahria Allocation Letter", "Bahria Transfer Certificate"],
+    "special_requirements": "Dues clearance and membership verification required"
+  }
+}

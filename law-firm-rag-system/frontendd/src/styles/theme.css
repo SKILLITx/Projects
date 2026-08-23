@@ -1,0 +1,152 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Design tokens
+   ───────────────────────────────────────────────────────────────────────
+   The visual identity from the previous build — deep navy with a legal-gold
+   accent — is kept, because it reads as a law firm rather than a start-up.
+   What changes is the system underneath it: a fluid type scale, a spacing
+   scale, semantic risk colours that satisfy WCAG AA against their own
+   surfaces, and motion that honours prefers-reduced-motion.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Surfaces ─────────────────────────────────────────────────────── */
+  --bg-base:        #070b14;
+  --bg-raised:      #0c1322;
+  --bg-surface:     #111a2c;
+  --bg-card:        rgba(255, 255, 255, 0.035);
+  --bg-card-hover:  rgba(255, 255, 255, 0.06);
+  --bg-input:       rgba(255, 255, 255, 0.045);
+  --bg-overlay:     rgba(4, 7, 14, 0.82);
+
+  /* ── Brand ────────────────────────────────────────────────────────── */
+  --gold:           #c9a84c;
+  --gold-light:     #e8c96a;
+  --gold-dim:       rgba(201, 168, 76, 0.12);
+  --gold-line:      rgba(201, 168, 76, 0.32);
+  --blue:           #4a9eff;
+  --blue-dim:       rgba(74, 158, 255, 0.1);
+  --blue-line:      rgba(74, 158, 255, 0.28);
+
+  /* ── Risk semantics ───────────────────────────────────────────────── */
+  --risk-high:      #ff6b6b;
+  --risk-high-dim:  rgba(255, 107, 107, 0.12);
+  --risk-high-line: rgba(255, 107, 107, 0.34);
+  --risk-med:       #f5a524;
+  --risk-med-dim:   rgba(245, 165, 36, 0.12);
+  --risk-med-line:  rgba(245, 165, 36, 0.32);
+  --risk-low:       #3ddc97;
+  --risk-low-dim:   rgba(61, 220, 151, 0.1);
+  --risk-low-line:  rgba(61, 220, 151, 0.3);
+  --risk-none:      #8892a4;
+  --risk-none-dim:  rgba(136, 146, 164, 0.1);
+  --risk-none-line: rgba(136, 146, 164, 0.26);
+
+  /* ── Text ─────────────────────────────────────────────────────────── */
+  --text-primary:   #eef0f6;
+  --text-secondary: #9aa5b8;
+  --text-muted:     #6b7688;
+  --text-inverse:   #070b14;
+
+  /* ── Lines ────────────────────────────────────────────────────────── */
+  --border:         rgba(255, 255, 255, 0.08);
+  --border-strong:  rgba(255, 255, 255, 0.14);
+  --focus-ring:     #7fc4ff;
+
+  /* ── Elevation ────────────────────────────────────────────────────── */
+  --shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md:  0 8px 28px rgba(0, 0, 0, 0.38), 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-lg:  0 20px 56px rgba(0, 0, 0, 0.5);
+  --shadow-gold: 0 0 32px rgba(201, 168, 76, 0.16);
+
+  /* ── Radii ────────────────────────────────────────────────────────── */
+  --r-xs: 6px;
+  --r-sm: 9px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-full: 999px;
+
+  /* ── Spacing scale ────────────────────────────────────────────────── */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4rem;
+
+  /* ── Fluid type scale ─────────────────────────────────────────────── */
+  --fs-xs:   clamp(0.68rem, 0.66rem + 0.1vw, 0.74rem);
+  --fs-sm:   clamp(0.78rem, 0.75rem + 0.14vw, 0.86rem);
+  --fs-base: clamp(0.88rem, 0.85rem + 0.16vw, 0.96rem);
+  --fs-md:   clamp(1rem, 0.95rem + 0.24vw, 1.12rem);
+  --fs-lg:   clamp(1.15rem, 1.05rem + 0.5vw, 1.45rem);
+  --fs-xl:   clamp(1.4rem, 1.15rem + 1.2vw, 2.1rem);
+  --fs-2xl:  clamp(1.9rem, 1.3rem + 2.8vw, 3.2rem);
+
+  /* ── Layout ───────────────────────────────────────────────────────── */
+  --max-w: 1180px;
+  --header-h: 64px;
+
+  /* ── Motion ───────────────────────────────────────────────────────── */
+  --ease: cubic-bezier(0.32, 0.72, 0.35, 1);
+  --t-fast: 140ms var(--ease);
+  --t-base: 240ms var(--ease);
+  --t-slow: 420ms var(--ease);
+
+  /* ── Fonts ────────────────────────────────────────────────────────── */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+               Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+               'Liberation Mono', monospace;
+
+  color-scheme: dark;
+}
+
+/* Users who prefer a light interface get a genuinely legible one rather
+   than an inverted dark theme. */
+@media (prefers-color-scheme: light) {
+  :root[data-theme='auto'] {
+    --bg-base:       #f6f8fc;
+    --bg-raised:     #ffffff;
+    --bg-surface:    #ffffff;
+    --bg-card:       rgba(20, 60, 110, 0.03);
+    --bg-card-hover: rgba(20, 60, 110, 0.06);
+    --bg-input:      #ffffff;
+    --bg-overlay:    rgba(240, 244, 250, 0.86);
+
+    --gold:       #9a7c22;
+    --gold-light: #7d6417;
+    --gold-dim:   rgba(154, 124, 34, 0.1);
+    --gold-line:  rgba(154, 124, 34, 0.3);
+    --blue:       #0f6fd1;
+    --blue-dim:   rgba(15, 111, 209, 0.08);
+    --blue-line:  rgba(15, 111, 209, 0.26);
+
+    --risk-high:  #b4232a;
+    --risk-high-dim: rgba(180, 35, 42, 0.08);
+    --risk-med:   #9a5b00;
+    --risk-med-dim:  rgba(154, 91, 0, 0.08);
+    --risk-low:   #16704a;
+    --risk-low-dim:  rgba(22, 112, 74, 0.08);
+    --risk-none:  #5a6478;
+    --risk-none-dim: rgba(90, 100, 120, 0.08);
+
+    --text-primary:   #0d1524;
+    --text-secondary: #465064;
+    --text-muted:     #6b7688;
+    --text-inverse:   #ffffff;
+
+    --border:        rgba(13, 21, 36, 0.1);
+    --border-strong: rgba(13, 21, 36, 0.18);
+    --focus-ring:    #0f6fd1;
+
+    --shadow-sm: 0 1px 3px rgba(13, 21, 36, 0.08);
+    --shadow-md: 0 6px 20px rgba(13, 21, 36, 0.09);
+    --shadow-lg: 0 18px 44px rgba(13, 21, 36, 0.13);
+    --shadow-gold: 0 0 24px rgba(154, 124, 34, 0.14);
+
+    color-scheme: light;
+  }
+}

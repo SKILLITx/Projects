@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend — pytest (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    defaults:
+      run:
+        working-directory: backendd
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install test dependencies
+        # The unit suite deliberately avoids torch, chromadb and the LlamaIndex
+        # stack: every test here runs without a model, a GPU or a network.
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov httpx \
+                      fastapi "uvicorn[standard]" python-multipart pydantic \
+                      python-docx reportlab python-dotenv pdfplumber
+
+      - name: Run tests with coverage
+        run: pytest --cov=core --cov-report=term-missing --cov-report=xml
+
+      - name: Upload coverage artefact
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backendd/coverage.xml
+          if-no-files-found: ignore
+
+  frontend:
+    name: Frontend — lint and build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontendd
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontendd/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Production build
+        run: npm run build
+
+      - name: Upload build artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontendd/dist
+          if-no-files-found: error

@@ -1,0 +1,9 @@
+Direct revenue loss: A mid-size law firm handling 8–12 transactions/month, each worth PKR 500K–1.5M in fees, that loses even 2 mandates/month to faster competitors loses PKR 1M–3M/month in revenue — PKR 12M–36M annually. This is the primary commercial risk.
+
+Wasted senior time: The brief itself states PKR 250K/week in senior associate time spent on first-pass review — that's PKR 13M/year per firm in high-cost labor doing a task automatable at PKR 2,000–5,000/month in API costs.
+
+Error liability: A missed clause (an undisclosed encumbrance, a defective title chain, a missing NOC) in a PKR 50M property transaction exposes the firm to professional liability claims that dwarf any technology investment. Human reviewers working under time pressure miss an estimated 10–15% of material clauses per the ABA Legal Technology Survey (2024).
+
+Competitive displacement: The legal market in Lahore, Karachi, and Islamabad is shifting. Larger firms with greater associate bandwidth are absorbing mandates from mid-size firms that cannot match 48-hour turnaround. Firms that don't modernize in the next 2–3 years risk permanent market share loss as AI-assisted firms become the default choice for institutional clients (banks, developers, PE funds).
+
+Client attrition cost: Acquiring a new corporate client costs 5–7× more than retaining one. A firm losing 3 clients/year to competitors due to slow turnaround, each worth PKR 2M in annual fees, is losing PKR 6M/year in client lifetime value — not just in missed fees, but in referrals and repeat mandates that compound over time.

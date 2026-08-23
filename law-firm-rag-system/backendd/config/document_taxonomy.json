@@ -1,0 +1,33 @@
+{
+  "required_documents": {
+    "property": [
+      "Fard-e-Malkiat",
+      "Intiqal",
+      "Registry",
+      "Aks Shajra",
+      "Jamabandi",
+      "NOC",
+      "CNIC"
+    ],
+    "loan": [
+      "Loan Agreement",
+      "Mortgage Deed",
+      "Title Documents",
+      "Valuation Report",
+      "Insurance Policy"
+    ],
+    "acquisition": [
+      "Share Purchase Agreement",
+      "Memorandum of Association",
+      "Articles of Association",
+      "SECP Certificate",
+      "Due Diligence Report"
+    ]
+  },
+  "urdu_document_names": {
+    "Fard-e-Malkiat": "فرد مالکیت",
+    "Intiqal": "انتقال",
+    "Registry": "رجسٹری",
+    "Jamabandi": "جمع بندی"
+  }
+}

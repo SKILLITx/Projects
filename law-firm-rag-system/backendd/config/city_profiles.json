@@ -1,0 +1,30 @@
+{
+  "islamabad": {
+    "authority": "CDA",
+    "full_name": "Capital Development Authority",
+    "noc_types": ["CDA Building NOC", "CDA Land Use NOC", "CDA Height NOC"],
+    "relevant_bylaws": "CDA Bye-Laws 2020",
+    "statutes": ["Capital Development Authority Ordinance 1960"]
+  },
+  "rawalpindi": {
+    "authority": "RDA",
+    "full_name": "Rawalpindi Development Authority",
+    "noc_types": ["RDA Building NOC", "TMA NOC"],
+    "relevant_bylaws": "RDA Bye-Laws",
+    "statutes": ["Punjab Local Government Act 2019"]
+  },
+  "lahore": {
+    "authority": "LDA",
+    "full_name": "Lahore Development Authority",
+    "noc_types": ["LDA NOC", "WASA NOC", "Environment NOC"],
+    "relevant_bylaws": "LDA Bye-Laws 2022",
+    "statutes": ["Punjab Development of Cities Act 1976"]
+  },
+  "karachi": {
+    "authority": "SBCA",
+    "full_name": "Sindh Building Control Authority",
+    "noc_types": ["SBCA NOC", "KMC NOC", "KBCA NOC"],
+    "relevant_bylaws": "SBCA Building Regulations",
+    "statutes": ["Sindh Building Control Ordinance 1979"]
+  }
+}

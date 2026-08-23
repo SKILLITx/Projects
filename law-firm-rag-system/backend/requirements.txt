@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+pydantic-settings
+pdfplumber
+pdf2image
+pytesseract
+pikepdf
+llama-index-core
+llama-index-embeddings-huggingface
+llama-index-vector-stores-chroma
+sentence-transformers
+chromadb

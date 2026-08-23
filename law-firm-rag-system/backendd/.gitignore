@@ -1,0 +1,16 @@
+venv/
+.venv/
+chroma_db/
+uploads/
+outputs/
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.log
+sessions.db
+sessions.db-wal
+sessions.db-shm
+.pytest_cache/
+.coverage
+htmlcov/

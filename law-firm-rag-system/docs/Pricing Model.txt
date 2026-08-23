@@ -1,0 +1,9 @@
+Three tiers priced in PKR, designed for the Pakistan mid-market:
+
+Tier		Price/month	Quota		Includes
+
+Starter		PKR 15,000	25 reviews	Property checklist only, standard template
+Professional	PKR 35,000	100 reviews	All 3 transaction types, custom checklist
+Enterprise	PKR 70,000	Unlimited	White-label letterhead, API access, SLA
+
+ROI story for a Professional subscriber: at 50 reviews/month, the PKR 35,000 subscription replaces roughly PKR 500,000/month in senior associate time — a 14× return in the first month.

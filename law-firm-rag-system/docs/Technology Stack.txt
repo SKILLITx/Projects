@@ -1,0 +1,14 @@
+LlamaIndex over LangChain:
+LlamaIndex achieved a 35% boost in retrieval accuracy in 2025, making it a top choice for document-heavy applications, which is exactly our use case. LlamaIndex is a good choice for text-heavy projects such as implementing a knowledge management system within an enterprise in which document hierarchy is paramount. LangChain is better suited to multi-step agentic workflows with tools and memory — we don't need that complexity on a 5-day sprint. LlamaIndex generally has a gentler learning curve; its high-level API and focus on data connection and querying make it easier to get started, especially for developers new to LLMs. For a time-constrained build, faster time-to-working-pipeline wins. Latenode + 2
+
+Claude Sonnet 4.6 as production LLM:
+Claude Sonnet 4.6 costs $3.00 input / $15.00 output per million tokens. It has a 1M-token context window at standard pricing — meaning even a very large document bundle can be passed in a single context without cost penalties. Claude's instruction-following is industry-leading for structured output tasks, which our JSON-format memo generation absolutely depends on. CloudZero
+
+Groq Llama 3.3 70B for development/testing:
+Groq offers a genuinely free, no-credit-card developer tier with access to every model on its ultra-fast LPU hardware, gated only by rate limits — there is no credits system and no per-token charge. Llama-3.3-70b-versatile is listed at 30 RPM, 1K RPD, 12K TPM, and 100K TPD on the Free Plan. The API is OpenAI-compatible, meaning our code needs zero changes when switching between Groq and Claude — just swap the base URL and API key. Price Per TokenTokenMix
+
+HuggingFace all-MiniLM-L6-v2 for embeddings: Free, open-source, runs locally. No API calls, no rate limits, no cost. 384-dimensional vectors are more than sufficient for legal clause retrieval at this scale. Fast enough to embed a 50-page document in under 10 seconds on CPU.
+
+ChromaDB for vector storage: Free, open-source, zero-config local deployment. Persistent storage means the index survives between requests. No Docker required for the development build. Can be swapped for Pinecone or Weaviate in a production upgrade without touching the LlamaIndex query layer.
+
+FastAPI over Flask: Async support handles concurrent uploads without blocking. Auto-generated OpenAPI docs make integration with the React frontend straightforward. Type hints via Pydantic give us request validation for free.

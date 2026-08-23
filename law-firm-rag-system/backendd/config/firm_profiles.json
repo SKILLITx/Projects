@@ -1,0 +1,29 @@
+{
+  "josh_mak": {
+    "name": "Josh and Mak International",
+    "address": "No. 01, LG Floor, Josh and Mak International, Park Avenue, Hamza Rd, F-11/1, Islamabad, 44000",
+    "phone": "+92-304-8734889",
+    "email": "aemen@joshandmak.com",
+    "website": "www.joshandmakinternational.com",
+    "city": "islamabad",
+    "tagline": "Advocates & Legal Consultants — Legal 500 Ranked"
+  },
+  "mumtaz_brohi": {
+    "name": "Mumtaz & Brohi",
+    "address": "House No. 134, Street No. 60, Sector I-8/3, Islamabad",
+    "phone": "+92-51-4800851",
+    "email": "info@mumtazandbrohi.com",
+    "website": "www.mumtazandbrohi.com",
+    "city": "islamabad",
+    "tagline": "Barristers & Corporate Counsel — Legal 500 Ranked"
+  },
+  "custom": {
+    "name": "",
+    "address": "",
+    "phone": "",
+    "email": "",
+    "website": "",
+    "city": "islamabad",
+    "tagline": ""
+  }
+}
